@@ -1299,7 +1299,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--saju) 5%, transparent)",
+                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--saju) 12%, transparent)",
                     }}
                   >
                     <CivilizationHeader
@@ -1412,7 +1412,7 @@ function AnalyzePageInner() {
                       {/* 오행 요약 */}
                       <div
                         className="flex justify-center gap-3 py-2 text-[11px]"
-                        style={{ background: "color-mix(in srgb, var(--saju) 5%, transparent)", borderTop: "1px solid var(--border)" }}
+                        style={{ background: "color-mix(in srgb, var(--saju) 12%, transparent)", borderTop: "1px solid var(--border)" }}
                       >
                         <span style={{ color: OHANG_INFO[result.saju.year.ohang].color }}>
                           {result.saju.year.ohang} {OHANG_INFO[result.saju.year.ohang].kr}
@@ -1644,7 +1644,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--astro) 5%, transparent)",
+                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--astro) 12%, transparent)",
                     }}
                   >
                     <CivilizationHeader
@@ -1852,7 +1852,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--numero) 5%, transparent)",
+                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--numero) 12%, transparent)",
                     }}
                   >
                     <CivilizationHeader
@@ -2113,7 +2113,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--mbti) 5%, transparent)",
+                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--mbti) 12%, transparent)",
                     }}
                   >
                     <CivilizationHeader

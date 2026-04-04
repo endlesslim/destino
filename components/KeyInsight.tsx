@@ -23,7 +23,7 @@ export default function KeyInsight({
       className="py-[14px] px-[18px] rounded-lg"
       style={{
         borderLeft: `3px solid ${accentColor}`,
-        background: `color-mix(in srgb, ${accentColor} 5%, transparent)`,
+        background: `color-mix(in srgb, ${accentColor} 12%, transparent)`,
       }}
     >
       <p

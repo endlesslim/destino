@@ -13,7 +13,7 @@ const systems = [
     origin: "중국 한나라 (~2,000년 전)",
     years: "3,000년",
     color: "var(--saju)",
-    bgColor: "color-mix(in srgb, var(--saju) 8%, transparent)",
+    bgColor: "color-mix(in srgb, var(--saju) 15%, transparent)",
     icon: "四",
     principle: "생년월일시의 천간·지지 8글자로 음양오행의 균형을 분석합니다.",
     history:
@@ -27,7 +27,7 @@ const systems = [
     origin: "바빌로니아 (~4,000년 전)",
     years: "4,000년",
     color: "var(--astro)",
-    bgColor: "color-mix(in srgb, var(--astro) 8%, transparent)",
+    bgColor: "color-mix(in srgb, var(--astro) 15%, transparent)",
     icon: "☉",
     principle: "출생 시각의 행성 배치와 황도 12궁의 관계를 분석합니다.",
     history:
@@ -41,7 +41,7 @@ const systems = [
     origin: "피타고라스 (~2,500년 전)",
     years: "2,500년",
     color: "var(--numero)",
-    bgColor: "color-mix(in srgb, var(--numero) 8%, transparent)",
+    bgColor: "color-mix(in srgb, var(--numero) 15%, transparent)",
     icon: "Σ",
     principle: "생년월일과 이름의 숫자 진동(vibration)으로 인생 경로를 분석합니다.",
     history:
@@ -55,7 +55,7 @@ const systems = [
     origin: "칼 융 심리 유형론 (1921년~)",
     years: "100년+",
     color: "var(--mbti)",
-    bgColor: "color-mix(in srgb, var(--mbti) 8%, transparent)",
+    bgColor: "color-mix(in srgb, var(--mbti) 15%, transparent)",
     icon: "Ψ",
     principle: "인지 기능 4축(에너지·인식·판단·생활양식)으로 성격 유형을 분류합니다.",
     history:
@@ -69,7 +69,7 @@ const systems = [
     origin: "동양 오관 이론 (~1,500년 전)",
     years: "1,500년",
     color: "var(--face)",
-    bgColor: "color-mix(in srgb, var(--face) 8%, transparent)",
+    bgColor: "color-mix(in srgb, var(--face) 15%, transparent)",
     icon: "面",
     principle: "얼굴의 오관(五官)에서 오행의 기운을 읽습니다.",
     history:
@@ -84,7 +84,7 @@ const systems = [
     origin: "15세기 이탈리아~",
     years: "600년",
     color: "var(--tarot)",
-    bgColor: "color-mix(in srgb, var(--tarot) 8%, transparent)",
+    bgColor: "color-mix(in srgb, var(--tarot) 15%, transparent)",
     icon: "⚶",
     principle: "메이저 아르카나 22장이 그리는 인생 여정의 원형(archetype)을 분석합니다.",
     history:
