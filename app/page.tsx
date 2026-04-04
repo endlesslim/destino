@@ -5,6 +5,169 @@ import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
 import ScrollReveal from "@/components/ScrollReveal";
 
+/* ━━━ Celestial Icons ━━━ */
+
+/** 4-pointed star — ✦ celestial cross-analysis */
+function StarIcon({ color, size = 16 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M8 1 L9.5 6.5 L15 8 L9.5 9.5 L8 15 L6.5 9.5 L1 8 L6.5 6.5 Z" stroke={color} strokeWidth="1.2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Twin crescents — ☽☾ compatibility / union */
+function TwinMoonsIcon({ color, size = 16 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M6.5 3 A4.5 4.5 0 0 1 6.5 13 A3.2 3.2 0 0 0 6.5 3" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9.5 3 A4.5 4.5 0 0 0 9.5 13 A3.2 3.2 0 0 1 9.5 3" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Sun symbol — ☉ daily fortune */
+function SunIcon({ color, size = 16 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="8" cy="8" r="3" stroke={color} strokeWidth="1.2" />
+      <circle cx="8" cy="8" r="0.8" stroke={color} strokeWidth="0.8" />
+      <line x1="8" y1="1.5" x2="8" y2="3.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="8" y1="12.5" x2="8" y2="14.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="1.5" y1="8" x2="3.5" y2="8" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="12.5" y1="8" x2="14.5" y2="8" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="3.4" y1="3.4" x2="4.8" y2="4.8" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="11.2" y1="11.2" x2="12.6" y2="12.6" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="12.6" y1="3.4" x2="11.2" y2="4.8" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="4.8" y1="11.2" x2="3.4" y2="12.6" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Pentagram — 5-pointed star in circle (tarot) */
+function PentagramIcon({ color, size = 16 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="8" cy="8" r="6.5" stroke={color} strokeWidth="1.2" />
+      <path d="M8 1.5 L9.9 6.2 L14.5 6.2 L10.8 9.2 L12.2 14 L8 11.2 L3.8 14 L5.2 9.2 L1.5 6.2 L6.1 6.2 Z" stroke={color} strokeWidth="1" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** All-seeing eye — simplified (face reading) */
+function EyeIcon({ color, size = 16 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M1 8 C3 4 6 2.5 8 2.5 C10 2.5 13 4 15 8 C13 12 10 13.5 8 13.5 C6 13.5 3 12 1 8 Z" stroke={color} strokeWidth="1.2" strokeLinejoin="round" />
+      <circle cx="8" cy="8" r="2.5" stroke={color} strokeWidth="1.2" />
+      <circle cx="8" cy="8" r="0.8" stroke={color} strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/** Yin-yang simplified — saju (14px system icon) */
+function YinYangIcon({ color, size = 14 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="6" stroke={color} strokeWidth="1.2" />
+      <path d="M7 1 A3 3 0 0 1 7 7 A3 3 0 0 0 7 13" stroke={color} strokeWidth="1.2" />
+      <circle cx="7" cy="4" r="0.9" stroke={color} strokeWidth="0.8" />
+      <circle cx="7" cy="10" r="0.9" stroke={color} strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/** Zodiac wheel — circle with 4 divisions (western astrology) */
+function ZodiacWheelIcon({ color, size = 14 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="6" stroke={color} strokeWidth="1.2" />
+      <circle cx="7" cy="7" r="3" stroke={color} strokeWidth="0.8" />
+      <line x1="7" y1="1" x2="7" y2="13" stroke={color} strokeWidth="0.8" />
+      <line x1="1" y1="7" x2="13" y2="7" stroke={color} strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/** Spiral / fibonacci — numerology */
+function SpiralIcon({ color, size = 14 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M7 7 A1.2 1.2 0 0 1 8.2 5.8 A2.4 2.4 0 0 1 9.4 8.2 A3.6 3.6 0 0 1 4.6 9.4 A4.8 4.8 0 0 1 3.4 3.4 A6 6 0 0 1 12 5" stroke={color} strokeWidth="1.2" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
+
+/** Brain / mind — circle with waves inside (MBTI) */
+function BrainIcon({ color, size = 14 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="6" stroke={color} strokeWidth="1.2" />
+      <path d="M4 5.5 C5 4.5 6 6 7 5 C8 4 9 5.5 10 5" stroke={color} strokeWidth="1" strokeLinecap="round" fill="none" />
+      <path d="M4 8 C5 7 6 8.5 7 7.5 C8 6.5 9 8 10 7.5" stroke={color} strokeWidth="1" strokeLinecap="round" fill="none" />
+      <path d="M5 10.5 C6 9.5 7 10.5 8 10 C8.5 9.5 9 10 9.5 10" stroke={color} strokeWidth="1" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
+
+/** Eye with iris — face reading (14px system icon) */
+function EyeSmallIcon({ color, size = 14 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M1 7 C3 3.5 5 2.5 7 2.5 C9 2.5 11 3.5 13 7 C11 10.5 9 11.5 7 11.5 C5 11.5 3 10.5 1 7 Z" stroke={color} strokeWidth="1.2" strokeLinejoin="round" />
+      <circle cx="7" cy="7" r="2" stroke={color} strokeWidth="1" />
+      <circle cx="7" cy="7" r="0.7" stroke={color} strokeWidth="0.7" />
+    </svg>
+  );
+}
+
+/** Card with star — tarot (14px system icon) */
+function CardStarIcon({ color, size = 14 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <rect x="2.5" y="1" width="9" height="12" rx="1" stroke={color} strokeWidth="1.2" />
+      <path d="M7 3.5 L7.8 5.8 L10 6 L8.3 7.5 L8.8 9.8 L7 8.5 L5.2 9.8 L5.7 7.5 L4 6 L6.2 5.8 Z" stroke={color} strokeWidth="0.8" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* Feature card icon lookup */
+function FeatureIcon({ type, color }: { type: string; color: string }) {
+  switch (type) {
+    case "cross": return <StarIcon color={color} />;
+    case "archetype": return <StarIcon color={color} />;
+    case "ohaeng": return <YinYangIcon color={color} size={16} />;
+    case "career": return <SpiralIcon color={color} size={16} />;
+    case "love": return <BrainIcon color={color} size={16} />;
+    case "advice": return <CardStarIcon color={color} size={16} />;
+    default: return <StarIcon color={color} />;
+  }
+}
+
+/* Service card icon lookup */
+function ServiceIcon({ type, color }: { type: string; color: string }) {
+  switch (type) {
+    case "compatibility": return <TwinMoonsIcon color={color} />;
+    case "daily": return <SunIcon color={color} />;
+    case "tarot": return <PentagramIcon color={color} />;
+    case "face": return <EyeIcon color={color} />;
+    default: return <StarIcon color={color} />;
+  }
+}
+
+/* System grid icon lookup */
+function SystemIcon({ type, color }: { type: string; color: string }) {
+  switch (type) {
+    case "saju": return <YinYangIcon color={color} />;
+    case "astro": return <ZodiacWheelIcon color={color} />;
+    case "numero": return <SpiralIcon color={color} />;
+    case "mbti": return <BrainIcon color={color} />;
+    case "face": return <EyeSmallIcon color={color} />;
+    case "tarot": return <CardStarIcon color={color} />;
+    default: return <StarIcon color={color} size={14} />;
+  }
+}
+
 /* ━━━ Data ━━━ */
 
 const howItWorksSteps = [
@@ -35,31 +198,37 @@ const reportCards = [
     color: "var(--seal)",
     title: "교차점 수렴률",
     description: "당신의 동서양 일치도",
+    icon: "cross",
   },
   {
     color: "var(--astro)",
     title: "아키타입",
     description: "3개 문명이 본 당신의 본질",
+    icon: "archetype",
   },
   {
     color: "var(--saju)",
     title: "오행 밸런스",
     description: "木火土金水 에너지 분포",
+    icon: "ohaeng",
   },
   {
     color: "var(--numero)",
     title: "직업/진로",
     description: "운명이 가리키는 방향",
+    icon: "career",
   },
   {
     color: "var(--mbti)",
     title: "연애/관계",
     description: "사랑에 대한 교차 분석",
+    icon: "love",
   },
   {
     color: "var(--tarot)",
     title: "인생 조언",
     description: "4개 체계가 전하는 메시지",
+    icon: "advice",
   },
 ];
 
@@ -69,24 +238,28 @@ const services = [
     description: "두 사람의 교차점 비교",
     href: "/compatibility",
     color: "var(--astro)",
+    icon: "compatibility",
   },
   {
     title: "오늘의 운세",
     description: "매일 달라지는 오행의 기운",
     href: "/daily",
     color: "var(--saju)",
+    icon: "daily",
   },
   {
     title: "타로 리딩",
     description: "탄생 카드와 올해의 카드",
     href: "/tarot",
     color: "var(--tarot)",
+    icon: "tarot",
   },
   {
     title: "관상 분석",
     description: "얼굴에서 읽는 오행",
     href: "/face",
     color: "var(--face)",
+    icon: "face",
   },
 ];
 
@@ -107,12 +280,12 @@ const whyCards = [
 ];
 
 const systems = [
-  { label: "사주", sub: "천간·지지·오행", color: "var(--saju)" },
-  { label: "서양 점성술", sub: "태양궁·상승궁·달궁", color: "var(--astro)" },
-  { label: "수비학", sub: "생명경로수·표현수", color: "var(--numero)" },
-  { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)" },
-  { label: "관상", sub: "오관·오행 체형", color: "var(--face)" },
-  { label: "타로", sub: "메이저 아르카나", color: "var(--tarot)" },
+  { label: "사주", sub: "천간·지지·오행", color: "var(--saju)", icon: "saju" },
+  { label: "서양 점성술", sub: "태양궁·상승궁·달궁", color: "var(--astro)", icon: "astro" },
+  { label: "수비학", sub: "생명경로수·표현수", color: "var(--numero)", icon: "numero" },
+  { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)", icon: "mbti" },
+  { label: "관상", sub: "오관·오행 체형", color: "var(--face)", icon: "face" },
+  { label: "타로", sub: "메이저 아르카나", color: "var(--tarot)", icon: "tarot" },
 ];
 
 /* ━━━ Page ━━━ */
@@ -399,7 +572,7 @@ export default function Home() {
           </ScrollReveal>
 
           <div className="grid grid-cols-2 gap-3">
-            {reportCards.map(({ color, title, description }, i) => (
+            {reportCards.map(({ color, title, description, icon }, i) => (
               <ScrollReveal key={title} delay={i * 60}>
                 <div
                   className="rounded-lg p-4 h-full"
@@ -408,11 +581,8 @@ export default function Home() {
                     border: "1px solid var(--border)",
                   }}
                 >
-                  <div
-                    className="text-[10px] mb-2"
-                    style={{ color }}
-                  >
-                    ●
+                  <div className="mb-2">
+                    <FeatureIcon type={icon} color={color} />
                   </div>
                   <p
                     className="text-[15px] font-bold leading-[1.4] mb-1"
@@ -458,7 +628,7 @@ export default function Home() {
           </ScrollReveal>
 
           <div className="grid grid-cols-2 gap-3">
-            {services.map(({ title, description, href, color }, i) => (
+            {services.map(({ title, description, href, color, icon }, i) => (
               <ScrollReveal key={title} delay={i * 60}>
                 <Link
                   href={href}
@@ -468,8 +638,8 @@ export default function Home() {
                     border: "1px solid var(--border)",
                   }}
                 >
-                  <span className="text-[10px]" style={{ color }}>
-                    ●
+                  <span>
+                    <ServiceIcon type={icon} color={color} />
                   </span>
                   <span
                     className="text-[15px] font-bold"
@@ -568,7 +738,7 @@ export default function Home() {
           </ScrollReveal>
 
           <div className="grid grid-cols-2 gap-3">
-            {systems.map(({ label, sub, color }, i) => (
+            {systems.map(({ label, sub, color, icon }, i) => (
               <ScrollReveal key={label} delay={i * 50}>
                 <div
                   className="rounded-lg p-4 hover-lift"
@@ -577,11 +747,8 @@ export default function Home() {
                     border: "1px solid var(--border)",
                   }}
                 >
-                  <div
-                    className="text-[10px] tracking-[0.08em] font-medium mb-1"
-                    style={{ color }}
-                  >
-                    ●
+                  <div className="mb-1">
+                    <SystemIcon type={icon} color={color} />
                   </div>
                   <div
                     className="text-sm font-bold"

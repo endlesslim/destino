@@ -569,21 +569,104 @@ function AnalyzePageInner() {
     });
   }, [year, month, day]);
 
-  const shareToTwitter = () => {
-    const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
-    const url = `${window.location.origin}/analyze`;
-    window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-      "_blank"
-    );
-  };
-
   const shareToThreads = () => {
     const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}% ${window.location.origin}/analyze`;
     window.open(
       `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`,
       "_blank"
     );
+  };
+
+  const shareToKakao = async () => {
+    const title = "DESTINO 운명 분석";
+    const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
+    const url = `${window.location.origin}/analyze?y=${year}&m=${month}&d=${day}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      navigator.clipboard.writeText(`${title}\n${text}\n${url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const [instaSaved, setInstaSaved] = useState(false);
+
+  const downloadResultCard = () => {
+    if (!result) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const ctx = canvas.getContext("2d")!;
+
+    // Background
+    ctx.fillStyle = "#F5F0E8";
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    // Top decoration line
+    ctx.fillStyle = "#C53D43";
+    ctx.fillRect(440, 120, 200, 3);
+
+    // Brand
+    ctx.fillStyle = "#1C1917";
+    ctx.font = "bold 48px serif";
+    ctx.textAlign = "center";
+    ctx.fillText("DESTINO", 540, 200);
+
+    // Subtitle
+    ctx.fillStyle = "#8B7E74";
+    ctx.font = "24px sans-serif";
+    ctx.fillText("동서양 운명 교차 분석", 540, 260);
+
+    // Convergence rate
+    ctx.fillStyle = "#1C1917";
+    ctx.font = "bold 160px serif";
+    ctx.fillText(`${result.convergence_rate}%`, 540, 680);
+
+    // Rate label
+    ctx.fillStyle = "#8B7E74";
+    ctx.font = "28px sans-serif";
+    ctx.fillText("수렴률", 540, 740);
+
+    // Archetype
+    ctx.fillStyle = "#C53D43";
+    ctx.font = "bold 56px serif";
+    ctx.fillText(result.archetype, 540, 880);
+
+    // East element
+    ctx.fillStyle = "#6B5E53";
+    ctx.font = "32px sans-serif";
+    ctx.fillText(
+      `${result.saju.day.ohang} · ${result.western.sunSign.name}`,
+      540,
+      1000
+    );
+
+    // Divider
+    ctx.fillStyle = "#D4C9BC";
+    ctx.fillRect(390, 1080, 300, 1);
+
+    // Brand footer
+    ctx.fillStyle = "#8B7E74";
+    ctx.font = "26px sans-serif";
+    ctx.fillText("destino.kr", 540, 1700);
+
+    // Bottom decoration line
+    ctx.fillStyle = "#C53D43";
+    ctx.fillRect(440, 1750, 200, 3);
+
+    // Download
+    const link = document.createElement("a");
+    link.download = "destino-result.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+
+    setInstaSaved(true);
+    setTimeout(() => setInstaSaved(false), 3000);
   };
 
   const inputClass =
@@ -2313,24 +2396,29 @@ function AnalyzePageInner() {
                       Threads
                     </button>
                     <button
-                      onClick={shareToTwitter}
+                      onClick={shareToKakao}
                       className="flex-1 py-3 text-sm font-semibold rounded-lg border-none cursor-pointer transition-opacity hover:opacity-80"
-                      style={{ background: "var(--bg-paper)", color: "var(--ink-medium)", fontFamily: "inherit" }}
+                      style={{ background: "#FEE500", color: "#191919", fontFamily: "inherit" }}
                     >
-                      X (Twitter)
+                      카카오톡 공유
                     </button>
                   </div>
                   <button
-                    onClick={() => window.print()}
-                    className="no-print w-full py-3 text-sm font-semibold rounded-lg cursor-pointer transition-opacity hover:opacity-80"
+                    onClick={downloadResultCard}
+                    className="no-print w-full py-3 text-sm font-semibold rounded-lg cursor-pointer transition-opacity hover:opacity-80 flex items-center justify-center gap-1.5"
                     style={{
-                      background: "transparent",
-                      color: "var(--ink-muted)",
-                      border: "1.5px solid var(--border)",
+                      background: instaSaved ? "var(--saju)" : "transparent",
+                      color: instaSaved ? "#fff" : "var(--ink-muted)",
+                      border: instaSaved ? "1.5px solid transparent" : "1.5px solid var(--border)",
                       fontFamily: "inherit",
                     }}
                   >
-                    PDF로 저장
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                      <circle cx="12" cy="12" r="5" />
+                      <circle cx="17.5" cy="6.5" r="1.5" />
+                    </svg>
+                    {instaSaved ? "이미지가 저장되었습니다. 인스타 스토리에 업로드하세요" : "인스타 스토리용 저장"}
                   </button>
                 </div>
               </div>
