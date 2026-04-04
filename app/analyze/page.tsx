@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
-import PaymentGate from "@/components/PaymentGate";
+
 import { analyzeCrosspoint, type CrosspointResult } from "@/lib/cross-engine";
 import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
 
@@ -698,7 +698,7 @@ export default function AnalyzePage() {
             {/* ═══════════════════════════════════════════
                 SECTION B: PREMIUM REPORT (PaymentGate)
                ═══════════════════════════════════════════ */}
-            <PaymentGate result={JSON.stringify(result)}>
+            {/* SECTION B: FULL REPORT */}
               <div className="flex flex-col gap-0">
 
                 {/* B1: 아키타입 상세 */}
@@ -1120,7 +1120,6 @@ export default function AnalyzePage() {
                 </StaggerSection>
 
               </div>
-            </PaymentGate>
 
             {/* ═══════════════════════════════════════════
                 SECTION C: BOTTOM (always visible)
