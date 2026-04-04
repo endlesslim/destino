@@ -81,28 +81,38 @@ function TabIcon({ type, active }: { type: string; active: boolean }) {
   const s = 16;
   const icons: Record<string, React.ReactNode> = {
     saju: (
+      // 음양 (yin-yang)
       <svg width={s} height={s} viewBox="0 0 16 16" fill="none">
-        <rect x="2" y="2" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" />
-        <rect x="9" y="2" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" />
-        <rect x="2" y="9" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" />
-        <rect x="9" y="9" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" />
+        <circle cx="8" cy="8" r="6.5" stroke={color} strokeWidth="1.2" />
+        <path d="M8 1.5A6.5 6.5 0 0 1 8 14.5A3.25 3.25 0 0 1 8 8A3.25 3.25 0 0 0 8 1.5Z" fill={color} opacity="0.15" />
+        <circle cx="8" cy="4.75" r="1" fill={color} />
+        <circle cx="8" cy="11.25" r="1" stroke={color} strokeWidth="0.8" />
       </svg>
     ),
     star: (
+      // 조디악 휠
       <svg width={s} height={s} viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="5.5" stroke={color} strokeWidth="1.5" />
-        <circle cx="8" cy="8" r="1.5" fill={color} />
+        <circle cx="8" cy="8" r="6.5" stroke={color} strokeWidth="1.2" />
+        <circle cx="8" cy="8" r="2" stroke={color} strokeWidth="1" />
+        <line x1="8" y1="1.5" x2="8" y2="6" stroke={color} strokeWidth="0.8" />
+        <line x1="8" y1="10" x2="8" y2="14.5" stroke={color} strokeWidth="0.8" />
+        <line x1="1.5" y1="8" x2="6" y2="8" stroke={color} strokeWidth="0.8" />
+        <line x1="10" y1="8" x2="14.5" y2="8" stroke={color} strokeWidth="0.8" />
       </svg>
     ),
     num: (
+      // 나선 (spiral)
       <svg width={s} height={s} viewBox="0 0 16 16" fill="none">
-        <path d="M5 3v10M11 3v10M2 6h12M2 10h12" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M8 8.5a1 1 0 0 1 1-1 2 2 0 0 1 2 2 3 3 0 0 1-3 3 4 4 0 0 1-4-4 5 5 0 0 1 5-5 6 6 0 0 1 6 6" stroke={color} strokeWidth="1.2" strokeLinecap="round" fill="none" />
       </svg>
     ),
     person: (
+      // 뇌/파동 (brain waves)
       <svg width={s} height={s} viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="5" r="3" stroke={color} strokeWidth="1.5" />
-        <path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="8" cy="8" r="6" stroke={color} strokeWidth="1.2" />
+        <path d="M4 8c1-2 2 2 4 0s3 2 4 0" stroke={color} strokeWidth="1" strokeLinecap="round" fill="none" />
+        <path d="M5 5.5c0.8-1 1.5 1 3 0s2 1 3 0" stroke={color} strokeWidth="0.8" strokeLinecap="round" fill="none" opacity="0.5" />
+        <path d="M5 10.5c0.8-1 1.5 1 3 0s2 1 3 0" stroke={color} strokeWidth="0.8" strokeLinecap="round" fill="none" opacity="0.5" />
       </svg>
     ),
   };
@@ -439,7 +449,7 @@ function AnalyzePageInner() {
             const r = analyzeCrosspoint(yi, mi, di, n || undefined, hi !== undefined && hi >= 0 && hi <= 23 ? hi : undefined);
             setResult(r);
             setLoading(false);
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            window.scrollTo(0, 0);
             playStampSound();
             try {
               saveAnalysis({
@@ -504,7 +514,7 @@ function AnalyzePageInner() {
       const r = analyzeCrosspoint(y, m, d, name || undefined, h !== undefined && h >= 0 && h <= 23 ? h : undefined);
       setResult(r);
       setLoading(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo(0, 0);
       playStampSound();
       // Save to history
       try {
