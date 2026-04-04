@@ -13,9 +13,11 @@ import StatCard from "@/components/StatCard";
 
 import { analyzeCrosspoint, type CrosspointResult } from "@/lib/cross-engine";
 import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
+import { generateMonthlyForecast, type MonthlyForecast } from "@/lib/monthly-forecast";
 import { playStampSound } from "@/lib/sound";
 import { saveAnalysis } from "@/lib/history";
 import FeedbackWidget from "@/components/FeedbackWidget";
+import ChatConsultation from "@/components/ChatConsultation";
 import Dot from "@/components/ui/Dot";
 import StaggerSection from "@/components/ui/StaggerSection";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -902,7 +904,7 @@ function AnalyzePageInner() {
               style={{
                 background: valid ? "var(--seal)" : "var(--ink-ghost)",
                 color: valid ? "#fff" : "var(--ink-faint)",
-                boxShadow: valid ? "0 4px 16px rgba(197,61,67,0.25)" : "none",
+                boxShadow: valid ? "0 4px 16px var(--shadow-btn)" : "none",
                 animationDelay: "0.1s",
               }}
             >
@@ -1161,7 +1163,7 @@ function AnalyzePageInner() {
                       return (
                         <div
                           className="relative overflow-hidden rounded-lg p-4"
-                          style={{ background: "var(--seal-bg)", border: "1px solid rgba(197,61,67,0.12)" }}
+                          style={{ background: "var(--seal-bg)", border: "1px solid color-mix(in srgb, var(--seal) 15%, transparent)" }}
                         >
                           {/* Seal watermark */}
                           <div
@@ -1297,7 +1299,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px rgba(45,90,39,0.03)",
+                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--saju) 5%, transparent)",
                     }}
                   >
                     <CivilizationHeader
@@ -1316,11 +1318,11 @@ function AnalyzePageInner() {
                       {/* 만세력 헤더 */}
                       <div
                         className="flex text-center text-[10px] font-bold tracking-wider py-1.5"
-                        style={{ background: "rgba(45,90,39,0.08)", color: "var(--saju)" }}
+                        style={{ background: "color-mix(in srgb, var(--saju) 10%, transparent)", color: "var(--saju)" }}
                       >
                         <div className="flex-1">年柱</div>
-                        <div className="flex-1" style={{ borderLeft: "1px solid rgba(45,90,39,0.15)" }}>月柱</div>
-                        <div className="flex-1" style={{ borderLeft: "1px solid rgba(45,90,39,0.15)", borderRight: "1px solid rgba(45,90,39,0.15)" }}>日柱</div>
+                        <div className="flex-1" style={{ borderLeft: "1px solid color-mix(in srgb, var(--saju) 18%, transparent)" }}>月柱</div>
+                        <div className="flex-1" style={{ borderLeft: "1px solid color-mix(in srgb, var(--saju) 18%, transparent)", borderRight: "1px solid color-mix(in srgb, var(--saju) 18%, transparent)" }}>日柱</div>
                         {result.saju.hour && <div className="flex-1">時柱</div>}
                       </div>
                       {/* 천간 행 */}
@@ -1410,7 +1412,7 @@ function AnalyzePageInner() {
                       {/* 오행 요약 */}
                       <div
                         className="flex justify-center gap-3 py-2 text-[11px]"
-                        style={{ background: "rgba(45,90,39,0.04)", borderTop: "1px solid var(--border)" }}
+                        style={{ background: "color-mix(in srgb, var(--saju) 5%, transparent)", borderTop: "1px solid var(--border)" }}
                       >
                         <span style={{ color: OHANG_INFO[result.saju.year.ohang].color }}>
                           {result.saju.year.ohang} {OHANG_INFO[result.saju.year.ohang].kr}
@@ -1642,7 +1644,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px rgba(30,58,95,0.03)",
+                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--astro) 5%, transparent)",
                     }}
                   >
                     <CivilizationHeader
@@ -1850,7 +1852,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px rgba(107,58,42,0.03)",
+                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--numero) 5%, transparent)",
                     }}
                   >
                     <CivilizationHeader
@@ -2111,7 +2113,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px rgba(91,62,138,0.03)",
+                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--mbti) 5%, transparent)",
                     }}
                   >
                     <CivilizationHeader
@@ -2439,6 +2441,11 @@ function AnalyzePageInner() {
               </div>
 
             {/* ═══════════════════════════════════════════
+                SECTION B9: 월별 운세
+               ═══════════════════════════════════════════ */}
+            <MonthlyForecastSection year={parseInt(year)} month={parseInt(month)} day={parseInt(day)} />
+
+            {/* ═══════════════════════════════════════════
                 SECTION C: BOTTOM (always visible)
                ═══════════════════════════════════════════ */}
 
@@ -2451,6 +2458,22 @@ function AnalyzePageInner() {
                 convergenceRate={result.convergence_rate}
                 archetype={result.archetype}
               />
+            </ScrollReveal>
+
+            {/* AI Chat Consultation */}
+            <ScrollReveal delay={630}>
+              <div className="mb-3.5">
+                <ChatConsultation
+                  context={{
+                    archetype: result.archetype,
+                    saju: `${result.saju.day.cheongan} (${result.saju.day.ohang})`,
+                    zodiac: result.western.sunSign.name,
+                    numerology: `${result.numerology.lifePath}`,
+                    mbti: result.mbti.primaryType,
+                    convergenceRate: result.convergence_rate,
+                  }}
+                />
+              </div>
             </ScrollReveal>
 
             {/* Share */}
@@ -2547,7 +2570,7 @@ function AnalyzePageInner() {
               >
                 <div
                   className="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
-                  style={{ background: "rgba(26,74,74,0.08)" }}
+                  style={{ background: "color-mix(in srgb, var(--tarot) 10%, transparent)" }}
                 >
                   <Dot color="var(--tarot)" size={10} />
                 </div>
@@ -2565,13 +2588,67 @@ function AnalyzePageInner() {
               </Link>
             </ScrollReveal>
 
+            {/* Career Deep Analysis link */}
+            <ScrollReveal delay={860}>
+              <Link
+                href="/career"
+                className="flex items-center gap-3 p-4 rounded-xl mb-3 no-underline transition-opacity hover:opacity-85"
+                style={{ background: "var(--bg-warm)", border: "1.5px solid var(--saju)" }}
+              >
+                <div
+                  className="flex items-center justify-center w-9 h-9 rounded-[3px] shrink-0 -rotate-[3deg]"
+                  style={{ border: "2px solid var(--saju)", color: "var(--saju)", fontFamily: "var(--font-display)" }}
+                >
+                  <span className="text-sm font-black">職</span>
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>
+                    커리어 심화 분석
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
+                    TOP 5 추천 직업과 업무 성향 분석
+                  </div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                  <path d="M6 4l4 4-4 4" stroke="var(--saju)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </ScrollReveal>
+
+            {/* Love Deep Analysis link */}
+            <ScrollReveal delay={920}>
+              <Link
+                href="/love"
+                className="flex items-center gap-3 p-4 rounded-xl mb-4 no-underline transition-opacity hover:opacity-85"
+                style={{ background: "var(--bg-warm)", border: "1.5px solid var(--seal)" }}
+              >
+                <div
+                  className="flex items-center justify-center w-9 h-9 rounded-[3px] shrink-0 -rotate-[3deg]"
+                  style={{ border: "2px solid var(--seal)", color: "var(--seal)", fontFamily: "var(--font-display)" }}
+                >
+                  <span className="text-sm font-black">緣</span>
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>
+                    연애 심화 분석
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
+                    이상형, 연애 패턴, 올해 연애운
+                  </div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                  <path d="M6 4l4 4-4 4" stroke="var(--seal)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </ScrollReveal>
+
             {/* Actions */}
-            <ScrollReveal delay={880}>
+            <ScrollReveal delay={980}>
               <div className="flex flex-col gap-2.5">
                 <button
                   onClick={reset}
                   className="w-full py-4 text-[15px] font-bold rounded-xl border-none cursor-pointer transition-opacity hover:opacity-85"
-                  style={{ background: "var(--seal)", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 16px rgba(197,61,67,0.25)" }}
+                  style={{ background: "var(--seal)", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 16px var(--shadow-btn)" }}
                 >
                   다시 분석하기
                 </button>
@@ -2591,6 +2668,168 @@ function AnalyzePageInner() {
         )}
       </div>
     </main>
+  );
+}
+
+// ━━━ 월별 운세 섹션 ━━━
+function MonthlyForecastSection({ year, month, day }: { year: number; month: number; day: number }) {
+  const forecast = generateMonthlyForecast(year, month, day, 2026);
+  const [expandedMonth, setExpandedMonth] = useState<number | null>(null);
+
+  return (
+    <ScrollReveal delay={650}>
+      <div className="mb-3.5">
+        <SectionHeader color="var(--astro)" title="2026년 월별 운세" />
+
+        {/* Year Summary */}
+        <div
+          className="rounded-[14px] p-5 mb-4"
+          style={{
+            background: "var(--bg-white)",
+            border: "1.5px solid var(--border)",
+            borderLeft: "3px solid var(--seal)",
+          }}
+        >
+          <p
+            className="text-[14px] leading-[1.9] italic"
+            style={{ color: "var(--ink-muted)", fontFamily: "var(--font-display)" }}
+          >
+            &ldquo;{forecast.yearSummary}&rdquo;
+          </p>
+        </div>
+
+        {/* Best & Caution badges */}
+        <div className="flex gap-2 mb-4">
+          <div
+            className="flex-1 rounded-lg px-3 py-2.5 text-center"
+            style={{ background: "var(--seal-bg)", border: "1px solid var(--seal)" }}
+          >
+            <div className="text-[10px] font-semibold tracking-wider mb-0.5" style={{ color: "var(--seal)" }}>
+              BEST MONTH
+            </div>
+            <div className="text-lg font-black" style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}>
+              {forecast.bestMonth}월
+            </div>
+          </div>
+          <div
+            className="flex-1 rounded-lg px-3 py-2.5 text-center"
+            style={{ background: "#FFF8E1", border: "1px solid #F59E0B" }}
+          >
+            <div className="text-[10px] font-semibold tracking-wider mb-0.5" style={{ color: "#B45309" }}>
+              CAUTION
+            </div>
+            <div className="text-lg font-black" style={{ fontFamily: "var(--font-display)", color: "#B45309" }}>
+              {forecast.cautionMonth}월
+            </div>
+          </div>
+        </div>
+
+        {/* 12 month cards — 2 column grid */}
+        <div className="grid grid-cols-2 gap-2.5">
+          {forecast.months.map((m) => {
+            const isBest = m.month === forecast.bestMonth;
+            const isCaution = m.month === forecast.cautionMonth;
+            const isExpanded = expandedMonth === m.month;
+            const borderColor = isBest ? "var(--seal)" : isCaution ? "#F59E0B" : "var(--border)";
+            const bgColor = isBest ? "var(--seal-bg)" : isCaution ? "#FFFBEB" : "var(--bg-white)";
+
+            return (
+              <button
+                key={m.month}
+                onClick={() => setExpandedMonth(isExpanded ? null : m.month)}
+                className="rounded-[12px] p-3.5 text-left transition-all cursor-pointer"
+                style={{
+                  background: bgColor,
+                  border: `1.5px solid ${borderColor}`,
+                  gridColumn: isExpanded ? "1 / -1" : undefined,
+                }}
+              >
+                {/* Header row */}
+                <div className="flex items-center justify-between mb-2">
+                  <span
+                    className="text-[15px] font-black"
+                    style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                  >
+                    {m.label}
+                  </span>
+                  <span
+                    className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                    style={{
+                      background: isBest ? "var(--seal)" : isCaution ? "#F59E0B" : "var(--ink-muted)",
+                      color: "#fff",
+                    }}
+                  >
+                    {m.keyword}
+                  </span>
+                </div>
+
+                {/* Score bar */}
+                <div className="mb-2">
+                  <div
+                    className="h-[6px] rounded-full overflow-hidden"
+                    style={{ background: "var(--border)" }}
+                  >
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${m.score * 10}%`,
+                        background: isBest ? "var(--seal)" : isCaution ? "#F59E0B" : "var(--ink-muted)",
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-[10px]" style={{ color: "var(--ink-light)" }}>
+                      {m.score}/10
+                    </span>
+                    <span className="text-[10px]" style={{ color: "var(--ink-light)" }}>
+                      행운의 날: {m.luckyDay}일
+                    </span>
+                  </div>
+                </div>
+
+                {/* Category mini-bars (always visible) */}
+                <div className="flex gap-1.5 mb-1.5">
+                  {(["career", "love", "health", "wealth"] as const).map((cat) => {
+                    const labels = { career: "직업", love: "연애", health: "건강", wealth: "재물" };
+                    const colors = { career: "var(--saju)", love: "var(--seal)", health: "var(--astro)", wealth: "var(--face)" };
+                    return (
+                      <div key={cat} className="flex-1">
+                        <div className="text-[9px] font-medium mb-0.5" style={{ color: "var(--ink-light)" }}>
+                          {labels[cat]}
+                        </div>
+                        <div className="flex gap-[2px]">
+                          {[1, 2, 3, 4, 5].map((n) => (
+                            <div
+                              key={n}
+                              className="h-[3px] flex-1 rounded-full"
+                              style={{
+                                background: n <= m.category[cat] ? colors[cat] : "var(--border)",
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Expanded content */}
+                {isExpanded && (
+                  <div className="mt-3 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
+                    <p className="text-[13px] leading-[1.8] mb-2" style={{ color: "var(--ink-muted)" }}>
+                      {m.description}
+                    </p>
+                    <p className="text-[12px] leading-[1.6] font-semibold" style={{ color: "var(--ink-medium)" }}>
+                      {m.advice}
+                    </p>
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </ScrollReveal>
   );
 }
 

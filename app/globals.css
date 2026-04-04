@@ -58,6 +58,10 @@ html.night {
   --border: #4A4038;
   --border-strong: #6B5E53;
 
+  /* 그림자 */
+  --shadow-lift: rgba(0,0,0,0.25);
+  --shadow-btn: rgba(240,112,120,0.35);
+
   /* System-specific colors — 다크 배경에서 잘 보이도록 명도 UP */
   --saju: #6FCF73;
   --astro: #7CB3E0;
@@ -249,7 +253,7 @@ input::placeholder, textarea::placeholder {
 
 /* ━━━ Night mode: shimmer tweak ━━━ */
 html.night .animate-shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(232,86,92,0.08) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(240,112,120,0.10) 50%, transparent 100%);
   background-size: 200% 100%;
 }
 

@@ -17,7 +17,7 @@ export default function Button({ variant = "primary", className = "", children, 
 
   const inlineStyle =
     variant === "primary"
-      ? { background: "var(--seal)", color: "#fff", fontFamily: "var(--font-display)", boxShadow: "0 4px 16px rgba(197,61,67,0.25)" }
+      ? { background: "var(--seal)", color: "#fff", fontFamily: "var(--font-display)", boxShadow: "0 4px 16px var(--shadow-btn)" }
       : { background: "transparent", color: "var(--ink)", borderColor: "var(--border-strong)", fontFamily: "var(--font-display)" };
 
   return (

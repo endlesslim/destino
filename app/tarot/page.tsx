@@ -33,7 +33,7 @@ function CardVisual({
     <div
       style={{
         transform: `rotate(${rotation}deg)`,
-        filter: "drop-shadow(0 4px 12px rgba(28, 25, 23, 0.08)) drop-shadow(0 1px 3px rgba(28, 25, 23, 0.06))",
+        filter: "drop-shadow(0 4px 12px var(--shadow-lift)) drop-shadow(0 1px 3px var(--shadow-lift))",
         transition: "transform 0.3s ease",
       }}
     >
@@ -430,7 +430,7 @@ function ReadingDisplay({ reading }: { reading: TarotReading }) {
               background: "var(--seal)",
               color: "#fff",
               fontFamily: "var(--font-display)",
-              boxShadow: "0 4px 16px rgba(197,61,67,0.25)",
+              boxShadow: "0 4px 16px var(--shadow-btn)",
             }}
           >
             교차 분석도 해보기

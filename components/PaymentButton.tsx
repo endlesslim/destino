@@ -257,7 +257,7 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
           transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
           boxShadow: isProcessing
             ? "none"
-            : "0 4px 20px rgba(197, 61, 67, 0.3), 0 1px 3px rgba(0,0,0,0.1)",
+            : "0 4px 20px var(--shadow-btn), 0 1px 3px rgba(0,0,0,0.1)",
           transform: isProcessing ? "scale(0.98)" : "scale(1)",
           opacity: isProcessing ? 0.85 : 1,
         }}
@@ -265,14 +265,14 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
           if (!isProcessing) {
             e.currentTarget.style.transform = "scale(1.02)";
             e.currentTarget.style.boxShadow =
-              "0 6px 28px rgba(197, 61, 67, 0.4), 0 2px 6px rgba(0,0,0,0.12)";
+              "0 6px 28px var(--shadow-btn), 0 2px 6px rgba(0,0,0,0.12)";
           }
         }}
         onMouseLeave={(e) => {
           if (!isProcessing) {
             e.currentTarget.style.transform = "scale(1)";
             e.currentTarget.style.boxShadow =
-              "0 4px 20px rgba(197, 61, 67, 0.3), 0 1px 3px rgba(0,0,0,0.1)";
+              "0 4px 20px var(--shadow-btn), 0 1px 3px rgba(0,0,0,0.1)";
           }
         }}
       >

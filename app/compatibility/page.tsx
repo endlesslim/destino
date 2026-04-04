@@ -589,7 +589,7 @@ function CompatibilityPageInner() {
               style={{
                 background: valid ? "var(--seal)" : "var(--ink-ghost)",
                 color: valid ? "#fff" : "var(--ink-faint)",
-                boxShadow: valid ? "0 4px 16px rgba(197,61,67,0.25)" : "none",
+                boxShadow: valid ? "0 4px 16px var(--shadow-btn)" : "none",
                 animationDelay: "0.15s",
               }}
             >
@@ -1441,6 +1441,33 @@ function CompatibilityPageInner() {
               </div>
             </ScrollReveal>
 
+            {/* ━━━ 9.5. Marriage CTA ━━━ */}
+            <ScrollReveal delay={860}>
+              <Link
+                href={`/marriage?y1=${year1}&m1=${month1}&d1=${day1}&y2=${year2}&m2=${month2}&d2=${day2}${name1 ? `&n1=${encodeURIComponent(name1)}` : ""}${name2 ? `&n2=${encodeURIComponent(name2)}` : ""}`}
+                className="flex items-center gap-3 p-4 rounded-xl mb-3 no-underline transition-opacity hover:opacity-85"
+                style={{ background: "var(--seal-bg)", border: "2px solid var(--seal)", borderStyle: "double" }}
+              >
+                <div
+                  className="flex items-center justify-center w-9 h-9 rounded-[3px] shrink-0 -rotate-[3deg]"
+                  style={{ border: "2px solid var(--seal)", color: "var(--seal)", fontFamily: "var(--font-display)" }}
+                >
+                  <span className="text-sm font-black">合</span>
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold" style={{ color: "var(--seal)" }}>
+                    결혼 궁합도 알아보세요
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
+                    5대 차원 심화 분석 + 결혼 타임라인
+                  </div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                  <path d="M6 4l4 4-4 4" stroke="var(--seal)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </ScrollReveal>
+
             {/* ━━━ 10. Share ━━━ */}
             <ScrollReveal delay={880}>
               <div
@@ -1505,7 +1532,7 @@ function CompatibilityPageInner() {
                 <button
                   onClick={reset}
                   className="w-full py-4 text-[15px] font-bold rounded-xl border-none cursor-pointer transition-opacity hover:opacity-85"
-                  style={{ background: "var(--seal)", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 16px rgba(197,61,67,0.25)" }}
+                  style={{ background: "var(--seal)", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 16px var(--shadow-btn)" }}
                 >
                   다시 분석하기
                 </button>

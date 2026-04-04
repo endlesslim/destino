@@ -135,9 +135,35 @@ function CardStarIcon({ color, size = 14 }: { color: string; size?: number }) {
 function ServiceIcon({ type, color }: { type: string; color: string }) {
   switch (type) {
     case "compatibility": return <TwinMoonsIcon color={color} />;
+    case "marriage": return (
+      <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M8 14s-5.5-3.5-5.5-7.5C2.5 3.5 5 2 8 5c3-3 5.5-1.5 5.5 1.5S8 14 8 14z" stroke={color} strokeWidth="1.2" strokeLinejoin="round" />
+      </svg>
+    );
     case "daily": return <SunIcon color={color} />;
     case "tarot": return <PentagramIcon color={color} />;
     case "face": return <EyeIcon color={color} />;
+    case "chat": return (
+      <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M2 3C2 2.44772 2.44772 2 3 2H13C13.5523 2 14 2.44772 14 3V10.5C14 11.0523 13.5523 11.5 13 11.5H6L3 14.5V11.5C2.44772 11.5 2 11.0523 2 10.5V3Z" stroke={color} strokeWidth="1.2" strokeLinejoin="round" />
+        <circle cx="6" cy="6.8" r="0.7" fill={color} />
+        <circle cx="8" cy="6.8" r="0.7" fill={color} />
+        <circle cx="10" cy="6.8" r="0.7" fill={color} />
+      </svg>
+    );
+    case "career": return (
+      <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="2" y="4" width="12" height="9" rx="1.5" stroke={color} strokeWidth="1.2" />
+        <path d="M5 4V2.5C5 2.22386 5.22386 2 5.5 2H10.5C10.7761 2 11 2.22386 11 2.5V4" stroke={color} strokeWidth="1.2" />
+        <path d="M2 7.5h12" stroke={color} strokeWidth="0.8" />
+        <circle cx="8" cy="7.5" r="1" stroke={color} strokeWidth="0.8" />
+      </svg>
+    );
+    case "love": return (
+      <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M8 14S2 10 2 6.5C2 4.01472 4.01472 2 6.5 2C7.26 2 7.97 2.22 8 2.5C8.03 2.22 8.74 2 9.5 2C11.9853 2 14 4.01472 14 6.5C14 10 8 14 8 14Z" stroke={color} strokeWidth="1.2" strokeLinejoin="round" />
+      </svg>
+    );
     default: return <StarIcon color={color} />;
   }
 }
@@ -222,6 +248,13 @@ const services = [
     icon: "compatibility",
   },
   {
+    title: "결혼 궁합",
+    description: "결혼 5대 차원 심화 분석",
+    href: "/marriage",
+    color: "var(--seal)",
+    icon: "marriage",
+  },
+  {
     title: "오늘의 운세",
     description: "매일 달라지는 오행의 기운",
     href: "/daily",
@@ -241,6 +274,41 @@ const services = [
     href: "/face",
     color: "var(--face)",
     icon: "face",
+  },
+  {
+    title: "커리어 심화",
+    description: "TOP 5 추천 직업과 업무 성향",
+    href: "/career",
+    color: "var(--saju)",
+    icon: "career",
+  },
+  {
+    title: "연애 심화",
+    description: "이상형과 연애 패턴 분석",
+    href: "/love",
+    color: "var(--seal)",
+    icon: "love",
+  },
+  {
+    title: "AI 상담",
+    description: "분석 후 이용 가능 — 1:1 맞춤 상담",
+    href: "/analyze",
+    color: "var(--seal)",
+    icon: "chat",
+  },
+  {
+    title: "가족 분석",
+    description: "가족 구성원의 관계 역학",
+    href: "/family",
+    color: "var(--saju)",
+    icon: "compatibility",
+  },
+  {
+    title: "이름 풀이",
+    description: "획수와 오행으로 보는 이름",
+    href: "/name-analysis",
+    color: "var(--numero)",
+    icon: "default",
   },
 ];
 
@@ -320,7 +388,7 @@ export default function Home() {
                 background: "var(--seal)",
                 color: "#fff",
                 fontFamily: "var(--font-display)",
-                boxShadow: "0 4px 16px rgba(197,61,67,0.25)",
+                boxShadow: "0 4px 16px var(--shadow-btn)",
               }}
             >
               무료로 분석하기
@@ -799,7 +867,7 @@ export default function Home() {
                 background: "var(--seal)",
                 color: "#fff",
                 fontFamily: "var(--font-display)",
-                boxShadow: "0 4px 16px rgba(197,61,67,0.25)",
+                boxShadow: "0 4px 16px var(--shadow-btn)",
               }}
             >
               무료로 분석하기

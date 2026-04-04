@@ -320,8 +320,20 @@ export const LIFEPATH_TO_CHEONGAN: Record<number, string> = {
 export interface NumerologyResult {
   lifePath: number;
   lifePathInfo: LifePathInfo;
+  personalYear: number;
   destinyNumber?: number;
   destinyInfo?: LifePathInfo;
+}
+
+/** 개인 연수 계산: (birth month + birth day + current year) reduced */
+function calcPersonalYear(month: number, day: number): number {
+  const currentYear = new Date().getFullYear();
+  const digits = `${currentYear}${String(month).padStart(2,"0")}${String(day).padStart(2,"0")}`;
+  let sum = digits.split("").reduce((a, b) => a + parseInt(b), 0);
+  while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+    sum = String(sum).split("").reduce((a, b) => a + parseInt(b), 0);
+  }
+  return sum;
 }
 
 export function analyzeNumerology(
@@ -332,6 +344,7 @@ export function analyzeNumerology(
   const result: NumerologyResult = {
     lifePath: lp,
     lifePathInfo: LIFE_PATH_DATA[lp] || LIFE_PATH_DATA[9],
+    personalYear: calcPersonalYear(month, day),
   };
 
   if (name) {

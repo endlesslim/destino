@@ -578,7 +578,7 @@ function ResultSection({
                 background: "var(--seal)",
                 color: "#fff",
                 fontFamily: "var(--font-display)",
-                boxShadow: "0 4px 16px rgba(197,61,67,0.25)",
+                boxShadow: "0 4px 16px var(--shadow-btn)",
               }}
             >
               교차 분석 보기
