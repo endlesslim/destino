@@ -575,9 +575,10 @@ function ResultSection({
             <div
               className="w-full rounded-md py-4 text-center text-[15px] font-bold tracking-wider transition-opacity hover:opacity-80"
               style={{
-                background: "var(--ink)",
-                color: "var(--bg-paper)",
+                background: "var(--seal)",
+                color: "#fff",
                 fontFamily: "var(--font-display)",
+                boxShadow: "0 4px 16px rgba(197,61,67,0.25)",
               }}
             >
               교차 분석 보기

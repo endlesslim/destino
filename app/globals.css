@@ -73,6 +73,12 @@ body {
   color: var(--ink);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga' 1;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
 }
 
 @keyframes fadeUp {
@@ -201,17 +207,26 @@ body {
 
 /* ━━━ Card Hover Lift (CSS-only) ━━━ */
 .hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(28,25,23,0.08);
 }
 
 .hover-lift:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(28,25,23,0.06);
+}
+
+/* ━━━ Button Hover States ━━━ */
+button:hover, a[role="button"]:hover {
+  transform: translateY(-1px);
+}
+
+button:active, a[role="button"]:active {
   transform: translateY(0);
-  box-shadow: none;
 }
 
 /* ━━━ Print-Friendly Layout ━━━ */

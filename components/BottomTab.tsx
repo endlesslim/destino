@@ -155,7 +155,7 @@ export default function BottomTab() {
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1 transition-colors"
+              className="flex flex-col items-center justify-center gap-0.5 flex-1 py-2.5 min-h-[48px] transition-colors"
               aria-current={active ? "page" : undefined}
             >
               <Icon color={color} />

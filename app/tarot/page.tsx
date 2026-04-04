@@ -427,9 +427,10 @@ function ReadingDisplay({ reading }: { reading: TarotReading }) {
             href="/analyze"
             className="w-full py-3.5 text-[14px] font-bold rounded-lg text-center no-underline transition-opacity hover:opacity-80"
             style={{
-              background: "var(--ink)",
-              color: "var(--bg-paper)",
+              background: "var(--seal)",
+              color: "#fff",
               fontFamily: "var(--font-display)",
+              boxShadow: "0 4px 16px rgba(197,61,67,0.25)",
             }}
           >
             교차 분석도 해보기

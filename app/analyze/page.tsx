@@ -2446,7 +2446,7 @@ function AnalyzePageInner() {
                 <button
                   onClick={reset}
                   className="w-full py-4 text-[15px] font-bold rounded-xl border-none cursor-pointer transition-opacity hover:opacity-85"
-                  style={{ background: "var(--ink)", color: "var(--bg-paper)", fontFamily: "inherit" }}
+                  style={{ background: "var(--seal)", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 16px rgba(197,61,67,0.25)" }}
                 >
                   다시 분석하기
                 </button>

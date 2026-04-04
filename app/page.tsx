@@ -131,19 +131,6 @@ function CardStarIcon({ color, size = 14 }: { color: string; size?: number }) {
   );
 }
 
-/* Feature card icon lookup */
-function FeatureIcon({ type, color }: { type: string; color: string }) {
-  switch (type) {
-    case "cross": return <StarIcon color={color} />;
-    case "archetype": return <StarIcon color={color} />;
-    case "ohaeng": return <YinYangIcon color={color} size={16} />;
-    case "career": return <SpiralIcon color={color} size={16} />;
-    case "love": return <BrainIcon color={color} size={16} />;
-    case "advice": return <CardStarIcon color={color} size={16} />;
-    default: return <StarIcon color={color} />;
-  }
-}
-
 /* Service card icon lookup */
 function ServiceIcon({ type, color }: { type: string; color: string }) {
   switch (type) {
@@ -198,37 +185,31 @@ const reportCards = [
     color: "var(--seal)",
     title: "교차점 수렴률",
     description: "당신의 동서양 일치도",
-    icon: "cross",
   },
   {
     color: "var(--astro)",
     title: "아키타입",
     description: "3개 문명이 본 당신의 본질",
-    icon: "archetype",
   },
   {
     color: "var(--saju)",
     title: "오행 밸런스",
     description: "木火土金水 에너지 분포",
-    icon: "ohaeng",
   },
   {
     color: "var(--numero)",
     title: "직업/진로",
     description: "운명이 가리키는 방향",
-    icon: "career",
   },
   {
     color: "var(--mbti)",
     title: "연애/관계",
     description: "사랑에 대한 교차 분석",
-    icon: "love",
   },
   {
     color: "var(--tarot)",
     title: "인생 조언",
     description: "4개 체계가 전하는 메시지",
-    icon: "advice",
   },
 ];
 
@@ -295,7 +276,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center">
       {/* ━━━ 1. Hero ━━━ */}
       <section
-        className="w-full flex flex-col items-center px-6 pt-20 pb-16"
+        className="w-full flex flex-col items-center px-6 pt-24 pb-24"
         style={{ background: "var(--bg-paper)" }}
       >
         <div className="w-full max-w-[440px] flex flex-col items-center text-center gap-6 animate-fade-up">
@@ -322,7 +303,7 @@ export default function Home() {
 
           <p
             className="text-[15px] leading-[1.9]"
-            style={{ color: "var(--ink-muted)" }}
+            style={{ color: "var(--ink-medium)" }}
           >
             사주명리학 3,000년, 서양 점성술 4,000년, 수비학 2,500년.
             <br />
@@ -334,20 +315,21 @@ export default function Home() {
           <div className="flex flex-col gap-3 w-full mt-2">
             <Link
               href="/analyze"
-              className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-colors"
+              className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-all hover:opacity-90 active:opacity-80"
               style={{
-                background: "var(--ink)",
-                color: "var(--bg-paper)",
+                background: "var(--seal)",
+                color: "#fff",
                 fontFamily: "var(--font-display)",
+                boxShadow: "0 4px 16px rgba(197,61,67,0.25)",
               }}
             >
               무료로 분석하기
             </Link>
             <Link
               href="/compatibility"
-              className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg border-2 transition-colors"
+              className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-colors"
               style={{
-                borderColor: "var(--ink)",
+                border: "2px solid var(--ink)",
                 color: "var(--ink)",
                 background: "transparent",
                 fontFamily: "var(--font-display)",
@@ -361,15 +343,16 @@ export default function Home() {
 
       {/* ━━━ 2. 교차점이란? ━━━ */}
       <section
-        className="w-full flex flex-col items-center px-6 py-16"
+        className="w-full flex flex-col items-center px-6 py-20"
         style={{ background: "var(--bg-white)" }}
       >
         <div className="w-full max-w-[440px]">
           <ScrollReveal>
             <p
-              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4 flex items-center gap-2"
               style={{ color: "var(--ink-light)" }}
             >
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "var(--seal)" }} />
               교차점이란
             </p>
             <h2
@@ -494,14 +477,15 @@ export default function Home() {
       {/* ━━━ 3. 이렇게 분석합니다 ━━━ */}
       <section
         className="w-full flex flex-col items-center px-6 py-16"
-        style={{ background: "var(--bg-paper)" }}
+        style={{ background: "var(--bg-warm)" }}
       >
         <div className="w-full max-w-[440px]">
           <ScrollReveal>
             <p
-              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4 flex items-center gap-2"
               style={{ color: "var(--ink-light)" }}
             >
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "var(--seal)" }} />
               분석 과정
             </p>
             <h2
@@ -552,15 +536,16 @@ export default function Home() {
 
       {/* ━━━ 4. 무엇을 알 수 있나요? ━━━ */}
       <section
-        className="w-full flex flex-col items-center px-6 py-16"
+        className="w-full flex flex-col items-center px-6 py-20"
         style={{ background: "var(--bg-white)" }}
       >
         <div className="w-full max-w-[440px]">
           <ScrollReveal>
             <p
-              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4 flex items-center gap-2"
               style={{ color: "var(--ink-light)" }}
             >
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "var(--seal)" }} />
               리포트 구성
             </p>
             <h2
@@ -571,34 +556,33 @@ export default function Home() {
             </h2>
           </ScrollReveal>
 
-          <div className="grid grid-cols-2 gap-3">
-            {reportCards.map(({ color, title, description, icon }, i) => (
+          <div className="flex flex-col gap-3">
+            {reportCards.map(({ color, title, description }, i) => (
               <ScrollReveal key={title} delay={i * 60}>
                 <div
-                  className="rounded-lg p-4 h-full"
+                  className="rounded-lg px-5 py-4 flex items-start gap-4"
                   style={{
                     background: "var(--bg-paper)",
-                    border: "1px solid var(--border)",
+                    borderLeft: `3px solid ${color}`,
                   }}
                 >
-                  <div className="mb-2">
-                    <FeatureIcon type={icon} color={color} />
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-[15px] font-bold leading-[1.4] mb-1"
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        color: "var(--ink)",
+                      }}
+                    >
+                      {title}
+                    </p>
+                    <p
+                      className="text-[13px] leading-[1.6]"
+                      style={{ color: "var(--ink-muted)" }}
+                    >
+                      {description}
+                    </p>
                   </div>
-                  <p
-                    className="text-[15px] font-bold leading-[1.4] mb-1"
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      color: "var(--ink)",
-                    }}
-                  >
-                    {title}
-                  </p>
-                  <p
-                    className="text-[13px] leading-[1.6]"
-                    style={{ color: "var(--ink-muted)" }}
-                  >
-                    {description}
-                  </p>
                 </div>
               </ScrollReveal>
             ))}
@@ -614,9 +598,10 @@ export default function Home() {
         <div className="w-full max-w-[440px]">
           <ScrollReveal>
             <p
-              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4 flex items-center gap-2"
               style={{ color: "var(--ink-light)" }}
             >
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "var(--seal)" }} />
               더 알아보기
             </p>
             <h2
@@ -627,34 +612,42 @@ export default function Home() {
             </h2>
           </ScrollReveal>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             {services.map(({ title, description, href, color, icon }, i) => (
               <ScrollReveal key={title} delay={i * 60}>
                 <Link
                   href={href}
-                  className="flex flex-col gap-2 rounded-lg p-4 transition-colors hover-lift h-full"
+                  className="flex items-center gap-4 rounded-lg px-5 py-4 hover-lift h-full group"
                   style={{
                     background: "var(--bg-white)",
                     border: "1px solid var(--border)",
                   }}
                 >
-                  <span>
+                  <span className="shrink-0">
                     <ServiceIcon type={icon} color={color} />
                   </span>
-                  <span
-                    className="text-[15px] font-bold"
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      color: "var(--ink)",
-                    }}
-                  >
-                    {title}
+                  <span className="flex-1 min-w-0">
+                    <span
+                      className="text-[15px] font-bold block"
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        color: "var(--ink)",
+                      }}
+                    >
+                      {title}
+                    </span>
+                    <span
+                      className="text-[13px] leading-[1.6] block mt-0.5"
+                      style={{ color: "var(--ink-muted)" }}
+                    >
+                      {description}
+                    </span>
                   </span>
                   <span
-                    className="text-[13px] leading-[1.6]"
-                    style={{ color: "var(--ink-muted)" }}
+                    className="text-[16px] shrink-0 transition-transform group-hover:translate-x-1"
+                    style={{ color: "var(--ink-faint)" }}
                   >
-                    {description}
+                    &rarr;
                   </span>
                 </Link>
               </ScrollReveal>
@@ -665,15 +658,16 @@ export default function Home() {
 
       {/* ━━━ 6. 왜 DESTINO인가? ━━━ */}
       <section
-        className="w-full flex flex-col items-center px-6 py-16"
+        className="w-full flex flex-col items-center px-6 py-20"
         style={{ background: "var(--bg-white)" }}
       >
         <div className="w-full max-w-[440px]">
           <ScrollReveal>
             <p
-              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4 flex items-center gap-2"
               style={{ color: "var(--ink-light)" }}
             >
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "var(--seal)" }} />
               WHY DESTINO
             </p>
             <h2
@@ -688,7 +682,7 @@ export default function Home() {
             {whyCards.map(({ title, description }, i) => (
               <ScrollReveal key={title} delay={i * 80}>
                 <div
-                  className="rounded-lg p-5"
+                  className="rounded-lg p-5 hover-lift"
                   style={{
                     background: "var(--bg-paper)",
                     border: "1px solid var(--border)",
@@ -724,9 +718,10 @@ export default function Home() {
         <div className="w-full max-w-[440px]">
           <ScrollReveal>
             <p
-              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4 flex items-center gap-2"
               style={{ color: "var(--ink-light)" }}
             >
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "var(--seal)" }} />
               분석 체계
             </p>
             <h2
@@ -799,11 +794,12 @@ export default function Home() {
             </p>
             <Link
               href="/analyze"
-              className="w-full max-w-[320px] py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-colors"
+              className="w-full max-w-[320px] py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-all hover:opacity-90 active:opacity-80"
               style={{
-                background: "var(--ink)",
-                color: "var(--bg-paper)",
+                background: "var(--seal)",
+                color: "#fff",
                 fontFamily: "var(--font-display)",
+                boxShadow: "0 4px 16px rgba(197,61,67,0.25)",
               }}
             >
               무료로 분석하기
@@ -818,7 +814,7 @@ export default function Home() {
         style={{ background: "var(--bg-paper)" }}
       >
         <footer
-          className="w-full max-w-[440px] text-center flex flex-col gap-3 py-4"
+          className="w-full max-w-[440px] text-center flex flex-col gap-4 py-4"
           style={{ color: "var(--ink-light)" }}
         >
           <p
@@ -828,46 +824,40 @@ export default function Home() {
             DESTINO
           </p>
           <div
-            className="flex justify-center gap-4 text-[12px]"
+            className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-[13px]"
             style={{ color: "var(--ink-light)" }}
           >
-            <Link href="/analyze" className="hover:underline">
+            <Link href="/analyze" className="py-3 hover:underline">
               교차 분석
             </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/compatibility" className="hover:underline">
+            <Link href="/compatibility" className="py-3 hover:underline">
               궁합 분석
             </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/daily" className="hover:underline">
+            <Link href="/daily" className="py-3 hover:underline">
               오늘의 운세
             </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/tarot" className="hover:underline">
+            <Link href="/tarot" className="py-3 hover:underline">
               타로
             </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <a href="mailto:hello@destino.me" className="hover:underline">
+            <a href="mailto:hello@destino.me" className="py-3 hover:underline">
               문의
             </a>
           </div>
           <div
-            className="flex justify-center gap-4 text-[12px]"
+            className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-[13px]"
             style={{ color: "var(--ink-faint)" }}
           >
-            <Link href="/about" className="hover:underline">
+            <Link href="/about" className="py-3 hover:underline">
               분석 방법론
             </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/terms" className="hover:underline">
+            <Link href="/terms" className="py-3 hover:underline">
               이용약관
             </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/privacy" className="hover:underline">
+            <Link href="/privacy" className="py-3 hover:underline">
               개인정보처리방침
             </Link>
           </div>
-          <p className="text-[12px]" style={{ color: "var(--ink-faint)" }}>
+          <p className="text-[13px]" style={{ color: "var(--ink-faint)" }}>
             &copy; {new Date().getFullYear()} DESTINO. All rights reserved.
           </p>
         </footer>
