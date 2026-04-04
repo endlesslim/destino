@@ -21,6 +21,39 @@ import StaggerSection from "@/components/ui/StaggerSection";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { useCountUp } from "@/hooks/useCountUp";
 
+// ━━━ Canvas 유틸 (인스타 카드용) ━━━
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split("");
+  const lines: string[] = [];
+  let line = "";
+  for (const char of words) {
+    const test = line + char;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = char;
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+  return lines.slice(0, 3); // 최대 3줄
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
 // ━━━ 텍스트 유틸 ━━━
 function splitFirstSentence(text: string): [string, string] {
   if (!text || typeof text !== "string") return ["", ""];
@@ -538,64 +571,156 @@ function AnalyzePageInner() {
     canvas.height = 1920;
     const ctx = canvas.getContext("2d")!;
 
-    // Canvas drawing uses hardcoded hex colors because the Canvas 2D API
-    // cannot resolve CSS custom properties (var(--xxx)). These colors are
-    // intentionally fixed for the downloadable Instagram card image.
-    // Background
-    ctx.fillStyle = "#F5F0E8";
+    // Canvas 2D API는 CSS 변수를 사용할 수 없어 하드코딩된 색상 사용
+    const C = {
+      paper: "#F5F0E8", ink: "#1C1917", seal: "#C53D43",
+      muted: "#6B5E53", light: "#8B7E74", faint: "#B8AFA4",
+      border: "#D4C9BC", white: "#FFFDF7", warm: "#EDE8DE",
+      saju: "#2D5A27", astro: "#1E3A5F", numero: "#6B3A2A", mbti: "#5B3E8A",
+    };
+
+    // 배경
+    ctx.fillStyle = C.paper;
     ctx.fillRect(0, 0, 1080, 1920);
 
-    // Top decoration line
-    ctx.fillStyle = "#C53D43";
-    ctx.fillRect(440, 120, 200, 3);
+    // 상단 장식선
+    ctx.fillStyle = C.seal;
+    ctx.fillRect(440, 80, 200, 3);
 
-    // Brand
-    ctx.fillStyle = "#1C1917";
-    ctx.font = "bold 48px serif";
+    // 브랜드
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 42px serif";
     ctx.textAlign = "center";
-    ctx.fillText("DESTINO", 540, 200);
+    ctx.fillText("DESTINO", 540, 150);
 
-    // Subtitle
-    ctx.fillStyle = "#8B7E74";
+    // 부제
+    ctx.fillStyle = C.light;
+    ctx.font = "22px sans-serif";
+    ctx.fillText("동서양 운명 교차 분석", 540, 195);
+
+    // 이름 (있으면 표시)
+    if (name) {
+      ctx.fillStyle = C.ink;
+      ctx.font = "bold 36px serif";
+      ctx.fillText(name, 540, 280);
+    }
+
+    // 생년월일
+    ctx.fillStyle = C.muted;
     ctx.font = "24px sans-serif";
-    ctx.fillText("동서양 운명 교차 분석", 540, 260);
+    ctx.fillText(`${year}.${month}.${day}${hour ? ` ${hour}시` : ""}`, 540, name ? 325 : 280);
 
-    // Convergence rate
-    ctx.fillStyle = "#1C1917";
-    ctx.font = "bold 160px serif";
-    ctx.fillText(`${result.convergence_rate}%`, 540, 680);
+    // 구분선
+    const baseY = name ? 370 : 330;
+    ctx.fillStyle = C.border;
+    ctx.fillRect(340, baseY, 400, 1);
 
-    // Rate label
-    ctx.fillStyle = "#8B7E74";
+    // 수렴률
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 140px serif";
+    ctx.fillText(`${result.convergence_rate}%`, 540, baseY + 170);
+    ctx.fillStyle = C.seal;
+    ctx.font = "bold 32px serif";
+    ctx.fillText(result.element_harmony.relation === "공명" ? "완벽한 공명" : result.element_harmony.relation === "상생" ? "상생의 조화" : "변화의 긴장", 540, baseY + 220);
+
+    // 아키타입
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 48px serif";
+    ctx.fillText(result.archetype, 540, baseY + 320);
+
+    // 아키타입 설명 (첫 문장)
+    ctx.fillStyle = C.muted;
+    ctx.font = "22px sans-serif";
+    const descFirst = result.archetype_desc.split(".")[0] + ".";
+    const descLines = wrapText(ctx, descFirst, 800);
+    descLines.forEach((line, i) => {
+      ctx.fillText(line, 540, baseY + 370 + i * 32);
+    });
+
+    // 4개 체계 요약 박스
+    const boxY = baseY + 470;
+    const boxW = 460;
+    const boxH = 100;
+    const gap = 20;
+
+    // 사주
+    ctx.fillStyle = C.warm;
+    roundRect(ctx, 70, boxY, boxW, boxH, 12);
+    ctx.fillStyle = C.saju;
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("● 사주명리학", 90, boxY + 30);
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 32px serif";
+    ctx.fillText(`${result.saju.day.cheongan} (${result.saju.personality.nature})`, 90, boxY + 72);
+
+    // 별자리
+    ctx.fillStyle = C.warm;
+    roundRect(ctx, 70 + boxW + gap, boxY, boxW, boxH, 12);
+    ctx.fillStyle = C.astro;
+    ctx.font = "bold 14px sans-serif";
+    ctx.fillText("● 서양 점성술", 90 + boxW + gap, boxY + 30);
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 32px serif";
+    ctx.fillText(`${result.western.sunSign.name} (${result.western.sunSign.element_kr})`, 90 + boxW + gap, boxY + 72);
+
+    // 수비학
+    ctx.fillStyle = C.warm;
+    roundRect(ctx, 70, boxY + boxH + gap, boxW, boxH, 12);
+    ctx.fillStyle = C.numero;
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("● 수비학", 90, boxY + boxH + gap + 30);
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 32px serif";
+    ctx.fillText(`경로수 ${result.numerology.lifePath} (${result.numerology.lifePathInfo.name})`, 90, boxY + boxH + gap + 72);
+
+    // MBTI
+    ctx.fillStyle = C.warm;
+    roundRect(ctx, 70 + boxW + gap, boxY + boxH + gap, boxW, boxH, 12);
+    ctx.fillStyle = C.mbti;
+    ctx.font = "bold 14px sans-serif";
+    ctx.fillText("● MBTI", 90 + boxW + gap, boxY + boxH + gap + 30);
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 32px serif";
+    ctx.fillText(`${result.mbti.primaryType}`, 90 + boxW + gap, boxY + boxH + gap + 72);
+
+    // 동서양 교차
+    ctx.textAlign = "center";
+    const crossY = boxY + boxH * 2 + gap * 2 + 60;
+    ctx.fillStyle = C.faint;
+    ctx.font = "20px sans-serif";
+    ctx.fillText("동양", 340, crossY);
+    ctx.fillText("서양", 740, crossY);
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 48px serif";
+    ctx.fillText(result.saju.day.ohang, 340, crossY + 60);
+    ctx.fillText(result.western.sunSign.element, 740, crossY + 60);
+    ctx.fillStyle = C.seal;
     ctx.font = "28px sans-serif";
-    ctx.fillText("수렴률", 540, 740);
+    ctx.fillText("↔", 540, crossY + 55);
+    ctx.fillStyle = C.muted;
+    ctx.font = "20px sans-serif";
+    ctx.fillText(OHANG_INFO[result.saju.day.ohang].kr, 340, crossY + 95);
+    ctx.fillText(result.western.sunSign.element_kr, 740, crossY + 95);
 
-    // Archetype
-    ctx.fillStyle = "#C53D43";
-    ctx.font = "bold 56px serif";
-    ctx.fillText(result.archetype, 540, 880);
+    // 띠
+    ctx.fillStyle = C.light;
+    ctx.font = "22px sans-serif";
+    ctx.fillText(`${result.saju.animal.animal_kr}띠 · ${result.saju.year.cheongan}${result.saju.year.jiji}년생`, 540, crossY + 155);
 
-    // East element
-    ctx.fillStyle = "#6B5E53";
-    ctx.font = "32px sans-serif";
-    ctx.fillText(
-      `${result.saju.day.ohang} · ${result.western.sunSign.name}`,
-      540,
-      1000
-    );
+    // 하단 구분선
+    ctx.fillStyle = C.border;
+    ctx.fillRect(340, 1720, 400, 1);
 
-    // Divider
-    ctx.fillStyle = "#D4C9BC";
-    ctx.fillRect(390, 1080, 300, 1);
+    // 브랜드 푸터
+    ctx.fillStyle = C.light;
+    ctx.font = "24px sans-serif";
+    ctx.fillText("destino.kr", 540, 1770);
 
-    // Brand footer
-    ctx.fillStyle = "#8B7E74";
-    ctx.font = "26px sans-serif";
-    ctx.fillText("destino.kr", 540, 1700);
-
-    // Bottom decoration line
-    ctx.fillStyle = "#C53D43";
-    ctx.fillRect(440, 1750, 200, 3);
+    // 하단 장식선
+    ctx.fillStyle = C.seal;
+    ctx.fillRect(440, 1810, 200, 3);
 
     // Download
     const link = document.createElement("a");
