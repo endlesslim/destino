@@ -56,3 +56,13 @@ CREATE POLICY "Allow anonymous insert" ON analyses FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow anonymous read by id" ON analyses FOR SELECT USING (true);
 CREATE POLICY "Allow anonymous insert" ON feedback FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow anonymous insert" ON payments FOR INSERT WITH CHECK (true);
+
+-- Daily email subscribers
+CREATE TABLE subscribers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE subscribers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow anonymous insert" ON subscribers FOR INSERT WITH CHECK (true);

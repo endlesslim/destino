@@ -7,6 +7,7 @@ import Divider from "@/components/ui/Divider";
 import Nav from "@/components/Nav";
 import ScrollReveal from "@/components/ScrollReveal";
 import Button from "@/components/ui/Button";
+import DailyEmailSubscribe from "@/components/DailyEmailSubscribe";
 import { generateDailyFortune, type DailyFortune } from "@/lib/daily-fortune";
 
 // ━━━ 한국어 요일 ━━━
@@ -517,49 +518,9 @@ function FortuneDisplay({ fortune }: { fortune: DailyFortune }) {
 
       <Divider />
 
-      {/* 구독 CTA */}
+      {/* 이메일 구독 CTA */}
       <ScrollReveal delay={480}>
-        <div
-          className="rounded-lg p-6 flex flex-col gap-4 relative overflow-hidden"
-          style={{ background: "var(--bg-white)", border: "1.5px solid var(--seal)" }}
-        >
-        <div className="absolute top-3 right-3 opacity-20">
-          <Seal size="sm" char="運" />
-        </div>
-        <p
-          className="text-[11px] tracking-[0.1em] uppercase font-medium"
-          style={{ color: "var(--seal)" }}
-        >
-          DAILY SUBSCRIPTION
-        </p>
-        <h3
-          className="text-[18px] font-bold leading-[1.4]"
-          style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
-        >
-          매일 아침,<br />카카오톡으로 받아보기
-        </h3>
-        <p className="text-[14px] leading-[1.7]" style={{ color: "var(--ink-muted)" }}>
-          오늘의 운세를 매일 아침 7시에 카카오톡 알림으로 보내드립니다.
-          놓치지 않고 하루를 준비하세요.
-        </p>
-        <div
-          className="flex items-center justify-between rounded-md px-4 py-3"
-          style={{ background: "var(--seal-bg)" }}
-        >
-          <span
-            className="text-[15px] font-bold"
-            style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
-          >
-            월 4,900원
-          </span>
-          <span
-            className="text-[12px] font-medium"
-            style={{ color: "var(--seal-dark)" }}
-          >
-            Coming Soon
-          </span>
-        </div>
-        </div>
+        <DailyEmailSubscribe />
       </ScrollReveal>
 
       {/* 전체 분석 링크 */}
