@@ -137,7 +137,7 @@ export async function getInterpretation(result: CrosspointResult): Promise<strin
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 500,
+        max_tokens: 2000,
         messages: [
           { role: "user", content: buildCrosspointPrompt(result) }
         ],
@@ -173,8 +173,8 @@ export async function getDailyFortune(result: CrosspointResult): Promise<string>
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",  // 일상 운세는 Haiku로 비용 절감
-        max_tokens: 300,
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 1000,
         messages: [
           { role: "user", content: buildDailyPrompt(result, today) }
         ],
