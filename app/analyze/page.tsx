@@ -349,6 +349,12 @@ function AnalyzePageInner() {
 
     setValidationError(null);
     setLoading(true);
+
+    // 내 정보를 localStorage에 저장 (궁합 페이지에서 자동 불러오기용)
+    try {
+      localStorage.setItem("destino_my_info", JSON.stringify({ year: y, month: m, day: d, name: name || "" }));
+    } catch {}
+
     setTimeout(() => {
       setResult(analyzeCrosspoint(y, m, d, name || undefined));
       setLoading(false);

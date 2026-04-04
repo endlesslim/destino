@@ -185,9 +185,9 @@ export default function DailyPage() {
   const [fortune, setFortune] = useState<DailyFortune | null>(null);
   const [hasSaved, setHasSaved] = useState(false);
 
-  // localStorage에서 저장된 프로필 로드
+  // localStorage에서 저장된 프로필 로드 (daily 전용 또는 analyze에서 저장한 정보)
   useEffect(() => {
-    const saved = localStorage.getItem("destino_daily_birth");
+    const saved = localStorage.getItem("destino_daily_birth") || localStorage.getItem("destino_my_info");
     if (saved) {
       try {
         const { year, month, day } = JSON.parse(saved);

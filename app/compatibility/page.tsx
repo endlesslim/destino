@@ -178,8 +178,23 @@ function CompatibilityPageInner() {
     year1.length === 4 && month1 !== "" && day1 !== "" &&
     year2.length === 4 && month2 !== "" && day2 !== "";
 
-  // Read share URL params on mount
+  // Load my info from localStorage + read share URL params
   useEffect(() => {
+    // 1. 내 정보 자동 불러오기
+    try {
+      const saved = localStorage.getItem("destino_my_info");
+      if (saved) {
+        const my = JSON.parse(saved);
+        if (my.year && my.month && my.day) {
+          setYear1(String(my.year));
+          setMonth1(String(my.month));
+          setDay1(String(my.day));
+          if (my.name) setName1(my.name);
+        }
+      }
+    } catch {}
+
+    // 2. URL 파라미터 (공유 링크) — URL이 있으면 localStorage보다 우선
     const y1 = searchParams.get("y1");
     const m1 = searchParams.get("m1");
     const d1 = searchParams.get("d1");
