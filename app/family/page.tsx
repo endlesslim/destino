@@ -114,6 +114,7 @@ export default function FamilyPage() {
       const analysis = analyzeFamilyRelationships(members);
       setResult(analysis);
       setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }, 800);
   }, [members]);
 

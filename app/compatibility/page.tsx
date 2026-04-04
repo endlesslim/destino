@@ -195,6 +195,7 @@ function CompatibilityPageInner() {
               })
             );
             setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
             playStampSound();
           }, 2400);
         }
@@ -230,6 +231,7 @@ function CompatibilityPageInner() {
         })
       );
       setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       playStampSound();
     }, 2400);
   };

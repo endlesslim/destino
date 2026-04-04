@@ -438,6 +438,7 @@ function AnalyzePageInner() {
             const r = analyzeCrosspoint(yi, mi, di, n || undefined, hi !== undefined && hi >= 0 && hi <= 23 ? hi : undefined);
             setResult(r);
             setLoading(false);
+            window.scrollTo({ top: 0, behavior: "smooth" });
             playStampSound();
             try {
               saveAnalysis({
@@ -502,6 +503,7 @@ function AnalyzePageInner() {
       const r = analyzeCrosspoint(y, m, d, name || undefined, h !== undefined && h >= 0 && h <= 23 ? h : undefined);
       setResult(r);
       setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       playStampSound();
       // Save to history
       try {

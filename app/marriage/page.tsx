@@ -148,6 +148,7 @@ function MarriagePageInner() {
               })
             );
             setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
             playStampSound();
           }, 2400);
         }
@@ -181,6 +182,7 @@ function MarriagePageInner() {
         })
       );
       setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       playStampSound();
     }, 2400);
   };
