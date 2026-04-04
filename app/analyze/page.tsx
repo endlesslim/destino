@@ -7,11 +7,30 @@ import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
 import Nav from "@/components/Nav";
 import ScrollReveal from "@/components/ScrollReveal";
+import Expandable from "@/components/Expandable";
+import KeyInsight from "@/components/KeyInsight";
+import StatCard from "@/components/StatCard";
 
 import { analyzeCrosspoint, type CrosspointResult } from "@/lib/cross-engine";
 import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
 import { playStampSound } from "@/lib/sound";
 import { saveAnalysis } from "@/lib/history";
+
+// ━━━ 텍스트 유틸 ━━━
+function splitFirstSentence(text: string): [string, string] {
+  const m = text.match(/^(.+?[.!?。])\s*/);
+  if (m) return [m[1], text.slice(m[0].length)];
+  const mid = Math.min(60, Math.floor(text.length / 2));
+  const comma = text.indexOf(",", 20);
+  const split = comma > 0 && comma < 80 ? comma + 1 : mid;
+  return [text.slice(0, split).trim(), text.slice(split).trim()];
+}
+
+function splitFirstTwo(text: string): [string, string] {
+  const m = text.match(/^(.+?[.!?。]\s*.+?[.!?。])\s*/);
+  if (m) return [m[1], text.slice(m[0].length)];
+  return splitFirstSentence(text);
+}
 
 // ━━━ 컬러 도트 ━━━
 function Dot({ color, size = 8 }: { color: string; size?: number }) {
@@ -606,6 +625,16 @@ function AnalyzePageInner() {
                 </span>
               ))}
             </div>
+
+            <div className="flex justify-center mt-5 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+              <Link
+                href="/about"
+                className="text-[13px] font-medium transition-opacity hover:opacity-70"
+                style={{ color: "var(--ink-light)", textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                어떻게 분석하나요?
+              </Link>
+            </div>
           </>
         )}
 
@@ -803,21 +832,29 @@ function AnalyzePageInner() {
                       {result.archetype_desc}
                     </p>
 
-                    {/* cross_message blockquote */}
-                    {result.cross_message && (
-                      <blockquote
-                        className="text-[15px] leading-[2] italic"
-                        style={{
-                          fontFamily: "var(--font-display)",
-                          color: "var(--ink-medium)",
-                          borderLeft: "3px solid var(--seal)",
-                          paddingLeft: "16px",
-                          margin: 0,
-                        }}
-                      >
-                        {result.cross_message}
-                      </blockquote>
-                    )}
+                    {/* cross_message: KeyInsight + Expandable */}
+                    {result.cross_message && (() => {
+                      const [first, rest] = splitFirstSentence(result.cross_message);
+                      return (
+                        <div className="flex flex-col gap-[16px]">
+                          <KeyInsight text={first} source="교차점" />
+                          {rest && (
+                            <Expandable
+                              title="교차 메시지"
+                              preview={rest.slice(0, 80) + (rest.length > 80 ? "..." : "")}
+                              accentColor="var(--seal)"
+                            >
+                              <p
+                                className="text-[15px] leading-[2]"
+                                style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                              >
+                                {rest}
+                              </p>
+                            </Expandable>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Career Crosspoint */}
                     {(result as any)?.career_crosspoint && (
@@ -967,83 +1004,135 @@ function AnalyzePageInner() {
                       </div>
                     </div>
 
-                    {/* Detailed Personality */}
-                    {(result.saju.personality as any)?.detailed_personality && (
-                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Dot color="var(--saju)" size={7} />
-                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                    {/* Detailed Personality: KeyInsight + Expandable */}
+                    {(result.saju.personality as any)?.detailed_personality && (() => {
+                      const text = (result.saju.personality as any).detailed_personality as string;
+                      const [first, rest] = splitFirstSentence(text);
+                      return (
+                        <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Dot color="var(--saju)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                          </div>
+                          <KeyInsight text={first} source="사주" color="var(--saju)" />
+                          {rest && (
+                            <div className="mt-[16px]">
+                              <Expandable
+                                title="성격 심층"
+                                preview={rest.slice(0, 80) + (rest.length > 80 ? "..." : "")}
+                                accentColor="var(--saju)"
+                              >
+                                <p
+                                  className="text-[15px] leading-[2]"
+                                  style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                                >
+                                  {rest}
+                                </p>
+                              </Expandable>
+                            </div>
+                          )}
                         </div>
-                        <p
-                          className="text-[15px] leading-[2]"
-                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                        >
-                          {(result.saju.personality as any).detailed_personality}
-                        </p>
-                      </div>
-                    )}
+                      );
+                    })()}
 
-                    {/* Career */}
+                    {/* Career: StatCards */}
                     {(result.saju.personality as any)?.career && (
                       <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-3">
                           <Dot color="#8B6914" size={7} />
                           <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업/진로</span>
                         </div>
-                        <p
-                          className="text-[15px] leading-[2]"
-                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                        >
-                          {(result.saju.personality as any).career}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Relationship Style */}
-                    {(result.saju.personality as any)?.relationship && (
-                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Dot color="var(--seal)" size={7} />
-                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>연애/관계 스타일</span>
+                        <div className="flex gap-2 mb-[16px]">
+                          <StatCard
+                            number={result.saju.day.cheongan}
+                            label="일간"
+                            color="var(--saju)"
+                          />
+                          <StatCard
+                            number={result.saju.day.ohang}
+                            label={OHANG_INFO[result.saju.day.ohang].kr}
+                            color={OHANG_INFO[result.saju.day.ohang].color}
+                          />
                         </div>
-                        <p
-                          className="text-[15px] leading-[2]"
-                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        <Expandable
+                          title="직업/진로"
+                          preview={splitFirstSentence((result.saju.personality as any).career as string)[0]}
+                          accentColor="#8B6914"
                         >
-                          {(result.saju.personality as any).relationship}
-                        </p>
+                          <p
+                            className="text-[15px] leading-[2]"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result.saju.personality as any).career}
+                          </p>
+                        </Expandable>
                       </div>
                     )}
 
-                    {/* Weakness / Growth Area */}
-                    {(result.saju.personality as any)?.weakness && (
-                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Dot color="var(--ink-muted)" size={7} />
-                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>약점/성장 영역</span>
+                    {/* Relationship Style: Expandable */}
+                    {(result.saju.personality as any)?.relationship && (() => {
+                      const text = (result.saju.personality as any).relationship as string;
+                      const [first, rest] = splitFirstSentence(text);
+                      return (
+                        <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Dot color="var(--seal)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>연애/관계 스타일</span>
+                          </div>
+                          <Expandable
+                            title="연애/관계"
+                            preview={first}
+                            accentColor="var(--seal)"
+                          >
+                            <p
+                              className="text-[15px] leading-[2]"
+                              style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                            >
+                              {text}
+                            </p>
+                          </Expandable>
                         </div>
-                        <p
-                          className="text-[15px] leading-[2]"
-                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                        >
-                          {(result.saju.personality as any).weakness}
-                        </p>
-                      </div>
-                    )}
+                      );
+                    })()}
 
-                    {/* Life Advice */}
+                    {/* Weakness / Growth Area: Expandable */}
+                    {(result.saju.personality as any)?.weakness && (() => {
+                      const text = (result.saju.personality as any).weakness as string;
+                      const [first] = splitFirstSentence(text);
+                      return (
+                        <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Dot color="var(--ink-muted)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>약점/성장 영역</span>
+                          </div>
+                          <Expandable
+                            title="약점/성장"
+                            preview={first}
+                            accentColor="var(--ink-muted)"
+                          >
+                            <p
+                              className="text-[15px] leading-[2]"
+                              style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                            >
+                              {text}
+                            </p>
+                          </Expandable>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Life Advice: KeyInsight */}
                     {(result.saju.personality as any)?.advice && (
                       <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-3">
                           <Dot color="var(--numero)" size={7} />
                           <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>인생 조언</span>
                         </div>
-                        <p
-                          className="text-[15px] leading-[2]"
-                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                        >
-                          {(result.saju.personality as any).advice}
-                        </p>
+                        <KeyInsight
+                          text={(result.saju.personality as any).advice as string}
+                          source="사주"
+                          color="var(--numero)"
+                        />
                       </div>
                     )}
 
@@ -1154,41 +1243,50 @@ function AnalyzePageInner() {
                         </span>
                       </div>
 
-                      {/* Detailed Personality */}
-                      {(result.western.sunSign as any)?.detailed_personality && (
-                        <div className="text-left mt-4 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Dot color={result.western.sunSign.color} size={7} />
-                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                      {/* Detailed Personality: Expandable with first 2 sentences visible */}
+                      {(result.western.sunSign as any)?.detailed_personality && (() => {
+                        const text = (result.western.sunSign as any).detailed_personality as string;
+                        const [first, rest] = splitFirstTwo(text);
+                        return (
+                          <div className="text-left mt-4 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <Dot color={result.western.sunSign.color} size={7} />
+                              <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                            </div>
+                            <Expandable
+                              title="성격 심층"
+                              preview={first}
+                              accentColor={result.western.sunSign.color}
+                            >
+                              <p
+                                className="text-[15px] leading-[2]"
+                                style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                              >
+                                {text}
+                              </p>
+                            </Expandable>
                           </div>
-                          <p
-                            className="text-[15px] leading-[2]"
-                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                          >
-                            {(result.western.sunSign as any).detailed_personality}
-                          </p>
-                        </div>
-                      )}
+                        );
+                      })()}
 
-                      {/* Love Style */}
-                      {(result.western.sunSign as any)?.love_style && (
-                        <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Dot color="var(--seal)" size={7} />
-                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>연애 스타일</span>
+                      {/* Love Style: KeyInsight */}
+                      {(result.western.sunSign as any)?.love_style && (() => {
+                        const text = (result.western.sunSign as any).love_style as string;
+                        const [first] = splitFirstSentence(text);
+                        return (
+                          <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <Dot color="var(--seal)" size={7} />
+                              <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>연애 스타일</span>
+                            </div>
+                            <KeyInsight text={first} source="별자리" color="var(--seal)" />
                           </div>
-                          <p
-                            className="text-[15px] leading-[2]"
-                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                          >
-                            {(result.western.sunSign as any).love_style}
-                          </p>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {/* Career Strengths */}
                       {(result.western.sunSign as any)?.career_strengths && (
-                        <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                        <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--saju)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업 강점</span>
@@ -1201,21 +1299,31 @@ function AnalyzePageInner() {
                         </div>
                       )}
 
-                      {/* Shadow Side / Challenges */}
-                      {(result.western.sunSign as any)?.shadow_side && (
-                        <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Dot color="var(--ink-muted)" size={7} />
-                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>그림자 / 도전</span>
+                      {/* Shadow Side / Challenges: Expandable */}
+                      {(result.western.sunSign as any)?.shadow_side && (() => {
+                        const text = (result.western.sunSign as any).shadow_side as string;
+                        const [first] = splitFirstSentence(text);
+                        return (
+                          <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <Dot color="var(--ink-muted)" size={7} />
+                              <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>그림자 / 도전</span>
+                            </div>
+                            <Expandable
+                              title="그림자 / 도전"
+                              preview={first}
+                              accentColor="var(--ink-muted)"
+                            >
+                              <p
+                                className="text-[15px] leading-[2]"
+                                style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                              >
+                                {text}
+                              </p>
+                            </Expandable>
                           </div>
-                          <p
-                            className="text-[15px] leading-[2]"
-                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                          >
-                            {(result.western.sunSign as any).shadow_side}
-                          </p>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {/* Best / Worst Compatibility */}
                       {((result.western.sunSign as any)?.best_compatibility || (result.western.sunSign as any)?.worst_compatibility) && (
@@ -1322,44 +1430,65 @@ function AnalyzePageInner() {
                         </div>
                       </div>
 
-                      {/* Detailed Personality */}
-                      {(result.numerology.lifePathInfo as any)?.detailed_personality && (
-                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Dot color="var(--numero)" size={7} />
-                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                      {/* Detailed Personality: Expandable */}
+                      {(result.numerology.lifePathInfo as any)?.detailed_personality && (() => {
+                        const text = (result.numerology.lifePathInfo as any).detailed_personality as string;
+                        const [first] = splitFirstSentence(text);
+                        return (
+                          <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <Dot color="var(--numero)" size={7} />
+                              <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                            </div>
+                            <Expandable
+                              title="성격 심층"
+                              preview={first}
+                              accentColor="var(--numero)"
+                            >
+                              <p
+                                className="text-[15px] leading-[2]"
+                                style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                              >
+                                {text}
+                              </p>
+                            </Expandable>
                           </div>
-                          <p
-                            className="text-[15px] leading-[2]"
-                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                          >
-                            {(result.numerology.lifePathInfo as any).detailed_personality}
-                          </p>
-                        </div>
-                      )}
+                        );
+                      })()}
 
-                      {/* Life Purpose */}
+                      {/* Life Purpose: KeyInsight */}
                       {(result.numerology.lifePathInfo as any)?.life_purpose && (
-                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                          <div className="flex items-center gap-2 mb-2">
+                        <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--astro)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>인생 목적</span>
                           </div>
-                          <p
-                            className="text-[15px] leading-[2]"
-                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                          >
-                            {(result.numerology.lifePathInfo as any).life_purpose}
-                          </p>
+                          <KeyInsight
+                            text={(result.numerology.lifePathInfo as any).life_purpose as string}
+                            source="수비학"
+                            color="var(--astro)"
+                          />
                         </div>
                       )}
 
-                      {/* Career Paths */}
+                      {/* Career Paths: StatCards + Chips */}
                       {(result.numerology.lifePathInfo as any)?.career_paths && (
-                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--saju)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>추천 직업 분야</span>
+                          </div>
+                          <div className="flex gap-2 mb-[16px]">
+                            <StatCard
+                              number={String(result.numerology.lifePath)}
+                              label="생명경로수"
+                              color="var(--numero)"
+                            />
+                            <StatCard
+                              number={String(((result.numerology.lifePathInfo as any).career_paths as string[]).length)}
+                              label="경로수"
+                              color="var(--saju)"
+                            />
                           </div>
                           <div className="flex flex-wrap gap-2">
                             {((result.numerology.lifePathInfo as any).career_paths as string[]).map((c: string) => (
@@ -1371,8 +1500,8 @@ function AnalyzePageInner() {
 
                       {/* Relationship Style */}
                       {(result.numerology.lifePathInfo as any)?.relationship_style && (
-                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                          <div className="flex items-center gap-2 mb-2">
+                        <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--seal)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>관계 스타일</span>
                           </div>
@@ -1385,21 +1514,31 @@ function AnalyzePageInner() {
                         </div>
                       )}
 
-                      {/* Challenge */}
-                      {(result.numerology.lifePathInfo as any)?.challenge && (
-                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Dot color="var(--ink-muted)" size={7} />
-                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>도전 과제</span>
+                      {/* Challenge: Expandable */}
+                      {(result.numerology.lifePathInfo as any)?.challenge && (() => {
+                        const text = (result.numerology.lifePathInfo as any).challenge as string;
+                        const [first] = splitFirstSentence(text);
+                        return (
+                          <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <Dot color="var(--ink-muted)" size={7} />
+                              <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>도전 과제</span>
+                            </div>
+                            <Expandable
+                              title="도전 과제"
+                              preview={first}
+                              accentColor="var(--ink-muted)"
+                            >
+                              <p
+                                className="text-[15px] leading-[2]"
+                                style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                              >
+                                {text}
+                              </p>
+                            </Expandable>
                           </div>
-                          <p
-                            className="text-[15px] leading-[2]"
-                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
-                          >
-                            {(result.numerology.lifePathInfo as any).challenge}
-                          </p>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {/* Personal Year Number */}
                       {(() => {
@@ -1884,27 +2023,31 @@ function AnalyzePageInner() {
               </Link>
             </ScrollReveal>
 
-            {/* Coming Soon */}
+            {/* Tarot link */}
             <ScrollReveal delay={800}>
-              <div
-                className="flex items-center gap-3 p-4 rounded-xl mb-4"
-                style={{ background: "var(--bg-warm)", border: "1.5px solid var(--border)" }}
+              <Link
+                href="/tarot"
+                className="flex items-center gap-3 p-4 rounded-xl mb-4 no-underline transition-opacity hover:opacity-85"
+                style={{ background: "var(--bg-warm)", border: "1.5px solid var(--tarot)" }}
               >
                 <div
                   className="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
-                  style={{ background: "rgba(197,61,67,0.08)" }}
+                  style={{ background: "rgba(26,74,74,0.08)" }}
                 >
-                  <Dot color="#C53D43" size={10} />
+                  <Dot color="#1A4A4A" size={10} />
                 </div>
-                <div>
+                <div className="flex-1">
                   <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>
-                    관상 / 타로 / 점성술 심화
+                    타로 카드 리딩
                   </div>
                   <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
-                    추가 체계 분석 곧 공개
+                    탄생 카드와 올해의 카드 확인하기
                   </div>
                 </div>
-              </div>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                  <path d="M6 4l4 4-4 4" stroke="var(--tarot)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
             </ScrollReveal>
 
             {/* Actions */}

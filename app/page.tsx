@@ -1,58 +1,139 @@
+"use client";
+
 import Link from "next/link";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
+import ScrollReveal from "@/components/ScrollReveal";
 
-const features = [
+/* ━━━ Data ━━━ */
+
+const howItWorksSteps = [
+  {
+    number: "1",
+    title: "생년월일 입력",
+    description: "30초면 충분합니다",
+  },
+  {
+    number: "2",
+    title: "4개 체계 동시 분석",
+    description: "사주 · 별자리 · 수비학 · MBTI",
+  },
+  {
+    number: "3",
+    title: "교차점 발견",
+    description: "여러 문명이 같은 답을 내린 지점",
+  },
+  {
+    number: "4",
+    title: "맞춤 리포트",
+    description: "직업 · 연애 · 성격 · 인생 조언",
+  },
+];
+
+const reportCards = [
   {
     color: "var(--seal)",
-    title: "교차 분석",
-    description: "동서양 4개 체계가 같은 답을 내리는 교차점",
-    href: "/analyze",
+    title: "교차점 수렴률",
+    description: "당신의 동서양 일치도",
   },
   {
     color: "var(--astro)",
-    title: "궁합 분석",
-    description: "두 사람의 운명이 교차하는 지점",
-    href: "/compatibility",
+    title: "아키타입",
+    description: "3개 문명이 본 당신의 본질",
   },
   {
     color: "var(--saju)",
-    title: "오늘의 운세",
-    description: "매일 달라지는 오행의 기운",
-    href: "/daily",
+    title: "오행 밸런스",
+    description: "木火土金水 에너지 분포",
+  },
+  {
+    color: "var(--numero)",
+    title: "직업/진로",
+    description: "운명이 가리키는 방향",
+  },
+  {
+    color: "var(--mbti)",
+    title: "연애/관계",
+    description: "사랑에 대한 교차 분석",
+  },
+  {
+    color: "var(--tarot)",
+    title: "인생 조언",
+    description: "4개 체계가 전하는 메시지",
   },
 ];
 
-const steps = [
-  { number: "1", title: "생년월일 입력", description: "30초면 충분합니다" },
-  { number: "2", title: "4개 체계 동시 분석", description: "사주 \u00B7 별자리 \u00B7 수비학 \u00B7 MBTI" },
-  { number: "3", title: "교차점 발견", description: "여러 문명이 같은 답을 내린 지점" },
+const services = [
+  {
+    title: "궁합 분석",
+    description: "두 사람의 교차점 비교",
+    href: "/compatibility",
+    color: "var(--astro)",
+  },
+  {
+    title: "오늘의 운세",
+    description: "매일 달라지는 오행의 기운",
+    href: "/daily",
+    color: "var(--saju)",
+  },
+  {
+    title: "타로 리딩",
+    description: "탄생 카드와 올해의 카드",
+    href: "/tarot",
+    color: "var(--tarot)",
+  },
+  {
+    title: "관상 분석",
+    description: "얼굴에서 읽는 오행",
+    href: "/face",
+    color: "var(--face)",
+  },
+];
+
+const whyCards = [
+  {
+    title: "하나의 체계가 아닌, 교차 검증",
+    description:
+      "다른 앱은 사주 OR 별자리. DESTINO는 동시에.",
+  },
+  {
+    title: "범용이 아닌, 개인화",
+    description: "1,080가지 조합별 고유한 해석",
+  },
+  {
+    title: "점술이 아닌, 분석",
+    description: "수천 년의 데이터가 수렴하는 패턴",
+  },
 ];
 
 const systems = [
-  { label: "사주", sub: "천간\u00B7지지\u00B7오행", color: "var(--saju)", active: true },
-  { label: "서양 점성술", sub: "태양궁\u00B7상승궁\u00B7달궁", color: "var(--astro)", active: true },
-  { label: "수비학", sub: "생명경로수\u00B7표현수", color: "var(--numero)", active: true },
-  { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)", active: true },
-  { label: "관상", sub: "오관\u00B7오행 체형", color: "var(--face)", active: false },
-  { label: "타로", sub: "메이저 아르카나", color: "var(--tarot)", active: false },
+  { label: "사주", sub: "천간·지지·오행", color: "var(--saju)" },
+  { label: "서양 점성술", sub: "태양궁·상승궁·달궁", color: "var(--astro)" },
+  { label: "수비학", sub: "생명경로수·표현수", color: "var(--numero)" },
+  { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)" },
+  { label: "관상", sub: "오관·오행 체형", color: "var(--face)" },
+  { label: "타로", sub: "메이저 아르카나", color: "var(--tarot)" },
 ];
+
+/* ━━━ Page ━━━ */
 
 export default function Home() {
   return (
-    <main
-      className="min-h-screen flex flex-col items-center px-6 py-16"
-      style={{ background: "var(--bg-paper)" }}
-    >
-      <div className="w-full max-w-[440px] flex flex-col gap-10">
-
-        {/* 히어로 */}
-        <section className="flex flex-col items-center text-center gap-6 animate-fade-up">
+    <main className="min-h-screen flex flex-col items-center">
+      {/* ━━━ 1. Hero ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 pt-20 pb-16"
+        style={{ background: "var(--bg-paper)" }}
+      >
+        <div className="w-full max-w-[440px] flex flex-col items-center text-center gap-6 animate-fade-up">
           <Seal size="lg" char="命" className="animate-seal-pop" />
 
           <p
             className="text-sm font-black tracking-[0.15em] uppercase"
-            style={{ color: "var(--ink-light)", fontFamily: "var(--font-display)" }}
+            style={{
+              color: "var(--ink-light)",
+              fontFamily: "var(--font-display)",
+            }}
           >
             DESTINO
           </p>
@@ -61,15 +142,20 @@ export default function Home() {
             className="text-[36px] font-black leading-[1.2] tracking-[-0.02em]"
             style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
           >
-            6개 문명이<br />내린 같은 답
+            6개 문명이
+            <br />
+            내린 같은 답
           </h1>
 
           <p
-            className="text-[15px] leading-[1.8]"
+            className="text-[15px] leading-[1.9]"
             style={{ color: "var(--ink-muted)" }}
           >
-            사주 · 별자리 · 수비학 · MBTI가 당신에 대해<br />
-            같은 결론을 내리는 교차점을 찾습니다
+            사주명리학 3,000년, 서양 점성술 4,000년, 수비학 2,500년.
+            <br />
+            서로 다른 문명에서 독립적으로 발전한 운명 분석 체계들이
+            <br />
+            당신에 대해 같은 결론을 내리는 지점이 있습니다.
           </p>
 
           <div className="flex flex-col gap-3 w-full mt-2">
@@ -97,151 +183,475 @@ export default function Home() {
               궁합 분석하기
             </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <Divider />
+      {/* ━━━ 2. 교차점이란? ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 py-16"
+        style={{ background: "var(--bg-white)" }}
+      >
+        <div className="w-full max-w-[440px]">
+          <ScrollReveal>
+            <p
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              style={{ color: "var(--ink-light)" }}
+            >
+              교차점이란
+            </p>
+            <h2
+              className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
+              style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+            >
+              서로 다른 문명이
+              <br />
+              같은 답을 내리는 지점
+            </h2>
+          </ScrollReveal>
 
-        {/* 기능 카드 */}
-        <section className="flex flex-col gap-4">
-          {features.map(({ color, title, description, href }) => (
-            <Link
-              key={title}
-              href={href}
-              className="flex items-start gap-4 rounded-lg p-5 transition-colors hover-lift"
+          {/* Visual explainer: East ↔ Intersection ↔ West */}
+          <ScrollReveal delay={100}>
+            <div
+              className="rounded-xl p-6"
               style={{
-                background: "var(--bg-white)",
+                background: "var(--bg-paper)",
                 border: "1px solid var(--border)",
               }}
             >
-              <span
-                className="text-[10px] mt-1 shrink-0"
-                style={{ color }}
-              >
-                ●
-              </span>
-              <div className="flex flex-col gap-1">
-                <span
-                  className="text-[16px] font-bold"
-                  style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
-                >
-                  {title}
-                </span>
-                <span
-                  className="text-[14px]"
-                  style={{ color: "var(--ink-muted)" }}
-                >
-                  {description}
-                </span>
+              <div className="flex items-stretch gap-0">
+                {/* East */}
+                <div className="flex-1 flex flex-col items-center text-center gap-2 py-3">
+                  <p
+                    className="text-[11px] tracking-[0.06em] uppercase font-medium"
+                    style={{ color: "var(--saju)" }}
+                  >
+                    동양
+                  </p>
+                  <p
+                    className="text-[20px] font-black"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      color: "var(--ink)",
+                    }}
+                  >
+                    甲木
+                  </p>
+                  <p
+                    className="text-[12px]"
+                    style={{ color: "var(--ink-muted)" }}
+                  >
+                    사주 · 오행 木
+                  </p>
+                </div>
+
+                {/* Center arrows + intersection */}
+                <div className="flex flex-col items-center justify-center px-2 gap-1">
+                  <span
+                    className="text-[14px]"
+                    style={{ color: "var(--ink-faint)" }}
+                  >
+                    &larr;
+                  </span>
+                  <span
+                    className="text-[11px] font-bold px-2 py-1 rounded border-2"
+                    style={{
+                      borderColor: "var(--seal)",
+                      color: "var(--seal)",
+                      fontFamily: "var(--font-display)",
+                    }}
+                  >
+                    교차점
+                  </span>
+                  <span
+                    className="text-[14px]"
+                    style={{ color: "var(--ink-faint)" }}
+                  >
+                    &rarr;
+                  </span>
+                </div>
+
+                {/* West */}
+                <div className="flex-1 flex flex-col items-center text-center gap-2 py-3">
+                  <p
+                    className="text-[11px] tracking-[0.06em] uppercase font-medium"
+                    style={{ color: "var(--astro)" }}
+                  >
+                    서양
+                  </p>
+                  <p
+                    className="text-[20px] font-black"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      color: "var(--ink)",
+                    }}
+                  >
+                    Water
+                  </p>
+                  <p
+                    className="text-[12px]"
+                    style={{ color: "var(--ink-muted)" }}
+                  >
+                    게자리 · 수비학 7
+                  </p>
+                </div>
               </div>
-            </Link>
-          ))}
-        </section>
 
-        <Divider />
+              <div
+                className="h-px mt-5 mb-4 opacity-15"
+                style={{
+                  background:
+                    "repeating-linear-gradient(90deg, #1C1917 0, #1C1917 4px, transparent 4px, transparent 8px)",
+                }}
+              />
 
-        {/* 이용 방법 */}
-        <section className="flex flex-col gap-4">
-          <p
-            className="text-[11px] tracking-[0.1em] uppercase font-medium"
-            style={{ color: "var(--ink-light)" }}
-          >
-            이용 방법
-          </p>
-          <div className="flex flex-col gap-5">
-            {steps.map(({ number, title, description }) => (
-              <div key={number} className="flex items-start gap-4">
-                <span
-                  className="w-7 h-7 shrink-0 inline-flex items-center justify-center rounded-full text-[12px] font-bold"
+              <p
+                className="text-[14px] leading-[1.8] text-center"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  color: "var(--ink-medium)",
+                }}
+              >
+                서로 다른 언어로 같은 답을 내렸습니다
+              </p>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ━━━ 3. 이렇게 분석합니다 ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 py-16"
+        style={{ background: "var(--bg-paper)" }}
+      >
+        <div className="w-full max-w-[440px]">
+          <ScrollReveal>
+            <p
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              style={{ color: "var(--ink-light)" }}
+            >
+              분석 과정
+            </p>
+            <h2
+              className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
+              style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+            >
+              이렇게 분석합니다
+            </h2>
+          </ScrollReveal>
+
+          <div className="flex flex-col gap-6">
+            {howItWorksSteps.map(({ number, title, description }, i) => (
+              <ScrollReveal key={number} delay={i * 80}>
+                <div className="flex items-start gap-4">
+                  <span
+                    className="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-full text-[13px] font-bold"
+                    style={{
+                      background: "var(--bg-warm)",
+                      color: "var(--ink-medium)",
+                      fontFamily: "var(--font-display)",
+                    }}
+                  >
+                    {number}
+                  </span>
+                  <div className="flex flex-col gap-1 pt-0.5">
+                    <span
+                      className="text-[16px] font-bold"
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        color: "var(--ink)",
+                      }}
+                    >
+                      {title}
+                    </span>
+                    <span
+                      className="text-[14px]"
+                      style={{ color: "var(--ink-muted)" }}
+                    >
+                      {description}
+                    </span>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━ 4. 무엇을 알 수 있나요? ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 py-16"
+        style={{ background: "var(--bg-white)" }}
+      >
+        <div className="w-full max-w-[440px]">
+          <ScrollReveal>
+            <p
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              style={{ color: "var(--ink-light)" }}
+            >
+              리포트 구성
+            </p>
+            <h2
+              className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
+              style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+            >
+              무엇을 알 수 있나요?
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-2 gap-3">
+            {reportCards.map(({ color, title, description }, i) => (
+              <ScrollReveal key={title} delay={i * 60}>
+                <div
+                  className="rounded-lg p-4 h-full"
                   style={{
-                    background: "var(--bg-warm)",
-                    color: "var(--ink-medium)",
-                    fontFamily: "var(--font-display)",
+                    background: "var(--bg-paper)",
+                    border: "1px solid var(--border)",
                   }}
                 >
-                  {number}
-                </span>
-                <div className="flex flex-col gap-0.5">
+                  <div
+                    className="text-[10px] mb-2"
+                    style={{ color }}
+                  >
+                    ●
+                  </div>
+                  <p
+                    className="text-[15px] font-bold leading-[1.4] mb-1"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      color: "var(--ink)",
+                    }}
+                  >
+                    {title}
+                  </p>
+                  <p
+                    className="text-[13px] leading-[1.6]"
+                    style={{ color: "var(--ink-muted)" }}
+                  >
+                    {description}
+                  </p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━ 5. 추가 서비스 ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 py-16"
+        style={{ background: "var(--bg-paper)" }}
+      >
+        <div className="w-full max-w-[440px]">
+          <ScrollReveal>
+            <p
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              style={{ color: "var(--ink-light)" }}
+            >
+              더 알아보기
+            </p>
+            <h2
+              className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
+              style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+            >
+              추가 서비스
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-2 gap-3">
+            {services.map(({ title, description, href, color }, i) => (
+              <ScrollReveal key={title} delay={i * 60}>
+                <Link
+                  href={href}
+                  className="flex flex-col gap-2 rounded-lg p-4 transition-colors hover-lift h-full"
+                  style={{
+                    background: "var(--bg-white)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <span className="text-[10px]" style={{ color }}>
+                    ●
+                  </span>
                   <span
                     className="text-[15px] font-bold"
-                    style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      color: "var(--ink)",
+                    }}
                   >
                     {title}
                   </span>
                   <span
-                    className="text-[14px]"
+                    className="text-[13px] leading-[1.6]"
                     style={{ color: "var(--ink-muted)" }}
                   >
                     {description}
                   </span>
-                </div>
-              </div>
+                </Link>
+              </ScrollReveal>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <Divider />
+      {/* ━━━ 6. 왜 DESTINO인가? ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 py-16"
+        style={{ background: "var(--bg-white)" }}
+      >
+        <div className="w-full max-w-[440px]">
+          <ScrollReveal>
+            <p
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              style={{ color: "var(--ink-light)" }}
+            >
+              WHY DESTINO
+            </p>
+            <h2
+              className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
+              style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+            >
+              왜 DESTINO인가?
+            </h2>
+          </ScrollReveal>
 
-        {/* 분석 체계 */}
-        <section className="flex flex-col gap-4">
-          <p
-            className="text-[11px] tracking-[0.1em] uppercase font-medium"
-            style={{ color: "var(--ink-light)" }}
-          >
-            분석 체계
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            {systems.map(({ label, sub, color, active }) => (
-              <div
-                key={label}
-                className={`rounded-lg p-4 relative ${active ? "hover-lift" : ""}`}
-                style={{
-                  background: "var(--bg-white)",
-                  border: "1px solid var(--border)",
-                  opacity: active ? 1 : 0.5,
-                }}
-              >
+          <div className="flex flex-col gap-4">
+            {whyCards.map(({ title, description }, i) => (
+              <ScrollReveal key={title} delay={i * 80}>
                 <div
-                  className="text-[10px] tracking-[0.08em] font-medium mb-1"
-                  style={{ color: active ? color : "var(--ink-faint)" }}
-                >
-                  ●
-                </div>
-                <div
-                  className="text-sm font-bold"
+                  className="rounded-lg p-5"
                   style={{
-                    color: active ? "var(--ink)" : "var(--ink-light)",
-                    fontFamily: "var(--font-display)",
+                    background: "var(--bg-paper)",
+                    border: "1px solid var(--border)",
                   }}
                 >
-                  {label}
-                </div>
-                <div
-                  className="text-[12px] mt-0.5"
-                  style={{ color: active ? "var(--ink-light)" : "var(--ink-faint)" }}
-                >
-                  {sub}
-                </div>
-                {!active && (
-                  <span
-                    className="absolute top-3 right-3 text-[9px] tracking-[0.05em] font-medium px-1.5 py-0.5 rounded"
+                  <p
+                    className="text-[16px] font-bold leading-[1.5] mb-2"
                     style={{
-                      background: "var(--bg-warm)",
-                      color: "var(--ink-light)",
+                      fontFamily: "var(--font-display)",
+                      color: "var(--ink)",
                     }}
                   >
-                    곧 출시
-                  </span>
-                )}
-              </div>
+                    {title}
+                  </p>
+                  <p
+                    className="text-[14px] leading-[1.8]"
+                    style={{ color: "var(--ink-muted)" }}
+                  >
+                    {description}
+                  </p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <Divider />
+      {/* ━━━ 7. 분석 체계 그리드 ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 py-16"
+        style={{ background: "var(--bg-paper)" }}
+      >
+        <div className="w-full max-w-[440px]">
+          <ScrollReveal>
+            <p
+              className="text-[11px] tracking-[0.1em] uppercase font-medium mb-4"
+              style={{ color: "var(--ink-light)" }}
+            >
+              분석 체계
+            </p>
+            <h2
+              className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
+              style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+            >
+              6개 문명의 지혜
+            </h2>
+          </ScrollReveal>
 
-        {/* 푸터 */}
+          <div className="grid grid-cols-2 gap-3">
+            {systems.map(({ label, sub, color }, i) => (
+              <ScrollReveal key={label} delay={i * 50}>
+                <div
+                  className="rounded-lg p-4 hover-lift"
+                  style={{
+                    background: "var(--bg-white)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <div
+                    className="text-[10px] tracking-[0.08em] font-medium mb-1"
+                    style={{ color }}
+                  >
+                    ●
+                  </div>
+                  <div
+                    className="text-sm font-bold"
+                    style={{
+                      color: "var(--ink)",
+                      fontFamily: "var(--font-display)",
+                    }}
+                  >
+                    {label}
+                  </div>
+                  <div
+                    className="text-[12px] mt-0.5"
+                    style={{ color: "var(--ink-light)" }}
+                  >
+                    {sub}
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━ 8. CTA 반복 ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 py-20"
+        style={{ background: "var(--bg-white)" }}
+      >
+        <ScrollReveal>
+          <div className="w-full max-w-[440px] flex flex-col items-center text-center gap-6">
+            <Seal size="lg" char="命" />
+            <p
+              className="text-[20px] font-black leading-[1.5]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--ink)",
+              }}
+            >
+              지금 무료로 분석해보세요
+            </p>
+            <p
+              className="text-[15px] leading-[1.8]"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              생년월일만 입력하면, 30초 안에
+              <br />
+              당신의 교차점을 발견합니다.
+            </p>
+            <Link
+              href="/analyze"
+              className="w-full max-w-[320px] py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-colors"
+              style={{
+                background: "var(--ink)",
+                color: "var(--bg-paper)",
+                fontFamily: "var(--font-display)",
+              }}
+            >
+              무료로 분석하기
+            </Link>
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* ━━━ 9. Footer ━━━ */}
+      <section
+        className="w-full flex flex-col items-center px-6 py-8"
+        style={{ background: "var(--bg-paper)" }}
+      >
         <footer
-          className="text-center flex flex-col gap-3 py-4"
+          className="w-full max-w-[440px] text-center flex flex-col gap-3 py-4"
           style={{ color: "var(--ink-light)" }}
         >
           <p
@@ -254,28 +664,47 @@ export default function Home() {
             className="flex justify-center gap-4 text-[12px]"
             style={{ color: "var(--ink-light)" }}
           >
-            <Link href="/analyze" className="hover:underline">교차 분석</Link>
+            <Link href="/analyze" className="hover:underline">
+              교차 분석
+            </Link>
             <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/compatibility" className="hover:underline">궁합 분석</Link>
+            <Link href="/compatibility" className="hover:underline">
+              궁합 분석
+            </Link>
             <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/daily" className="hover:underline">오늘의 운세</Link>
+            <Link href="/daily" className="hover:underline">
+              오늘의 운세
+            </Link>
             <span style={{ color: "var(--border)" }}>|</span>
-            <a href="mailto:hello@destino.me" className="hover:underline">문의</a>
+            <Link href="/tarot" className="hover:underline">
+              타로
+            </Link>
+            <span style={{ color: "var(--border)" }}>|</span>
+            <a href="mailto:hello@destino.me" className="hover:underline">
+              문의
+            </a>
           </div>
           <div
             className="flex justify-center gap-4 text-[12px]"
             style={{ color: "var(--ink-faint)" }}
           >
-            <Link href="/terms" className="hover:underline">이용약관</Link>
+            <Link href="/about" className="hover:underline">
+              분석 방법론
+            </Link>
             <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/privacy" className="hover:underline">개인정보처리방침</Link>
+            <Link href="/terms" className="hover:underline">
+              이용약관
+            </Link>
+            <span style={{ color: "var(--border)" }}>|</span>
+            <Link href="/privacy" className="hover:underline">
+              개인정보처리방침
+            </Link>
           </div>
           <p className="text-[12px]" style={{ color: "var(--ink-faint)" }}>
             &copy; {new Date().getFullYear()} DESTINO. All rights reserved.
           </p>
         </footer>
-
-      </div>
+      </section>
     </main>
   );
 }
