@@ -1,65 +1,107 @@
-import Image from "next/image";
+import Seal from "@/components/ui/Seal";
+import Divider from "@/components/ui/Divider";
+import WaitlistForm from "@/components/WaitlistForm";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main
+      className="min-h-screen flex flex-col items-center px-6 py-16"
+      style={{ background: "var(--bg-paper)" }}
+    >
+      <div className="w-full max-w-[440px] flex flex-col gap-10">
+
+        {/* 헤더 */}
+        <header className="flex items-center gap-3">
+          <Seal size="md" char="命" className="animate-seal-pop" />
+          <span
+            className="text-sm font-black tracking-[0.15em] uppercase"
+            style={{ color: "var(--ink-light)", fontFamily: "var(--font-display)" }}
+          >
+            DESTINO
+          </span>
+        </header>
+
+        <Divider />
+
+        {/* 히어로 */}
+        <section className="flex flex-col gap-4 animate-fade-up">
+          <div
+            className="inline-block px-3 py-1 border-2 rounded-[3px] -rotate-[2deg] text-xs font-black tracking-wide w-fit"
+            style={{ borderColor: "var(--seal)", color: "var(--seal)", fontFamily: "var(--font-display)" }}
+          >
+            교차점
+          </div>
+
+          <h1
+            className="text-[36px] font-black leading-[1.2] tracking-[-0.02em]"
+            style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+          >
+            6개 문명이<br />내린 같은 답
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p
+            className="text-[15px] leading-[1.8]"
+            style={{ color: "var(--ink-muted)" }}
+          >
+            사주, 서양 점성술, MBTI, 관상, 수비학, 타로.<br />
+            모두 다른 언어로 당신을 설명하지만,<br />
+            교차하는 지점은 하나입니다.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        </section>
+
+        <Divider />
+
+        {/* 웨이트리스트 폼 */}
+        <WaitlistForm />
+
+        <Divider />
+
+        {/* 6개 체계 */}
+        <section className="flex flex-col gap-4">
+          <p
+            className="text-[11px] tracking-[0.1em] uppercase font-medium"
+            style={{ color: "var(--ink-light)" }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            분석 체계
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "사주", sub: "천간·지지·오행", color: "var(--saju)" },
+              { label: "서양 점성술", sub: "태양궁·상승궁·달궁", color: "var(--astro)" },
+              { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)" },
+              { label: "관상", sub: "오관·오행 체형", color: "var(--face)" },
+              { label: "수비학", sub: "생명경로수·표현수", color: "var(--numero)" },
+              { label: "타로", sub: "메이저 아르카나", color: "var(--tarot)" },
+            ].map(({ label, sub, color }) => (
+              <div
+                key={label}
+                className="rounded-lg p-4"
+                style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
+              >
+                <div
+                  className="text-[10px] tracking-[0.08em] font-medium mb-1"
+                  style={{ color }}
+                >
+                  ●
+                </div>
+                <div
+                  className="text-sm font-bold"
+                  style={{ color: "var(--ink)", fontFamily: "var(--font-display)" }}
+                >
+                  {label}
+                </div>
+                <div
+                  className="text-[12px] mt-0.5"
+                  style={{ color: "var(--ink-light)" }}
+                >
+                  {sub}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+      </div>
+    </main>
   );
 }

@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 배경 */
+  --bg-paper: #F5F0E8;
+  --bg-white: #FFFDF7;
+  --bg-warm: #EDE8DE;
+
+  /* 텍스트 */
+  --ink: #1C1917;
+  --ink-medium: #3D3229;
+  --ink-muted: #6B5E53;
+  --ink-light: #8B7E74;
+  --ink-faint: #B8AFA4;
+  --ink-ghost: #D6CFC4;
+
+  /* 악센트 — 주홍 */
+  --seal: #C53D43;
+  --seal-light: #E8565C;
+  --seal-dark: #9E2F34;
+  --seal-bg: #FDF0F0;
+
+  /* 보더 */
+  --border: #E8E2D8;
+  --border-strong: #D6CFC4;
+
+  /* 체계별 컬러 */
+  --saju: #2D5A27;
+  --astro: #1E3A5F;
+  --mbti: #5B3E8A;
+  --face: #8B6914;
+  --numero: #6B3A2A;
+  --tarot: #1A4A4A;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: 'Noto Serif KR', 'Batang', Georgia, serif;
+  --font-body: 'Pretendard Variable', 'Pretendard', -apple-system, system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sealPop {
+  from { opacity: 0; transform: scale(0) rotate(-3deg); }
+  to   { opacity: 1; transform: scale(1) rotate(-3deg); }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.4s ease forwards;
+}
+
+.animate-seal-pop {
+  animation: sealPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
