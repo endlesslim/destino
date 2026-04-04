@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Seal from "@/components/ui/Seal";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Nav() {
   return (
@@ -26,7 +25,6 @@ export default function Nav() {
         </Link>
 
         {/* Right: Theme toggle */}
-        <ThemeToggle />
       </div>
     </nav>
   );
