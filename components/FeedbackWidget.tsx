@@ -103,9 +103,9 @@ export default function FeedbackWidget({
           onClick={() => handleRate("inaccurate")}
           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm font-semibold rounded-lg cursor-pointer transition-all"
           style={{
-            background: rating === "inaccurate" ? "#6B7280" : "var(--bg-paper)",
-            color: rating === "inaccurate" ? "#fff" : "var(--ink-medium)",
-            border: rating === "inaccurate" ? "1.5px solid #6B7280" : "1.5px solid var(--border)",
+            background: rating === "inaccurate" ? "var(--ink-light)" : "var(--bg-paper)",
+            color: rating === "inaccurate" ? "var(--bg-white)" : "var(--ink-medium)",
+            border: rating === "inaccurate" ? "1.5px solid var(--ink-light)" : "1.5px solid var(--border)",
             fontFamily: "inherit",
           }}
           aria-label="아니에요"

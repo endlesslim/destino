@@ -114,10 +114,10 @@ const SYSTEM_ORIGIN_LABELS: Record<string, string> = {
 };
 
 const SYSTEM_BORDER_COLORS: Record<string, string> = {
-  saju: "#2D5A27",
-  western: "#1E3A5F",
-  numerology: "#6B3A2A",
-  mbti: "#5B3E8A",
+  saju: "var(--saju)",
+  western: "var(--astro)",
+  numerology: "var(--numero)",
+  mbti: "var(--mbti)",
 };
 
 export default function CompatibilityPage() {
@@ -285,6 +285,9 @@ function CompatibilityPageInner() {
     canvas.height = 1920;
     const ctx = canvas.getContext("2d")!;
 
+    // Canvas drawing uses hardcoded hex colors because the Canvas 2D API
+    // cannot resolve CSS custom properties (var(--xxx)). These colors are
+    // intentionally fixed for the downloadable Instagram card image.
     // Background
     ctx.fillStyle = "#F5F0E8";
     ctx.fillRect(0, 0, 1080, 1920);
@@ -605,10 +608,10 @@ function CompatibilityPageInner() {
 
             <div className="flex justify-center gap-3 mt-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
               {([
-                ["#2D5A27", "오행"],
-                ["#1E3A5F", "별자리"],
-                ["#6B3A2A", "수비학"],
-                ["#7B4FA0", "MBTI"],
+                ["var(--saju)", "오행"],
+                ["var(--astro)", "별자리"],
+                ["var(--numero)", "수비학"],
+                ["var(--mbti)", "MBTI"],
               ] as const).map(([c, v]) => (
                 <span key={v} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-muted)" }}>
                   <Dot color={c} />{v}
@@ -691,7 +694,7 @@ function CompatibilityPageInner() {
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
               >
                 <div className="flex items-center gap-2 mb-5">
-                  <Dot color="#C53D43" size={10} />
+                  <Dot color="var(--seal)" size={10} />
                   <span className="text-sm font-bold tracking-wider" style={{ color: "var(--seal)" }}>궁합</span>
                 </div>
 
@@ -779,7 +782,7 @@ function CompatibilityPageInner() {
             <ScrollReveal delay={160}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
-                style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
+                style={{ background: "var(--seal-bg)", border: "1.5px solid var(--seal-light)" }}
               >
                 <div className="text-[11px] font-semibold tracking-widest mb-2" style={{ color: "var(--ink-light)" }}>
                   궁합 유형

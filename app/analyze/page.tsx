@@ -41,7 +41,7 @@ function splitFirstTwo(text: string): [string, string] {
 
 // ━━━ 탭 아이콘 (SVG) ━━━
 function TabIcon({ type, active }: { type: string; active: boolean }) {
-  const color = active ? "#C53D43" : "#8B7E74";
+  const color = active ? "var(--seal)" : "var(--ink-light)";
   const s = 16;
   const icons: Record<string, React.ReactNode> = {
     saju: (
@@ -78,7 +78,7 @@ const OHANG_BAR_COLORS: Record<Ohang, string> = {
   "木": "var(--saju)",
   "火": "var(--seal)",
   "土": "var(--face)",
-  "金": "#6B6B6B",
+  "金": "var(--ink-muted)",
   "水": "var(--astro)",
 };
 
@@ -538,6 +538,9 @@ function AnalyzePageInner() {
     canvas.height = 1920;
     const ctx = canvas.getContext("2d")!;
 
+    // Canvas drawing uses hardcoded hex colors because the Canvas 2D API
+    // cannot resolve CSS custom properties (var(--xxx)). These colors are
+    // intentionally fixed for the downloadable Instagram card image.
     // Background
     ctx.fillStyle = "#F5F0E8";
     ctx.fillRect(0, 0, 1080, 1920);
@@ -793,10 +796,10 @@ function AnalyzePageInner() {
 
             <div className="flex justify-center gap-3 mt-4 animate-fade-up" style={{ animationDelay: "0.15s" }}>
               {([
-                ["#2D5A27", "사주"],
-                ["#1E3A5F", "별자리"],
-                ["#5B3E8A", "수비학"],
-                ["#8B6914", "띠"],
+                ["var(--saju)", "사주"],
+                ["var(--astro)", "별자리"],
+                ["var(--mbti)", "수비학"],
+                ["var(--face)", "띠"],
               ] as const).map(([c, v]) => (
                 <span key={v} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-muted)" }}>
                   <Dot color={c} />{v}
@@ -880,7 +883,7 @@ function AnalyzePageInner() {
               >
                 <div className="flex flex-col gap-1 mb-5">
                   <div className="flex items-center gap-2">
-                    <Dot color="#C53D43" size={10} />
+                    <Dot color="var(--seal)" size={10} />
                     <span className="text-sm font-bold tracking-wider" style={{ color: "var(--seal)" }}>교차점</span>
                   </div>
                   <p className="text-[12px] leading-snug ml-[18px]" style={{ color: "var(--ink-light)" }}>
@@ -978,7 +981,7 @@ function AnalyzePageInner() {
             <ScrollReveal delay={160}>
               <div
                 className="rounded-[14px] p-6 mb-3.5 relative overflow-hidden"
-                style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
+                style={{ background: "var(--seal-bg)", border: "1.5px solid var(--seal-light)" }}
               >
                 {/* Seal watermark */}
                 <div
@@ -1367,7 +1370,7 @@ function AnalyzePageInner() {
                     {result.saju.personality?.career && result.saju.personality.career.length > 0 && (
                       <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
                         <div className="flex items-center gap-2 mb-3">
-                          <Dot color="#8B6914" size={7} />
+                          <Dot color="var(--face)" size={7} />
                           <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업/진로</span>
                         </div>
                         <div className="flex gap-2 mb-[16px]">
@@ -1385,7 +1388,7 @@ function AnalyzePageInner() {
                         <Expandable
                           title="직업/진로"
                           preview={splitFirstSentence(result.saju.personality.career[0])[0]}
-                          accentColor="#8B6914"
+                          accentColor="var(--face)"
                         >
                           <ul className="text-[15px] leading-[2] list-none p-0 m-0"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
@@ -1468,7 +1471,7 @@ function AnalyzePageInner() {
                     {/* Animal Sign — Expanded */}
                     <div className="p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
                       <div className="flex items-center gap-2 mb-3">
-                        <Dot color="#8B6914" size={7} />
+                        <Dot color="var(--face)" size={7} />
                         <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
                           {result.saju.animal.animal_kr}띠
                         </span>
@@ -2222,7 +2225,7 @@ function AnalyzePageInner() {
                       style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
                     >
                       <div className="flex items-center gap-2 mb-3">
-                        <Dot color="#C53D43" size={8} />
+                        <Dot color="var(--seal)" size={8} />
                         <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>교차점 일치 특성</span>
                         <span className="text-xs ml-auto" style={{ color: "var(--ink-light)" }}>
                           {result.matches.length}개 발견
@@ -2388,7 +2391,7 @@ function AnalyzePageInner() {
               <Link
                 href="/compatibility"
                 className="flex items-center gap-3 p-4 rounded-xl mb-3 no-underline transition-opacity hover:opacity-85"
-                style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
+                style={{ background: "var(--seal-bg)", border: "1.5px solid var(--seal-light)" }}
               >
                 <div
                   className="flex items-center justify-center w-9 h-9 rounded-[3px] shrink-0 -rotate-[3deg]"
@@ -2421,7 +2424,7 @@ function AnalyzePageInner() {
                   className="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
                   style={{ background: "rgba(26,74,74,0.08)" }}
                 >
-                  <Dot color="#1A4A4A" size={10} />
+                  <Dot color="var(--tarot)" size={10} />
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>

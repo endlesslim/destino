@@ -246,7 +246,7 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
           background: isProcessing
             ? "var(--ink-light)"
             : "var(--seal)",
-          color: "#FFFDF7",
+          color: "var(--bg-white)",
           border: "none",
           borderRadius: "14px",
           padding: "20px 36px",

@@ -53,6 +53,14 @@ html.night {
 
   --border: #4A4038;
   --border-strong: #5A5048;
+
+  /* System-specific colors adjusted for dark background */
+  --saju: #4CAF50;
+  --astro: #5C8DB8;
+  --mbti: #9B7FCC;
+  --face: #C4A030;
+  --numero: #A07060;
+  --tarot: #3A8A8A;
 }
 
 @theme inline {

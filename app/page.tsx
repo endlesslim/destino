@@ -473,7 +473,7 @@ export default function Home() {
                 className="h-px mt-5 mb-4 opacity-15"
                 style={{
                   background:
-                    "repeating-linear-gradient(90deg, #1C1917 0, #1C1917 4px, transparent 4px, transparent 8px)",
+                    "repeating-linear-gradient(90deg, var(--ink) 0, var(--ink) 4px, transparent 4px, transparent 8px)",
                 }}
               />
 

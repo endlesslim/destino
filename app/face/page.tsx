@@ -19,7 +19,7 @@ import {
 const OHANG_COLORS: Record<string, string> = {
   "木": "var(--saju)",
   "火": "var(--seal)",
-  "土": "#8B6914",
+  "土": "var(--face)",
   "金": "var(--ink-medium)",
   "水": "var(--astro)",
 };
