@@ -33,6 +33,28 @@
   --tarot: #1A4A4A;
 }
 
+/* ━━━ Night Mode (warm candlelight) ━━━ */
+html.night {
+  --bg-paper: #2A2520;
+  --bg-white: #352F28;
+  --bg-warm: #3D362E;
+
+  --ink: #E8E2D8;
+  --ink-medium: #D6CFC4;
+  --ink-muted: #B8AFA4;
+  --ink-light: #8B7E74;
+  --ink-faint: #6B5E53;
+  --ink-ghost: #4A4038;
+
+  --seal: #E8565C;
+  --seal-light: #F07078;
+  --seal-dark: #C53D43;
+  --seal-bg: #3D2828;
+
+  --border: #4A4038;
+  --border-strong: #5A5048;
+}
+
 @theme inline {
   --font-display: 'Noto Serif KR', 'Batang', Georgia, serif;
   --font-body: 'Pretendard Variable', 'Pretendard', -apple-system, system-ui, sans-serif;
@@ -117,4 +139,84 @@ body {
 
 .animate-pulse-subtle {
   animation: pulseSubtle 2.5s ease-in-out infinite;
+}
+
+/* ━━━ Scroll Reveal ━━━ */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ━━━ Card Hover Lift ━━━ */
+@keyframes hoverLift {
+  to { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,25,23,0.08); }
+}
+
+/* ━━━ Number Counter Pulse ━━━ */
+@keyframes countPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* ━━━ Seal Stamp Effect ━━━ */
+@keyframes stampIn {
+  0% { opacity: 0; transform: scale(1.5) rotate(-8deg); }
+  60% { opacity: 1; transform: scale(0.95) rotate(-2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-3deg); }
+}
+
+/* ━━━ Subtle Shimmer ━━━ */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ━━━ Dot Pulse (loading) ━━━ */
+@keyframes dotPulse {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+.animate-stamp-in {
+  animation: stampIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-count-pulse {
+  animation: countPulse 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(197,61,67,0.06) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* ━━━ Card Hover Lift (CSS-only) ━━━ */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(28,25,23,0.08);
+}
+
+.hover-lift:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* ━━━ Print-Friendly Layout ━━━ */
+@media print {
+  /* Hide non-essential elements */
+  nav, .no-print, button { display: none !important; }
+
+  /* Reset backgrounds for printing */
+  body { background: white !important; color: black !important; }
+
+  /* Ensure content fits */
+  main { max-width: 100% !important; padding: 20px !important; }
+
+  /* Show full content */
+  .print-break { page-break-before: always; }
 }

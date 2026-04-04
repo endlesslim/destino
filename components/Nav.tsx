@@ -4,11 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Seal from "@/components/ui/Seal";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV_ITEMS = [
   { label: "교차 분석", href: "/analyze" },
   { label: "궁합 분석", href: "/compatibility" },
   { label: "오늘의 운세", href: "/daily" },
+  { label: "분석 기록", href: "/history" },
   { label: "카드 갤러리", href: "/cards" },
 ];
 
@@ -58,8 +60,10 @@ export default function Nav() {
           </span>
         </Link>
 
-        {/* Right: Hamburger */}
-        <button
+        {/* Right: Night toggle + Hamburger */}
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <button
           onClick={() => setOpen((v) => !v)}
           className="p-2 -mr-2 cursor-pointer"
           aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
@@ -77,6 +81,7 @@ export default function Nav() {
             <line x1="0" y1="13" x2="18" y2="13" stroke="var(--ink-light)" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
+        </div>
 
         {/* Dropdown */}
         {open && (

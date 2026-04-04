@@ -6,8 +6,10 @@ import { useSearchParams } from "next/navigation";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
 import Nav from "@/components/Nav";
+import ScrollReveal from "@/components/ScrollReveal";
 import { analyzeCompatibility, type CompatibilityResult } from "@/lib/compatibility";
 import { OHANG_INFO, type Ohang } from "@/lib/saju";
+import { playStampSound } from "@/lib/sound";
 
 // ━━━ 컬러 도트 ━━━
 function Dot({ color, size = 8 }: { color: string; size?: number }) {
@@ -222,6 +224,7 @@ function CompatibilityPageInner() {
               })
             );
             setLoading(false);
+            playStampSound();
           }, 2400);
         }
       }, 300);
@@ -255,6 +258,7 @@ function CompatibilityPageInner() {
         })
       );
       setLoading(false);
+      playStampSound();
     }, 2400);
   };
 

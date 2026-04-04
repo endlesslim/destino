@@ -107,7 +107,7 @@ export default function Home() {
             <Link
               key={title}
               href={href}
-              className="flex items-start gap-4 rounded-lg p-5 transition-colors"
+              className="flex items-start gap-4 rounded-lg p-5 transition-colors hover-lift"
               style={{
                 background: "var(--bg-white)",
                 border: "1px solid var(--border)",
@@ -193,7 +193,7 @@ export default function Home() {
             {systems.map(({ label, sub, color, active }) => (
               <div
                 key={label}
-                className="rounded-lg p-4 relative"
+                className={`rounded-lg p-4 relative ${active ? "hover-lift" : ""}`}
                 style={{
                   background: "var(--bg-white)",
                   border: "1px solid var(--border)",

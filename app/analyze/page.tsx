@@ -6,9 +6,12 @@ import { useSearchParams } from "next/navigation";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
 import Nav from "@/components/Nav";
+import ScrollReveal from "@/components/ScrollReveal";
 
 import { analyzeCrosspoint, type CrosspointResult } from "@/lib/cross-engine";
 import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
+import { playStampSound } from "@/lib/sound";
+import { saveAnalysis } from "@/lib/history";
 
 // ━━━ 컬러 도트 ━━━
 function Dot({ color, size = 8 }: { color: string; size?: number }) {
@@ -309,8 +312,23 @@ function AnalyzePageInner() {
         if (yi && mi && di) {
           setLoading(true);
           setTimeout(() => {
-            setResult(analyzeCrosspoint(yi, mi, di, n || undefined));
+            const r = analyzeCrosspoint(yi, mi, di, n || undefined);
+            setResult(r);
             setLoading(false);
+            playStampSound();
+            try {
+              saveAnalysis({
+                id: `${yi}-${mi}-${di}-${Date.now()}`,
+                date: new Date().toISOString(),
+                year: yi,
+                month: mi,
+                day: di,
+                name: n || undefined,
+                convergenceRate: r.convergence_rate,
+                archetype: r.archetype,
+                elementHarmony: r.element_harmony.relation,
+              });
+            } catch {}
           }, 2000);
         }
       }, 300);
@@ -356,8 +374,24 @@ function AnalyzePageInner() {
     } catch {}
 
     setTimeout(() => {
-      setResult(analyzeCrosspoint(y, m, d, name || undefined));
+      const r = analyzeCrosspoint(y, m, d, name || undefined);
+      setResult(r);
       setLoading(false);
+      playStampSound();
+      // Save to history
+      try {
+        saveAnalysis({
+          id: `${y}-${m}-${d}-${Date.now()}`,
+          date: new Date().toISOString(),
+          year: y,
+          month: m,
+          day: d,
+          name: name || undefined,
+          convergenceRate: r.convergence_rate,
+          archetype: r.archetype,
+          elementHarmony: r.element_harmony.relation,
+        });
+      } catch {}
     }, 2000);
   };
 
@@ -436,7 +470,7 @@ function AnalyzePageInner() {
               {/* 이름 (선택) */}
               <div className="mb-3.5">
                 <label className="flex items-center gap-2 text-sm font-semibold mb-1.5" style={{ color: "var(--ink-medium)" }}>
-                  이름 (영문)
+                  이름
                   <span
                     className="text-[10px] font-normal px-1.5 py-0.5 rounded"
                     style={{ background: "var(--bg-paper)", color: "var(--ink-light)" }}
@@ -447,14 +481,14 @@ function AnalyzePageInner() {
                 <input
                   className={inputClass}
                   style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)" }}
-                  placeholder="예: Hong Gildong"
+                  placeholder="예: 홍길동"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
                   onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
                 />
                 <p className="text-[11px] mt-1" style={{ color: "var(--ink-light)" }}>
-                  입력 시 운명수(Destiny Number)도 분석합니다
+                  영문 이름 입력 시 운명수(Destiny Number)도 함께 분석합니다
                 </p>
               </div>
 
@@ -512,7 +546,7 @@ function AnalyzePageInner() {
               {/* 시간 (선택) */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold mb-1.5" style={{ color: "var(--ink-medium)" }}>
-                  태어난 시간 (준비 중)
+                  태어난 시간
                   <span
                     className="text-[10px] font-normal px-1.5 py-0.5 rounded"
                     style={{ background: "var(--bg-paper)", color: "var(--ink-light)" }}
@@ -531,7 +565,7 @@ function AnalyzePageInner() {
                   disabled
                 />
                 <p className="text-[11px] mt-1" style={{ color: "var(--ink-light)" }}>
-                  시주 분석은 다음 업데이트에 추가됩니다
+                  시간 입력 시 더 정확한 일주 분석이 가능합니다
                 </p>
               </div>
             </div>
@@ -625,14 +659,14 @@ function AnalyzePageInner() {
                ═══════════════════════════════════════════ */}
 
             {/* Date */}
-            <StaggerSection index={0} className="flex justify-end items-center mb-5">
+            <ScrollReveal delay={0} className="flex justify-end items-center mb-5">
               <span className="text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
                 {year}.{month}.{day}
               </span>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* Convergence Hero */}
-            <StaggerSection index={1}>
+            <ScrollReveal delay={80}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -726,10 +760,10 @@ function AnalyzePageInner() {
                   {result.element_harmony.description}
                 </div>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* Archetype Name ONLY (no description in free preview) */}
-            <StaggerSection index={2}>
+            <ScrollReveal delay={160}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
@@ -744,7 +778,7 @@ function AnalyzePageInner() {
                   {result.archetype}
                 </h2>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* ═══════════════════════════════════════════
                 SECTION B: PREMIUM REPORT (PaymentGate)
@@ -753,7 +787,7 @@ function AnalyzePageInner() {
               <div className="flex flex-col gap-1">
 
                 {/* B1: 아키타입 상세 */}
-                <StaggerSection index={0}>
+                <ScrollReveal delay={0}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -849,10 +883,10 @@ function AnalyzePageInner() {
                       </>
                     )}
                   </div>
-                </StaggerSection>
+                </ScrollReveal>
 
                 {/* B2: 오행 밸런스 */}
-                <StaggerSection index={1}>
+                <ScrollReveal delay={80}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -874,10 +908,10 @@ function AnalyzePageInner() {
                     </div>
                     <OhangBars balance={result.saju.ohang_balance} />
                   </div>
-                </StaggerSection>
+                </ScrollReveal>
 
                 {/* B3: 사주 상세분석 */}
-                <StaggerSection index={2}>
+                <ScrollReveal delay={160}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1050,10 +1084,10 @@ function AnalyzePageInner() {
                       )}
                     </div>
                   </div>
-                </StaggerSection>
+                </ScrollReveal>
 
                 {/* B4: 별자리 상세 */}
-                <StaggerSection index={3}>
+                <ScrollReveal delay={240}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1226,10 +1260,10 @@ function AnalyzePageInner() {
                       )}
                     </div>
                   </div>
-                </StaggerSection>
+                </ScrollReveal>
 
                 {/* B5: 수비학 상세 */}
-                <StaggerSection index={4}>
+                <ScrollReveal delay={320}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1443,10 +1477,10 @@ function AnalyzePageInner() {
                       )}
                     </div>
                   </div>
-                </StaggerSection>
+                </ScrollReveal>
 
                 {/* B6: 성격 종합 */}
-                <StaggerSection index={5}>
+                <ScrollReveal delay={400}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1519,11 +1553,11 @@ function AnalyzePageInner() {
                       </div>
                     </div>
                   </div>
-                </StaggerSection>
+                </ScrollReveal>
 
                 {/* B7: 교차점 일치 특성 */}
                 {result.matches.length > 0 && (
-                  <StaggerSection index={6}>
+                  <ScrollReveal delay={480}>
                     <div
                       className="rounded-[14px] p-5 mb-3.5"
                       style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1607,13 +1641,13 @@ function AnalyzePageInner() {
                         </>
                       )}
                     </div>
-                  </StaggerSection>
+                  </ScrollReveal>
                 )}
 
                 {/* B8: AI 맞춤 해석 */}
-                <StaggerSection index={7}>
+                <ScrollReveal delay={560}>
                   <AIInterpretation result={result} />
-                </StaggerSection>
+                </ScrollReveal>
 
               </div>
 
@@ -1622,7 +1656,7 @@ function AnalyzePageInner() {
                ═══════════════════════════════════════════ */}
 
             {/* Share */}
-            <StaggerSection index={8}>
+            <ScrollReveal delay={640}>
               <div
                 className="rounded-[14px] p-5 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1658,12 +1692,24 @@ function AnalyzePageInner() {
                       X (Twitter)
                     </button>
                   </div>
+                  <button
+                    onClick={() => window.print()}
+                    className="no-print w-full py-3 text-sm font-semibold rounded-lg cursor-pointer transition-opacity hover:opacity-80"
+                    style={{
+                      background: "transparent",
+                      color: "var(--ink-muted)",
+                      border: "1.5px solid var(--border)",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    PDF로 저장
+                  </button>
                 </div>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* 궁합 분석 CTA */}
-            <StaggerSection index={9}>
+            <ScrollReveal delay={720}>
               <Link
                 href="/compatibility"
                 className="flex items-center gap-3 p-4 rounded-xl mb-3 no-underline transition-opacity hover:opacity-85"
@@ -1687,10 +1733,10 @@ function AnalyzePageInner() {
                   <path d="M6 4l4 4-4 4" stroke="var(--seal)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </Link>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* Coming Soon */}
-            <StaggerSection index={10}>
+            <ScrollReveal delay={800}>
               <div
                 className="flex items-center gap-3 p-4 rounded-xl mb-4"
                 style={{ background: "var(--bg-warm)", border: "1.5px solid var(--border)" }}
@@ -1710,10 +1756,10 @@ function AnalyzePageInner() {
                   </div>
                 </div>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* Actions */}
-            <StaggerSection index={11}>
+            <ScrollReveal delay={880}>
               <div className="flex flex-col gap-2.5">
                 <button
                   onClick={reset}
@@ -1730,7 +1776,7 @@ function AnalyzePageInner() {
                   DESTINO 소개 보기
                 </Link>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* Bottom Spacer */}
             <div className="h-10" />
