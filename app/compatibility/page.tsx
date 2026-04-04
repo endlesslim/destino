@@ -15,6 +15,7 @@ import StaggerSection from "@/components/ui/StaggerSection";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { SajuIcon, AstroIcon, NumeroIcon, MBTIIcon, FaceIcon, TarotIcon, SystemIcon, StarIcon, TwinMoonsIcon } from "@/components/ui/SystemIcons";
 import { useCountUp } from "@/hooks/useCountUp";
+import Footer from "@/components/Footer";
 
 // ━━━ 칩 컴포넌트 ━━━
 function Chip({
@@ -1511,7 +1512,7 @@ function CompatibilityPageInner() {
                     <button
                       onClick={shareToKakao}
                       className="flex-1 py-3 text-sm font-semibold rounded-lg border-none cursor-pointer transition-opacity hover:opacity-80"
-                      style={{ background: "#FEE500", color: "#191919", fontFamily: "inherit" }}
+                      style={{ background: "var(--bg-warm)", color: "var(--ink)", fontFamily: "inherit", border: "1px solid var(--border)" }}
                     >
                       카카오톡 공유
                     </button>
@@ -1557,10 +1558,11 @@ function CompatibilityPageInner() {
               </div>
             </ScrollReveal>
 
-            {/* Bottom Spacer */}
             <div className="h-10" />
           </>
         )}
+
+        <Footer />
       </div>
     </main>
   );

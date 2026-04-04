@@ -35,40 +35,52 @@
   --face: #8B6914;
   --numero: #6B3A2A;
   --tarot: #1A4A4A;
+
+  /* 경고 컬러 */
+  --caution-bg: #FFFBEB;
+  --caution-border: #F59E0B;
+  --caution-title: #B45309;
+  --caution-text: #92400E;
 }
 
-/* ━━━ Night Mode (warm candlelight — 명도 강화) ━━━ */
+/* ━━━ Night Mode (warm candlelight — 명도 강화, 카드/배경 대비 강화) ━━━ */
 html.night {
-  --bg-paper: #1E1A16;
-  --bg-white: #2A2520;
-  --bg-warm: #332E28;
+  --bg-paper: #18150F;
+  --bg-white: #252017;
+  --bg-warm: #2E2820;
 
-  --ink: #F5F0E8;
-  --ink-medium: #E8E2D8;
-  --ink-muted: #D0C8BC;
-  --ink-light: #A89E94;
-  --ink-faint: #8B7E74;
-  --ink-ghost: #5A5048;
+  --ink: #F2ECE2;
+  --ink-medium: #E0D8CC;
+  --ink-muted: #C8BEB0;
+  --ink-light: #9E9488;
+  --ink-faint: #7A7068;
+  --ink-ghost: #4E453C;
 
   --seal: #F07078;
   --seal-light: #F8989E;
   --seal-dark: #E8565C;
-  --seal-bg: #3D2525;
+  --seal-bg: #2E1E1E;
 
-  --border: #4A4038;
-  --border-strong: #6B5E53;
+  --border: #3E3628;
+  --border-strong: #5A4E40;
 
   /* 그림자 */
-  --shadow-lift: rgba(0,0,0,0.25);
+  --shadow-lift: rgba(0,0,0,0.30);
   --shadow-btn: rgba(240,112,120,0.35);
 
-  /* System-specific colors — 다크 배경에서 잘 보이도록 명도 UP */
-  --saju: #6FCF73;
-  --astro: #7CB3E0;
-  --mbti: #B89EE0;
-  --face: #E0C050;
-  --numero: #C89880;
-  --tarot: #5CC0C0;
+  /* System-specific colors — 다크 배경에서 잘 보이도록 명도·채도 조정 */
+  --saju: #5EBF62;
+  --astro: #6DABE0;
+  --mbti: #A88ED8;
+  --face: #D4B445;
+  --numero: #C08A70;
+  --tarot: #50B8B8;
+
+  /* 다크모드 전용 — 경고/카카오 등 하드코딩 방지 */
+  --caution-bg: #2E2510;
+  --caution-border: #8B6E20;
+  --caution-title: #D4A830;
+  --caution-text: #C89E50;
 }
 
 @theme inline {
@@ -220,12 +232,12 @@ h1, h2, h3 {
 
 .hover-lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(28,25,23,0.08);
+  box-shadow: 0 8px 24px var(--shadow-lift);
 }
 
 .hover-lift:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(28,25,23,0.06);
+  box-shadow: 0 4px 12px var(--shadow-lift);
 }
 
 html.night .hover-lift:hover {

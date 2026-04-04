@@ -5,6 +5,7 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import Seal from "@/components/ui/Seal";
 import { getHistory, clearHistory, type SavedAnalysis } from "@/lib/history";
+import Footer from "@/components/Footer";
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<SavedAnalysis[]>([]);
@@ -166,6 +167,8 @@ export default function HistoryPage() {
             </button>
           </>
         )}
+
+        <Footer />
       </div>
     </main>
   );

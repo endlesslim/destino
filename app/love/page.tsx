@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import ScrollReveal from "@/components/ScrollReveal";
 import Seal from "@/components/ui/Seal";
 import { analyzeLove, type LoveAnalysis } from "@/lib/love-analysis";
+import Footer from "@/components/Footer";
 
 // ━━━ 칩 컴포넌트 ━━━
 
@@ -453,7 +454,7 @@ function ResultDisplay({ result }: { result: LoveAnalysis }) {
           >
             <div
               className="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
-              style={{ background: "rgba(45,90,39,0.08)" }}
+              style={{ background: "color-mix(in srgb, var(--saju) 10%, transparent)" }}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <rect x="1" y="3" width="12" height="9" rx="1.5" stroke="var(--saju)" strokeWidth="1.2" />
@@ -571,6 +572,8 @@ export default function LovePage() {
         ) : (
           <ResultDisplay result={result} />
         )}
+
+        <Footer />
       </div>
     </main>
   );

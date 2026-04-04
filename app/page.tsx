@@ -231,6 +231,13 @@ export default function Home() {
               궁합 분석하기
             </Link>
           </div>
+
+          {/* Scroll indicator */}
+          <div className="flex justify-center mt-8 animate-bounce" style={{ opacity: 0.3 }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12l7 7 7-7" stroke="var(--ink-light)" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </div>
         </div>
       </section>
 

@@ -17,7 +17,7 @@ import { generateMonthlyForecast, type MonthlyForecast } from "@/lib/monthly-for
 import { playStampSound } from "@/lib/sound";
 import { saveAnalysis } from "@/lib/history";
 import FeedbackWidget from "@/components/FeedbackWidget";
-import ChatConsultation from "@/components/ChatConsultation";
+import Footer from "@/components/Footer";
 import Dot from "@/components/ui/Dot";
 import StaggerSection from "@/components/ui/StaggerSection";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -449,7 +449,7 @@ function AnalyzePageInner() {
             const r = analyzeCrosspoint(yi, mi, di, n || undefined, hi !== undefined && hi >= 0 && hi <= 23 ? hi : undefined);
             setResult(r);
             setLoading(false);
-            window.scrollTo(0, 0);
+            requestAnimationFrame(() => { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; });
             playStampSound();
             try {
               saveAnalysis({
@@ -514,7 +514,7 @@ function AnalyzePageInner() {
       const r = analyzeCrosspoint(y, m, d, name || undefined, h !== undefined && h >= 0 && h <= 23 ? h : undefined);
       setResult(r);
       setLoading(false);
-      window.scrollTo(0, 0);
+      requestAnimationFrame(() => { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; });
       playStampSound();
       // Save to history
       try {
@@ -2476,16 +2476,6 @@ function AnalyzePageInner() {
             {/* AI Chat Consultation */}
             <ScrollReveal delay={630}>
               <div className="mb-3.5">
-                <ChatConsultation
-                  context={{
-                    archetype: result.archetype,
-                    saju: `${result.saju.day.cheongan} (${result.saju.day.ohang})`,
-                    zodiac: result.western.sunSign.name,
-                    numerology: `${result.numerology.lifePath}`,
-                    mbti: result.mbti.primaryType,
-                    convergenceRate: result.convergence_rate,
-                  }}
-                />
               </div>
             </ScrollReveal>
 
@@ -2521,7 +2511,7 @@ function AnalyzePageInner() {
                     <button
                       onClick={shareToKakao}
                       className="flex-1 py-3 text-sm font-semibold rounded-lg border-none cursor-pointer transition-opacity hover:opacity-80"
-                      style={{ background: "#FEE500", color: "#191919", fontFamily: "inherit" }}
+                      style={{ background: "var(--bg-warm)", color: "var(--ink)", fontFamily: "inherit", border: "1px solid var(--border)" }}
                     >
                       카카오톡 공유
                     </button>
@@ -2675,10 +2665,11 @@ function AnalyzePageInner() {
               </div>
             </ScrollReveal>
 
-            {/* Bottom Spacer */}
             <div className="h-10" />
           </>
         )}
+
+        <Footer />
       </div>
     </main>
   );
@@ -2726,12 +2717,12 @@ function MonthlyForecastSection({ year, month, day }: { year: number; month: num
           </div>
           <div
             className="flex-1 rounded-lg px-3 py-2.5 text-center"
-            style={{ background: "#FFF8E1", border: "1px solid #F59E0B" }}
+            style={{ background: "var(--caution-bg)", border: "1px solid var(--caution-border)" }}
           >
-            <div className="text-[10px] font-semibold tracking-wider mb-0.5" style={{ color: "#B45309" }}>
+            <div className="text-[10px] font-semibold tracking-wider mb-0.5" style={{ color: "var(--caution-title)" }}>
               CAUTION
             </div>
-            <div className="text-lg font-black" style={{ fontFamily: "var(--font-display)", color: "#B45309" }}>
+            <div className="text-lg font-black" style={{ fontFamily: "var(--font-display)", color: "var(--caution-title)" }}>
               {forecast.cautionMonth}월
             </div>
           </div>
@@ -2743,8 +2734,8 @@ function MonthlyForecastSection({ year, month, day }: { year: number; month: num
             const isBest = m.month === forecast.bestMonth;
             const isCaution = m.month === forecast.cautionMonth;
             const isExpanded = expandedMonth === m.month;
-            const borderColor = isBest ? "var(--seal)" : isCaution ? "#F59E0B" : "var(--border)";
-            const bgColor = isBest ? "var(--seal-bg)" : isCaution ? "#FFFBEB" : "var(--bg-white)";
+            const borderColor = isBest ? "var(--seal)" : isCaution ? "var(--caution-border)" : "var(--border)";
+            const bgColor = isBest ? "var(--seal-bg)" : isCaution ? "var(--caution-bg)" : "var(--bg-white)";
 
             return (
               <button
@@ -2768,7 +2759,7 @@ function MonthlyForecastSection({ year, month, day }: { year: number; month: num
                   <span
                     className="text-[11px] font-bold px-2 py-0.5 rounded-full"
                     style={{
-                      background: isBest ? "var(--seal)" : isCaution ? "#F59E0B" : "var(--ink-muted)",
+                      background: isBest ? "var(--seal)" : isCaution ? "var(--caution-border)" : "var(--ink-muted)",
                       color: "#fff",
                     }}
                   >
@@ -2786,7 +2777,7 @@ function MonthlyForecastSection({ year, month, day }: { year: number; month: num
                       className="h-full rounded-full transition-all duration-700"
                       style={{
                         width: `${m.score * 10}%`,
-                        background: isBest ? "var(--seal)" : isCaution ? "#F59E0B" : "var(--ink-muted)",
+                        background: isBest ? "var(--seal)" : isCaution ? "var(--caution-border)" : "var(--ink-muted)",
                       }}
                     />
                   </div>

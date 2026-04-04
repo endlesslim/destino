@@ -19,10 +19,19 @@ export interface CharBreakdown {
   strokes: number;
 }
 
+export interface HanjaCharBreakdown {
+  char: string;
+  strokes: number;
+  known: boolean; // lookup에 있는 한자인지
+}
+
 export interface NameAnalysis {
   name: string;
+  hanjaName?: string;        // 한자 이름 (입력된 경우)
+  analysisMode: "한자" | "한글"; // 분석 모드
   totalStrokes: number;
   charBreakdowns: CharBreakdown[];
+  hanjaBreakdowns?: HanjaCharBreakdown[]; // 한자 글자별 획수
 
   // 성명학 기본
   cheonGeok: GeokResult;  // 천격 (성)
@@ -65,6 +74,66 @@ const JONG_STROKES: Record<string, number> = {
   "ㅇ": 1, "ㅈ": 3, "ㅊ": 4, "ㅋ": 3, "ㅌ": 4,
   "ㅍ": 4, "ㅎ": 3,
 };
+
+// ━━━ 한자 획수 매핑 (한국 이름에 자주 쓰이는 한자) ━━━
+
+const HANJA_STROKES: Record<string, number> = {
+  // 성씨 (Top 30)
+  "金": 8, "李": 7, "朴": 6, "崔": 11, "鄭": 15,
+  "姜": 9, "趙": 14, "尹": 4, "張": 11, "林": 8,
+  "韓": 17, "吳": 7, "徐": 10, "申": 5, "權": 22,
+  "黃": 12, "安": 6, "宋": 7, "柳": 9, "洪": 9,
+  "全": 6, "高": 10, "文": 4, "梁": 11, "孫": 10,
+  "裴": 14, "白": 5, "許": 11, "劉": 15, "南": 9,
+
+  // 이름 - 남자 이름에 자주 쓰이는 한자
+  "俊": 9, "民": 5, "成": 6, "正": 5, "承": 8,
+  "賢": 15, "相": 9, "鎬": 18, "勳": 16, "哲": 10,
+  "泰": 10, "炯": 9, "東": 8, "秀": 7, "榮": 14,
+  "永": 5, "龍": 16, "浩": 10, "基": 11, "鍾": 17,
+  "鉉": 13, "宰": 10, "仁": 4, "建": 9, "弘": 5,
+  "漢": 14, "昌": 8, "雲": 12, "日": 4, "大": 3,
+  "光": 6, "明": 8, "忠": 8, "孝": 7, "信": 9,
+  "義": 13, "德": 15, "智": 12, "勇": 9, "才": 3,
+  "碩": 14, "奎": 9, "翰": 16, "豪": 14, "亨": 7,
+  "載": 13, "廷": 7, "世": 5, "鎮": 18, "容": 10,
+
+  // 이름 - 여자 이름에 자주 쓰이는 한자
+  "美": 9, "英": 8, "惠": 12, "慧": 15, "珍": 9,
+  "淑": 11, "恩": 10, "貞": 9, "善": 12, "靜": 16,
+  "愛": 13, "玉": 5, "順": 12, "花": 7, "蓮": 15,
+  "潤": 15, "銀": 14, "素": 10, "真": 10, "彬": 11,
+  "敏": 11, "娟": 10, "瑛": 12, "雅": 12, "芝": 6,
+  "雪": 11, "允": 4, "多": 6, "娜": 9, "夏": 10,
+  "妍": 7, "彩": 11, "志": 7, "秋": 9, "春": 9,
+  "瑞": 13, "琳": 12, "莎": 10, "蘭": 21, "嬉": 15,
+
+  // 일반 상용 한자
+  "吉": 6, "童": 12, "天": 4, "地": 6, "人": 2,
+  "山": 3, "水": 4, "火": 4, "木": 4, "土": 3,
+  "星": 9, "月": 4, "風": 9, "雨": 8, "海": 10,
+  "江": 6, "石": 5, "國": 11, "家": 10, "福": 13,
+  "壽": 14, "富": 12, "貴": 12, "聖": 13, "道": 12,
+  "學": 16, "武": 8, "中": 4, "和": 8, "禮": 18,
+};
+
+function getHanjaStrokes(char: string): HanjaCharBreakdown {
+  const strokes = HANJA_STROKES[char];
+  if (strokes !== undefined) {
+    return { char, strokes, known: true };
+  }
+  // 알 수 없는 한자 — CJK 범위인지 확인
+  const code = char.charCodeAt(0);
+  if (code >= 0x4E00 && code <= 0x9FFF) {
+    return { char, strokes: 0, known: false };
+  }
+  return { char, strokes: 0, known: false };
+}
+
+function isCJKChar(char: string): boolean {
+  const code = char.charCodeAt(0);
+  return code >= 0x4E00 && code <= 0x9FFF;
+}
 
 // 초성 목록 (Unicode 순서)
 const CHO_LIST = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
@@ -217,8 +286,9 @@ export function analyzeKoreanName(
   birthYear?: number,
   birthMonth?: number,
   birthDay?: number,
+  hanjaName?: string,
 ): NameAnalysis {
-  // 1. 각 글자 분해 및 획수 계산
+  // 1. 한글 글자 분해 (표시용)
   const chars = [...name];
   const charBreakdowns: CharBreakdown[] = [];
   for (const c of chars) {
@@ -226,14 +296,46 @@ export function analyzeKoreanName(
     if (bd) charBreakdowns.push(bd);
   }
 
-  const totalStrokes = charBreakdowns.reduce((s, b) => s + b.strokes, 0);
+  // 2. 한자 입력 여부에 따라 획수 계산 모드 결정
+  const useHanja = hanjaName && hanjaName.length >= 2 && [...hanjaName].every(c => isCJKChar(c));
+  const analysisMode: "한자" | "한글" = useHanja ? "한자" : "한글";
 
-  // 2. 성명학 격수 계산
+  let hanjaBreakdowns: HanjaCharBreakdown[] | undefined;
+  let surnameStrokes: number;
+  let firstNameStrokes: number;
+  let restNameStrokes: number;
+  let totalStrokes: number;
+
+  if (useHanja && hanjaName) {
+    // 한자 기반 획수 계산
+    const hanjaChars = [...hanjaName];
+    hanjaBreakdowns = hanjaChars.map(c => getHanjaStrokes(c));
+
+    // 알 수 없는 한자가 있는지 확인
+    const hasUnknown = hanjaBreakdowns.some(bd => !bd.known);
+    if (hasUnknown) {
+      // 알 수 없는 한자가 있으면 한글 모드로 폴백
+      const hangulTotal = charBreakdowns.reduce((s, b) => s + b.strokes, 0);
+      surnameStrokes = charBreakdowns[0]?.strokes || 0;
+      firstNameStrokes = charBreakdowns[1]?.strokes || 0;
+      restNameStrokes = charBreakdowns.slice(1).reduce((s, b) => s + b.strokes, 0);
+      totalStrokes = hangulTotal;
+    } else {
+      surnameStrokes = hanjaBreakdowns[0]?.strokes || 0;
+      firstNameStrokes = hanjaBreakdowns[1]?.strokes || 0;
+      restNameStrokes = hanjaBreakdowns.slice(1).reduce((s, b) => s + b.strokes, 0);
+      totalStrokes = hanjaBreakdowns.reduce((s, b) => s + b.strokes, 0);
+    }
+  } else {
+    // 한글 기반 획수 계산 (기존 로직)
+    totalStrokes = charBreakdowns.reduce((s, b) => s + b.strokes, 0);
+    surnameStrokes = charBreakdowns[0]?.strokes || 0;
+    firstNameStrokes = charBreakdowns[1]?.strokes || 0;
+    restNameStrokes = charBreakdowns.slice(1).reduce((s, b) => s + b.strokes, 0);
+  }
+
+  // 3. 성명학 격수 계산
   // 성(1자) + 이름(1-3자) 구조 가정
-  const surnameStrokes = charBreakdowns[0]?.strokes || 0;
-  const firstNameStrokes = charBreakdowns[1]?.strokes || 0;
-  const restNameStrokes = charBreakdowns.slice(1).reduce((s, b) => s + b.strokes, 0);
-
   const cheonStrokes = surnameStrokes;
   const inStrokes = surnameStrokes + firstNameStrokes;
   const jiStrokes = restNameStrokes;
@@ -277,8 +379,11 @@ export function analyzeKoreanName(
 
   return {
     name,
+    hanjaName: useHanja ? hanjaName : undefined,
+    analysisMode,
     totalStrokes,
     charBreakdowns,
+    hanjaBreakdowns,
     cheonGeok,
     inGeok,
     jiGeok,

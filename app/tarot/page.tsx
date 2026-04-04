@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import ScrollReveal from "@/components/ScrollReveal";
 import Seal from "@/components/ui/Seal";
 import TarotCardVisual from "@/components/TarotCardVisual";
+import Footer from "@/components/Footer";
 import {
   generateTarotReading,
   toRomanNumeral,
@@ -544,36 +545,7 @@ export default function TarotPage() {
           <ReadingDisplay reading={reading} />
         )}
 
-        <Divider />
-
-        {/* Footer */}
-        <footer
-          className="text-center flex flex-col gap-2 py-4"
-          style={{ color: "var(--ink-light)" }}
-        >
-          <p
-            className="text-[11px] tracking-[0.1em] uppercase font-medium"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            DESTINO
-          </p>
-          <div
-            className="flex justify-center gap-4 text-[12px]"
-            style={{ color: "var(--ink-light)" }}
-          >
-            <Link href="/analyze" className="hover:underline">
-              교차 분석
-            </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/daily" className="hover:underline">
-              오늘의 운세
-            </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/" className="hover:underline">
-              홈으로
-            </Link>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </main>
   );

@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import ScrollReveal from "@/components/ScrollReveal";
 import Seal from "@/components/ui/Seal";
 import { analyzeCareer, type CareerAnalysis } from "@/lib/career-analysis";
+import Footer from "@/components/Footer";
 
 // ━━━ Fit % 바 ━━━
 
@@ -541,6 +542,8 @@ export default function CareerPage() {
         ) : (
           <ResultDisplay result={result} />
         )}
+
+        <Footer />
       </div>
     </main>
   );

@@ -12,6 +12,7 @@ import { playStampSound } from "@/lib/sound";
 import Dot from "@/components/ui/Dot";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { useCountUp } from "@/hooks/useCountUp";
+import Footer from "@/components/Footer";
 
 // ━━━ 칩 ━━━
 function Chip({ label, color = "var(--ink-muted)", bg }: { label: string; color?: string; bg?: string }) {
@@ -441,7 +442,7 @@ function MarriagePageInner() {
                   background: "var(--seal)",
                   color: "#fff",
                   fontFamily: "inherit",
-                  boxShadow: valid ? "0 4px 16px rgba(197,61,67,0.25)" : "none",
+                  boxShadow: valid ? "0 4px 16px var(--shadow-btn)" : "none",
                 }}
               >
                 결혼 궁합 분석하기
@@ -601,16 +602,16 @@ function MarriagePageInner() {
             <ScrollReveal delay={350}>
               <div
                 className="rounded-[14px] p-4 mb-3.5"
-                style={{ background: "#FFFBEB", border: "1.5px solid #F59E0B" }}
+                style={{ background: "var(--caution-bg)", border: "1.5px solid var(--caution-border)" }}
               >
-                <div className="text-[11px] font-bold tracking-wider mb-2" style={{ color: "#B45309" }}>
+                <div className="text-[11px] font-bold tracking-wider mb-2" style={{ color: "var(--caution-title)" }}>
                   주의할 시기
                 </div>
                 <ul className="flex flex-col gap-1.5">
                   {result.cautionPeriods.map((period) => (
-                    <li key={period} className="text-[13px] leading-[1.7] flex gap-2" style={{ color: "#92400E" }}>
+                    <li key={period} className="text-[13px] leading-[1.7] flex gap-2" style={{ color: "var(--caution-text)" }}>
                       <span className="shrink-0 mt-1">
-                        <Dot color="#F59E0B" size={5} />
+                        <Dot color="var(--caution-border)" size={5} />
                       </span>
                       {period}
                     </li>
@@ -713,7 +714,7 @@ function MarriagePageInner() {
                     <button
                       onClick={shareToKakao}
                       className="flex-1 py-3 text-sm font-semibold rounded-lg border-none cursor-pointer transition-opacity hover:opacity-80"
-                      style={{ background: "#FEE500", color: "#191919", fontFamily: "inherit" }}
+                      style={{ background: "var(--bg-warm)", color: "var(--ink)", fontFamily: "inherit", border: "1px solid var(--border)" }}
                     >
                       카카오톡 공유
                     </button>
@@ -745,7 +746,7 @@ function MarriagePageInner() {
                 <button
                   onClick={reset}
                   className="w-full py-4 text-[15px] font-bold rounded-xl border-none cursor-pointer transition-opacity hover:opacity-85"
-                  style={{ background: "var(--seal)", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 16px rgba(197,61,67,0.25)" }}
+                  style={{ background: "var(--seal)", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 16px var(--shadow-btn)" }}
                 >
                   다시 분석하기
                 </button>
@@ -762,6 +763,8 @@ function MarriagePageInner() {
             <div className="h-10" />
           </>
         )}
+
+        <Footer />
       </div>
     </main>
   );

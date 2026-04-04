@@ -10,6 +10,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { OHANG_INFO, type Ohang, OHANG_LIST } from "@/lib/saju";
 import { analyzeFamilyRelationships, type FamilyMember, type FamilyAnalysis } from "@/lib/family-analysis";
 import { useCountUp } from "@/hooks/useCountUp";
+import Footer from "@/components/Footer";
 
 // ━━━ 역할 드롭다운 옵션 ━━━
 const ROLE_OPTIONS = [
@@ -267,6 +268,8 @@ export default function FamilyPage() {
           /* ━━━ 결과 ━━━ */
           <FamilyResult result={result} onReset={() => setResult(null)} />
         )}
+
+        <Footer />
       </div>
     </main>
   );
@@ -280,11 +283,11 @@ function FamilyResult({ result, onReset }: { result: FamilyAnalysis; onReset: ()
       {/* 1. 구성원 카드 */}
       <StaggerSection index={0}>
         <SectionHeader color="var(--seal)" title="가족 구성원" subtitle="각 구성원의 아키타입" />
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {result.members.map((m, i) => (
             <div
               key={i}
-              className="shrink-0 w-[140px] rounded-xl p-4 flex flex-col items-center text-center gap-2"
+              className="rounded-xl p-4 flex flex-col items-center text-center gap-2"
               style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
             >
               <span
@@ -337,9 +340,9 @@ function FamilyResult({ result, onReset }: { result: FamilyAnalysis; onReset: ()
                   <span
                     className="text-xs font-bold px-2 py-0.5 rounded-full"
                     style={{
-                      background: rel.relation === "상생" ? "#2D5A2715" :
-                        rel.relation === "상극" ? "#C53D4315" :
-                          rel.relation === "비화" ? "#1E3A5F15" : "#8B691415",
+                      background: rel.relation === "상생" ? "color-mix(in srgb, var(--saju) 12%, transparent)" :
+                        rel.relation === "상극" ? "color-mix(in srgb, var(--seal) 12%, transparent)" :
+                          rel.relation === "비화" ? "color-mix(in srgb, var(--astro) 12%, transparent)" : "color-mix(in srgb, var(--face) 12%, transparent)",
                       color: rel.relation === "상생" ? "var(--saju)" :
                         rel.relation === "상극" ? "var(--seal)" :
                           rel.relation === "비화" ? "var(--astro)" : "var(--face)",

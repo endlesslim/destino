@@ -8,6 +8,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import StaggerSection from "@/components/ui/StaggerSection";
 import { OHANG_INFO, type Ohang } from "@/lib/saju";
 import { analyzeKoreanName, type NameAnalysis } from "@/lib/name-analysis";
+import Footer from "@/components/Footer";
 
 // ━━━ 스코어 원 (대형) ━━━
 function BigScoreCircle({ score, label }: { score: number; label: string }) {
@@ -62,6 +63,7 @@ function OhangBadge({ ohang, size = "md" }: { ohang: Ohang; size?: "sm" | "md" }
 // ━━━ 메인 페이지 ━━━
 export default function NameAnalysisPage() {
   const [name, setName] = useState("");
+  const [hanjaName, setHanjaName] = useState("");
   const [useBirth, setUseBirth] = useState(false);
   const [birthYear, setBirthYear] = useState(2000);
   const [birthMonth, setBirthMonth] = useState(1);
@@ -114,11 +116,12 @@ export default function NameAnalysisPage() {
         useBirth ? birthYear : undefined,
         useBirth ? birthMonth : undefined,
         useBirth ? birthDay : undefined,
+        hanjaName.trim() || undefined,
       );
       setResult(analysis);
       setLoading(false);
     }, 600);
-  }, [name, useBirth, birthYear, birthMonth, birthDay, validateName]);
+  }, [name, hanjaName, useBirth, birthYear, birthMonth, birthDay, validateName]);
 
   return (
     <main className="min-h-screen flex flex-col items-center" style={{ background: "var(--bg-paper)" }}>
@@ -178,6 +181,39 @@ export default function NameAnalysisPage() {
               )}
               <p className="text-xs mt-2" style={{ color: "var(--ink-light)" }}>
                 성 포함 2~4자 한글 이름을 입력하세요
+              </p>
+            </div>
+
+            {/* Hanja input */}
+            <div
+              className="rounded-xl p-5"
+              style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
+            >
+              <label
+                className="text-sm font-bold block mb-2"
+                style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+              >
+                한자 이름 <span className="font-normal text-xs" style={{ color: "var(--ink-light)" }}>(선택)</span>
+              </label>
+              <input
+                type="text"
+                value={hanjaName}
+                onChange={e => setHanjaName(e.target.value)}
+                placeholder="예: 金民俊"
+                maxLength={4}
+                className="w-full h-12 px-4 rounded-lg text-lg font-bold text-center tracking-widest"
+                style={{
+                  background: "var(--bg-paper)",
+                  border: "1px solid var(--border)",
+                  color: "var(--ink)",
+                  fontFamily: "var(--font-display)",
+                }}
+                aria-label="한자 이름 입력"
+              />
+              <p className="text-xs mt-2" style={{ color: "var(--ink-light)" }}>
+                {hanjaName.trim()
+                  ? "한자 획수 기반으로 정통 성명학 분석을 진행합니다"
+                  : "한자 이름을 입력하시면 더 정확한 획수 분석이 가능합니다"}
               </p>
             </div>
 
@@ -260,6 +296,8 @@ export default function NameAnalysisPage() {
           /* ━━━ 결과 ━━━ */
           <NameResult result={result} onReset={() => setResult(null)} />
         )}
+
+        <Footer />
       </div>
     </main>
   );
@@ -282,41 +320,87 @@ function NameResult({ result, onReset }: { result: NameAnalysis; onReset: () => 
           >
             {result.name}
           </h2>
+          {result.hanjaName && (
+            <p className="text-lg tracking-[0.2em]" style={{ color: "var(--ink-muted)", fontFamily: "var(--font-display)" }}>
+              {result.hanjaName}
+            </p>
+          )}
           <BigScoreCircle score={result.overallScore} label={result.overallLabel} />
           <p className="text-xs" style={{ color: "var(--ink-muted)" }}>
             총 획수: {result.totalStrokes}획
           </p>
+          <span
+            className="text-[11px] font-bold px-3 py-1 rounded-full"
+            style={{
+              background: result.analysisMode === "한자" ? "color-mix(in srgb, var(--saju) 12%, transparent)" : "color-mix(in srgb, var(--face) 12%, transparent)",
+              color: result.analysisMode === "한자" ? "var(--saju)" : "var(--face)",
+            }}
+          >
+            {result.analysisMode === "한자" ? "한자 기반 정통 분석" : "한글 기반 간이 분석"}
+          </span>
         </div>
       </StaggerSection>
 
       {/* 2. 글자별 획수 */}
       <StaggerSection index={1}>
-        <SectionHeader color="var(--seal)" title="글자별 획수 분석" />
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(90px,1fr))] gap-3">
-          {result.charBreakdowns.map((bd, i) => (
-            <div
-              key={i}
-              className="rounded-xl p-4 text-center"
-              style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
-            >
+        <SectionHeader
+          color="var(--seal)"
+          title="글자별 획수 분석"
+          subtitle={result.analysisMode === "한자" ? "한자 획수 기준" : "한글 자모 획수 기준"}
+        />
+        {result.hanjaBreakdowns && result.hanjaBreakdowns.length > 0 ? (
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(90px,1fr))] gap-3">
+            {result.hanjaBreakdowns.map((bd, i) => (
               <div
-                className="text-[24px] font-black mb-2"
-                style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                key={i}
+                className="rounded-xl p-4 text-center"
+                style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
               >
-                {bd.char}
+                <div
+                  className="text-[28px] font-black mb-1"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                >
+                  {bd.char}
+                </div>
+                <div className="text-[12px] mb-1" style={{ color: "var(--ink-muted)" }}>
+                  {result.charBreakdowns[i]?.char || ""}
+                </div>
+                <div
+                  className="text-sm font-bold mt-1"
+                  style={{ fontFamily: "var(--font-display)", color: bd.known ? "var(--ink)" : "var(--seal)" }}
+                >
+                  {bd.known ? `${bd.strokes}획` : "?획"}
+                </div>
               </div>
-              <div className="text-[11px] leading-[1.6]" style={{ color: "var(--ink-muted)" }}>
-                {bd.cho} + {bd.jung}{bd.jong ? ` + ${bd.jong}` : ""}
-              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(90px,1fr))] gap-3">
+            {result.charBreakdowns.map((bd, i) => (
               <div
-                className="text-sm font-bold mt-1"
-                style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                key={i}
+                className="rounded-xl p-4 text-center"
+                style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
               >
-                {bd.strokes}획
+                <div
+                  className="text-[24px] font-black mb-2"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                >
+                  {bd.char}
+                </div>
+                <div className="text-[11px] leading-[1.6]" style={{ color: "var(--ink-muted)" }}>
+                  {bd.cho} + {bd.jung}{bd.jong ? ` + ${bd.jong}` : ""}
+                </div>
+                <div
+                  className="text-sm font-bold mt-1"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                >
+                  {bd.strokes}획
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </StaggerSection>
 
       {/* 3. 천격/인격/지격 */}

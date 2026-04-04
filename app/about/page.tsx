@@ -589,11 +589,12 @@ export default function AboutPage() {
             </p>
             <Link
               href="/analyze"
-              className="w-full max-w-[320px] py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-colors"
+              className="w-full max-w-[320px] py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-all hover:opacity-90 active:opacity-80"
               style={{
-                background: "var(--ink)",
-                color: "var(--bg-paper)",
+                background: "var(--seal)",
+                color: "#fff",
                 fontFamily: "var(--font-display)",
+                boxShadow: "0 4px 16px var(--shadow-btn)",
               }}
             >
               무료로 분석하기

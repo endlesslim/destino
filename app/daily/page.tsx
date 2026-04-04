@@ -8,6 +8,7 @@ import Nav from "@/components/Nav";
 import ScrollReveal from "@/components/ScrollReveal";
 import Button from "@/components/ui/Button";
 import DailyEmailSubscribe from "@/components/DailyEmailSubscribe";
+import Footer from "@/components/Footer";
 import { generateDailyFortune, type DailyFortune } from "@/lib/daily-fortune";
 
 // ━━━ 한국어 요일 ━━━
@@ -273,29 +274,7 @@ export default function DailyPage() {
           <FortuneDisplay fortune={fortune} />
         )}
 
-        <Divider />
-
-        {/* 푸터 */}
-        <footer
-          className="text-center flex flex-col gap-2 py-4"
-          style={{ color: "var(--ink-light)" }}
-        >
-          <p
-            className="text-[11px] tracking-[0.1em] uppercase font-medium"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            DESTINO
-          </p>
-          <div className="flex justify-center gap-4 text-[12px]" style={{ color: "var(--ink-light)" }}>
-            <Link href="/analyze" className="hover:underline">
-              전체 분석 보기
-            </Link>
-            <span style={{ color: "var(--border)" }}>|</span>
-            <Link href="/" className="hover:underline">
-              홈으로
-            </Link>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </main>
   );
