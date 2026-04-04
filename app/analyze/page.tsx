@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
+import Nav from "@/components/Nav";
 
 import { analyzeCrosspoint, type CrosspointResult } from "@/lib/cross-engine";
 import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
@@ -266,6 +268,15 @@ function AIInterpretation({ result }: { result: CrosspointResult }) {
 }
 
 export default function AnalyzePage() {
+  return (
+    <Suspense fallback={null}>
+      <AnalyzePageInner />
+    </Suspense>
+  );
+}
+
+function AnalyzePageInner() {
+  const searchParams = useSearchParams();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
@@ -273,10 +284,50 @@ export default function AnalyzePage() {
   const [name, setName] = useState("");
   const [result, setResult] = useState<CrosspointResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [copied, setCopied] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
   const valid = year.length === 4 && month !== "" && day !== "";
+
+  const loadingSteps = ["사주 분석 중", "별자리 확인 중", "수비학 계산 중", "교차점 발견 중"];
+
+  // Read share URL params on mount
+  useEffect(() => {
+    const y = searchParams.get("y");
+    const m = searchParams.get("m");
+    const d = searchParams.get("d");
+    const n = searchParams.get("n");
+    if (y && m && d) {
+      setYear(y);
+      setMonth(m);
+      setDay(d);
+      if (n) setName(n);
+      // Auto-analyze after a short delay
+      setTimeout(() => {
+        const yi = parseInt(y), mi = parseInt(m), di = parseInt(d);
+        if (yi && mi && di) {
+          setLoading(true);
+          setTimeout(() => {
+            setResult(analyzeCrosspoint(yi, mi, di, n || undefined));
+            setLoading(false);
+          }, 2000);
+        }
+      }, 300);
+    }
+  }, []);
+
+  // Animate loading steps
+  useEffect(() => {
+    if (!loading) {
+      setLoadingStep(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setLoadingStep((prev) => (prev < loadingSteps.length - 1 ? prev + 1 : prev));
+    }, 600);
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const analyze = () => {
     const y = parseInt(year);
@@ -349,7 +400,8 @@ export default function AnalyzePage() {
       className="min-h-screen flex flex-col items-center px-5 py-10"
       style={{ background: "var(--bg-paper)" }}
     >
-      <div className="w-full max-w-[420px] flex flex-col">
+      <Nav />
+      <div className="w-full max-w-[420px] flex flex-col pt-8">
 
         {/* ━━━ INPUT ━━━ */}
         {!result && !loading && (
@@ -527,13 +579,24 @@ export default function AnalyzePage() {
                 style={{ border: "2px solid var(--seal)" }}
               />
             </div>
-            <p
-              className="text-base font-bold mt-3"
-              style={{ color: "var(--ink)", fontFamily: "var(--font-display)" }}
-            >
-              동서양 체계 분석 중
-            </p>
-            <div className="flex justify-center gap-1 mt-3">
+            <div className="flex flex-col items-center gap-2 mt-4">
+              {loadingSteps.map((step, i) => (
+                <p
+                  key={step}
+                  className="text-sm font-semibold transition-all duration-500"
+                  style={{
+                    color: i <= loadingStep ? "var(--ink)" : "transparent",
+                    fontFamily: "var(--font-display)",
+                    opacity: i <= loadingStep ? 1 : 0,
+                    transform: i <= loadingStep ? "translateY(0)" : "translateY(8px)",
+                    transition: "opacity 0.5s ease, transform 0.5s ease, color 0.5s ease",
+                  }}
+                >
+                  {i === loadingStep && "● "}{step}{i < loadingStep && " ✓"}
+                </p>
+              ))}
+            </div>
+            <div className="flex justify-center gap-1 mt-4">
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
@@ -543,20 +606,6 @@ export default function AnalyzePage() {
                     animationDelay: `${i * 0.2}s`,
                   }}
                 />
-              ))}
-            </div>
-            <div className="flex justify-center gap-4 mt-6">
-              {(["사주", "별자리", "수비학", "띠"] as const).map((sys, i) => (
-                <span
-                  key={sys}
-                  className="text-xs font-semibold animate-fade-up"
-                  style={{
-                    color: "var(--ink-light)",
-                    animationDelay: `${0.3 + i * 0.15}s`,
-                  }}
-                >
-                  {sys}
-                </span>
               ))}
             </div>
           </div>
@@ -569,12 +618,8 @@ export default function AnalyzePage() {
                 SECTION A: FREE PREVIEW (always visible)
                ═══════════════════════════════════════════ */}
 
-            {/* Header */}
-            <StaggerSection index={0} className="flex justify-between items-center mb-5">
-              <div className="flex items-center gap-2">
-                <Seal size="sm" char="命" />
-                <span className="text-xs tracking-widest" style={{ color: "var(--ink-light)" }}>DESTINO</span>
-              </div>
+            {/* Date */}
+            <StaggerSection index={0} className="flex justify-end items-center mb-5">
               <span className="text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
                 {year}.{month}.{day}
               </span>

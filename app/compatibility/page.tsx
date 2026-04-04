@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
+import Nav from "@/components/Nav";
 import { analyzeCompatibility, type CompatibilityResult } from "@/lib/compatibility";
 import { OHANG_INFO, type Ohang } from "@/lib/saju";
 
@@ -146,6 +148,15 @@ const SYSTEM_COLORS: Record<string, string> = {
 };
 
 export default function CompatibilityPage() {
+  return (
+    <Suspense fallback={null}>
+      <CompatibilityPageInner />
+    </Suspense>
+  );
+}
+
+function CompatibilityPageInner() {
+  const searchParams = useSearchParams();
   // Person 1
   const [year1, setYear1] = useState("");
   const [month1, setMonth1] = useState("");
@@ -166,6 +177,41 @@ export default function CompatibilityPage() {
   const valid =
     year1.length === 4 && month1 !== "" && day1 !== "" &&
     year2.length === 4 && month2 !== "" && day2 !== "";
+
+  // Read share URL params on mount
+  useEffect(() => {
+    const y1 = searchParams.get("y1");
+    const m1 = searchParams.get("m1");
+    const d1 = searchParams.get("d1");
+    const y2 = searchParams.get("y2");
+    const m2 = searchParams.get("m2");
+    const d2 = searchParams.get("d2");
+    if (y1 && m1 && d1 && y2 && m2 && d2) {
+      setYear1(y1); setMonth1(m1); setDay1(d1);
+      setYear2(y2); setMonth2(m2); setDay2(d2);
+      const n1 = searchParams.get("n1");
+      const n2 = searchParams.get("n2");
+      if (n1) setName1(n1);
+      if (n2) setName2(n2);
+      // Auto-analyze after a short delay
+      setTimeout(() => {
+        const yi1 = parseInt(y1), mi1 = parseInt(m1), di1 = parseInt(d1);
+        const yi2 = parseInt(y2), mi2 = parseInt(m2), di2 = parseInt(d2);
+        if (yi1 && mi1 && di1 && yi2 && mi2 && di2) {
+          setLoading(true);
+          setTimeout(() => {
+            setResult(
+              analyzeCompatibility({
+                person1: { year: yi1, month: mi1, day: di1, name: n1 || undefined },
+                person2: { year: yi2, month: mi2, day: di2, name: n2 || undefined },
+              })
+            );
+            setLoading(false);
+          }, 2400);
+        }
+      }, 300);
+    }
+  }, []);
 
   const analyze = () => {
     const y1 = parseInt(year1), m1 = parseInt(month1), d1 = parseInt(day1);
@@ -206,15 +252,16 @@ export default function CompatibilityPage() {
   };
 
   const handleShare = useCallback(() => {
-    const url = `${window.location.origin}/compatibility`;
+    const url = `${window.location.origin}/compatibility?y1=${year1}&m1=${month1}&d1=${day1}&y2=${year2}&m2=${month2}&d2=${day2}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
-  }, []);
+  }, [year1, month1, day1, year2, month2, day2]);
 
   const shareToThreads = () => {
-    const text = `두 사람의 궁합 점수: ${result?.overallScore}% — ${result?.archetype}. DESTINO 궁합 분석 ${window.location.origin}/compatibility`;
+    const shareUrl = `${window.location.origin}/compatibility?y1=${year1}&m1=${month1}&d1=${day1}&y2=${year2}&m2=${month2}&d2=${day2}`;
+    const text = `두 사람의 궁합 점수: ${result?.overallScore}% — ${result?.archetype}. DESTINO 궁합 분석 ${shareUrl}`;
     window.open(
       `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -223,9 +270,9 @@ export default function CompatibilityPage() {
 
   const shareToTwitter = () => {
     const text = `두 사람의 궁합 점수: ${result?.overallScore}% — ${result?.archetype}`;
-    const url = `${window.location.origin}/compatibility`;
+    const shareUrl = `${window.location.origin}/compatibility?y1=${year1}&m1=${month1}&d1=${day1}&y2=${year2}&m2=${month2}&d2=${day2}`;
     window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`,
       "_blank"
     );
   };
@@ -242,7 +289,8 @@ export default function CompatibilityPage() {
       className="min-h-screen flex flex-col items-center px-5 py-10"
       style={{ background: "var(--bg-paper)" }}
     >
-      <div className="w-full max-w-[420px] flex flex-col">
+      <Nav />
+      <div className="w-full max-w-[420px] flex flex-col pt-8">
 
         {/* ━━━ INPUT ━━━ */}
         {!result && !loading && (
@@ -553,12 +601,8 @@ export default function CompatibilityPage() {
         {/* ━━━ RESULT ━━━ */}
         {result && (
           <>
-            {/* Header */}
-            <StaggerSection index={0} className="flex justify-between items-center mb-5">
-              <div className="flex items-center gap-2">
-                <Seal size="sm" char="合" />
-                <span className="text-xs tracking-widest" style={{ color: "var(--ink-light)" }}>DESTINO</span>
-              </div>
+            {/* Section Label */}
+            <StaggerSection index={0} className="flex justify-end items-center mb-5">
               <span className="text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
                 궁합 분석
               </span>

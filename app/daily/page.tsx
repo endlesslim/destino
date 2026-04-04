@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
+import Nav from "@/components/Nav";
 import Button from "@/components/ui/Button";
 import { generateDailyFortune, type DailyFortune } from "@/lib/daily-fortune";
 
@@ -237,20 +238,12 @@ export default function DailyPage() {
       className="min-h-screen flex flex-col items-center px-6 py-12"
       style={{ background: "var(--bg-paper)" }}
     >
-      <div className="w-full max-w-[440px] flex flex-col gap-8">
+      <Nav />
+      <div className="w-full max-w-[440px] flex flex-col gap-8 pt-14">
 
-        {/* 헤더 */}
-        <header className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <Seal size="md" char="命" />
-            <span
-              className="text-sm font-black tracking-[0.15em] uppercase"
-              style={{ color: "var(--ink-light)", fontFamily: "var(--font-display)" }}
-            >
-              DESTINO
-            </span>
-          </Link>
-          {hasSaved && (
+        {/* 헤더 부가 */}
+        {hasSaved && (
+          <div className="flex justify-end -mb-4">
             <button
               onClick={handleReset}
               className="text-[12px] font-medium hover:underline cursor-pointer"
@@ -258,8 +251,8 @@ export default function DailyPage() {
             >
               초기화
             </button>
-          )}
-        </header>
+          </div>
+        )}
 
         <Divider />
 
