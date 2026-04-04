@@ -3,6 +3,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { PAYMENT_CONFIG, type PaymentVerifyResponse } from "@/lib/payment";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -103,6 +104,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<PaymentVe
     const accessToken = createAccessToken(paymentId);
     const paidAt = new Date().toISOString();
 
+    // Save to Supabase when configured
+    if (isSupabaseConfigured()) {
+      await supabase.from("payments").insert({
+        payment_id: paymentId,
+        amount: PAYMENT_CONFIG.price,
+        product: orderName,
+        status: "paid",
+      });
+    }
+
+    // File-based fallback
     savePaymentRecord({
       paymentId,
       orderName,

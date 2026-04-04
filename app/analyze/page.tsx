@@ -15,9 +15,11 @@ import { analyzeCrosspoint, type CrosspointResult } from "@/lib/cross-engine";
 import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
 import { playStampSound } from "@/lib/sound";
 import { saveAnalysis } from "@/lib/history";
+import FeedbackWidget from "@/components/FeedbackWidget";
 
 // ━━━ 텍스트 유틸 ━━━
 function splitFirstSentence(text: string): [string, string] {
+  if (!text || typeof text !== "string") return ["", ""];
   const m = text.match(/^(.+?[.!?。])\s*/);
   if (m) return [m[1], text.slice(m[0].length)];
   const mid = Math.min(60, Math.floor(text.length / 2));
@@ -27,6 +29,7 @@ function splitFirstSentence(text: string): [string, string] {
 }
 
 function splitFirstTwo(text: string): [string, string] {
+  if (!text || typeof text !== "string") return ["", ""];
   const m = text.match(/^(.+?[.!?。]\s*.+?[.!?。])\s*/);
   if (m) return [m[1], text.slice(m[0].length)];
   return splitFirstSentence(text);
@@ -2237,6 +2240,17 @@ function AnalyzePageInner() {
             {/* ═══════════════════════════════════════════
                 SECTION C: BOTTOM (always visible)
                ═══════════════════════════════════════════ */}
+
+            {/* Feedback */}
+            <ScrollReveal delay={620}>
+              <FeedbackWidget
+                year={parseInt(year)}
+                month={parseInt(month)}
+                day={parseInt(day)}
+                convergenceRate={result.convergence_rate}
+                archetype={result.archetype}
+              />
+            </ScrollReveal>
 
             {/* Share */}
             <ScrollReveal delay={640}>

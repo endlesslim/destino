@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 const DATA_PATH = "/tmp/destino-waitlist.json";
 
@@ -50,6 +51,11 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // GET — return current waitlist count
 // ---------------------------------------------------------------------------
 export async function GET() {
+  if (isSupabaseConfigured()) {
+    const { count } = await supabase.from("waitlist").select("*", { count: "exact", head: true });
+    return NextResponse.json({ count: count || 0 });
+  }
+
   const emails = readEmails();
   return NextResponse.json({ count: emails.length });
 }
@@ -92,7 +98,33 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Read current list
+  if (isSupabaseConfigured()) {
+    // Check duplicate
+    const { data: existing } = await supabase
+      .from("waitlist")
+      .select("id")
+      .eq("email", email)
+      .single();
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "duplicate", message: "이미 등록된 이메일입니다." },
+        { status: 409 },
+      );
+    }
+
+    // Insert
+    const { error } = await supabase.from("waitlist").insert({ email });
+    if (error) throw error;
+
+    recordRequest(ip);
+
+    // Get count
+    const { count } = await supabase.from("waitlist").select("*", { count: "exact", head: true });
+    return NextResponse.json({ success: true, position: count || 1 });
+  }
+
+  // File-based fallback
   const emails = readEmails();
 
   // Duplicate check
