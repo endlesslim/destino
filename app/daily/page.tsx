@@ -100,7 +100,7 @@ function CategoryCard({ cat }: { cat: DailyFortune["categories"][0] }) {
         </span>
         <DotRating score={cat.score} />
       </div>
-      <p className="text-[13px] leading-[1.6]" style={{ color: "var(--ink-muted)" }}>
+      <p className="text-[14px] leading-[1.6]" style={{ color: "var(--ink-muted)" }}>
         {cat.advice}
       </p>
     </div>
@@ -168,7 +168,7 @@ function ElementComparison({ fortune }: { fortune: DailyFortune }) {
         </div>
       </div>
       <p
-        className="text-[13px] text-center font-medium"
+        className="text-[14px] text-center font-medium"
         style={{ color: "var(--ink-medium)" }}
       >
         {fortune.elementRelation}
@@ -476,7 +476,7 @@ function FortuneDisplay({ fortune }: { fortune: DailyFortune }) {
                 style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
               >
                 <span
-                  className="text-[10px] tracking-[0.05em] font-medium"
+                  className="text-[12px] tracking-[0.05em] font-medium"
                   style={{ color: "var(--ink-faint)" }}
                 >
                   {label}
@@ -538,7 +538,7 @@ function FortuneDisplay({ fortune }: { fortune: DailyFortune }) {
         >
           매일 아침,<br />카카오톡으로 받아보기
         </h3>
-        <p className="text-[13px] leading-[1.7]" style={{ color: "var(--ink-muted)" }}>
+        <p className="text-[14px] leading-[1.7]" style={{ color: "var(--ink-muted)" }}>
           오늘의 운세를 매일 아침 7시에 카카오톡 알림으로 보내드립니다.
           놓치지 않고 하루를 준비하세요.
         </p>

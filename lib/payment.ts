@@ -14,7 +14,7 @@
 export const PAYMENT_CONFIG = {
   storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "store-test",
   channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY || "channel-test",
-  price: 9900,
+  price: 16500,
   currency: "KRW",
   productName: "DESTINO 운명의 교차점 전체 분석 리포트",
 } as const;

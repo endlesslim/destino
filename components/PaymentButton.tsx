@@ -291,7 +291,7 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
           >
             {isProcessing
               ? statusText[status]
-              : "전체 분석 리포트 받기 — ₩9,900"}
+              : "전체 분석 리포트 받기 — ₩16,500"}
           </span>
         </div>
         {!isProcessing && (

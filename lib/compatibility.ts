@@ -4,6 +4,7 @@
 import { analyzeCrosspoint, type CrosspointResult, type TraitAxis } from "./cross-engine";
 import { OHANG_INFO, SANGSAENG, SANGGEUK, type Ohang } from "./saju";
 import type { WesternElement } from "./western";
+import { MBTI_DATA } from "./mbti";
 
 // ━━━ 타입 ━━━
 
@@ -25,6 +26,7 @@ export interface CompatibilityResult {
     name: string;
     score: number;
     description: string;
+    detail: string;      // 3-4 sentence detailed explanation
     system: string;
   }[];
 
@@ -230,6 +232,152 @@ function scoreNumerologyCompat(
     score,
     description: `생명경로수 ${lp1}(${lp1Name})과 ${lp2}(${lp2Name})는 서로 다른 리듬을 가진 조합입니다. 차이 속에서 배움을 찾는 관계.`,
   };
+}
+
+// ━━━ MBTI 궁합 ━━━
+
+const MBTI_COMPLEMENTARY_PAIRS: [string, string][] = [
+  ["ENTJ", "INFP"], ["ENFP", "INTJ"],
+  ["ENTP", "INFJ"], ["ENFJ", "INTP"],
+  ["ESTJ", "ISFP"], ["ESFP", "ISTJ"],
+  ["ESTP", "ISFJ"], ["ESFJ", "ISTP"],
+];
+
+function getMbtiMiddleLetters(type: string): string {
+  return type.slice(1, 3); // e.g. "ENTJ" -> "NT"
+}
+
+const MBTI_COMPATIBLE_GROUPS = ["NF", "NT", "SF", "ST"];
+
+function scoreMbtiCompat(
+  type1: string, type2: string,
+  name1: string, name2: string,
+): { score: number; description: string; detail: string } {
+  const profile1 = MBTI_DATA[type1];
+  const profile2 = MBTI_DATA[type2];
+  const name1Kr = profile1?.name_kr || type1;
+  const name2Kr = profile2?.name_kr || type2;
+
+  // Same type
+  if (type1 === type2) {
+    return {
+      score: 75,
+      description: `${type1}(${name1Kr}) 동일 유형입니다. 깊은 이해가 가능하지만 같은 맹점을 공유합니다.`,
+      detail: `${name1}과 ${name2}는 모두 ${type1}(${name1Kr}) 유형으로, 서로의 사고방식과 행동 패턴을 직관적으로 이해합니다. 같은 가치관을 공유하기에 갈등이 적지만, 동일한 약점을 보완해줄 사람이 없어 함께 막히는 순간이 올 수 있습니다. 너무 비슷한 관계는 성장의 자극이 줄어들 수 있으므로, 의식적으로 새로운 관점을 탐색하는 노력이 필요합니다.`,
+    };
+  }
+
+  // Complementary pairs (golden pairs)
+  for (const [a, b] of MBTI_COMPLEMENTARY_PAIRS) {
+    if ((type1 === a && type2 === b) || (type1 === b && type2 === a)) {
+      return {
+        score: 90,
+        description: `${type1}(${name1Kr})와 ${type2}(${name2Kr})는 심리학에서 '황금 페어'로 불리는 상호보완 조합입니다.`,
+        detail: `${type1}와 ${type2}의 조합은 심리학에서 '황금 페어'로 불립니다. ${type1}의 주기능과 ${type2}의 주기능이 서로의 열등 기능을 자연스럽게 보완합니다. ${name1}이 놓치기 쉬운 영역을 ${name2}가 채워주고, ${name2}가 어려워하는 부분을 ${name1}이 이끌어줍니다. 이 조합은 처음에는 신비로운 끌림으로, 시간이 지나면 깊은 존경과 신뢰로 발전합니다.`,
+      };
+    }
+  }
+
+  // Compatible (same middle letters: NF+NF, NT+NT, etc.)
+  const mid1 = getMbtiMiddleLetters(type1);
+  const mid2 = getMbtiMiddleLetters(type2);
+  if (mid1 === mid2 && MBTI_COMPATIBLE_GROUPS.includes(mid1)) {
+    const groupNames: Record<string, string> = {
+      "NF": "이상주의적 직관형",
+      "NT": "전략적 분석형",
+      "SF": "현실적 공감형",
+      "ST": "실용적 논리형",
+    };
+    return {
+      score: 80,
+      description: `${type1}와 ${type2}는 같은 ${groupNames[mid1] || mid1} 기질군으로, 세상을 바라보는 렌즈가 유사합니다.`,
+      detail: `${name1}(${type1})과 ${name2}(${type2})는 같은 ${groupNames[mid1] || mid1} 기질을 공유합니다. 정보를 처리하고 결정을 내리는 핵심 방식이 유사하기 때문에, 대화에서 깊은 공감이 자연스럽게 일어납니다. 외향/내향이나 판단/인식의 차이가 적절한 변주를 만들어, 지루하지 않으면서도 편안한 관계가 형성됩니다. 같은 언어로 소통하되 다른 악기를 연주하는 듀엣과 같습니다.`,
+    };
+  }
+
+  // Check if all 4 axes are opposite (clash)
+  const axes = [
+    [type1[0], type2[0]], // E/I
+    [type1[1], type2[1]], // S/N
+    [type1[2], type2[2]], // T/F
+    [type1[3], type2[3]], // J/P
+  ];
+  const allOpposite = axes.every(([a, b]) => a !== b);
+  if (allOpposite) {
+    return {
+      score: 50,
+      description: `${type1}(${name1Kr})와 ${type2}(${name2Kr})는 모든 축에서 정반대입니다. 강한 끌림과 동시에 큰 도전이 공존합니다.`,
+      detail: `${name1}(${type1})과 ${name2}(${type2})는 네 가지 심리 축 모두에서 정반대에 위치합니다. 에너지 방향, 정보 수집, 의사결정, 생활양식 — 모든 면에서 다른 세계에 살고 있습니다. 이 극단적 차이는 초기에 강렬한 호기심과 끌림을 유발하지만, 일상에서는 끊임없는 조율이 필요합니다. 서로의 방식을 '틀린 것'이 아닌 '다른 렌즈'로 받아들일 때, 이 관계는 가장 큰 성장의 도구가 됩니다.`,
+    };
+  }
+
+  // Neutral
+  return {
+    score: 65,
+    description: `${type1}(${name1Kr})와 ${type2}(${name2Kr})는 일부 축에서 유사하고 일부에서 다른 중립적 조합입니다.`,
+    detail: `${name1}(${type1})과 ${name2}(${type2})는 일부 심리 기능에서 유사성을, 나머지에서는 차이를 보이는 균형 잡힌 조합입니다. 완전한 공감도, 극적인 충돌도 아닌 이 중간 지대에서 관계의 질은 두 사람의 소통 의지에 크게 좌우됩니다. 비슷한 부분에서는 편안함을 찾고, 다른 부분에서는 상대의 관점을 배우는 자세가 이 관계를 풍요롭게 만듭니다.`,
+  };
+}
+
+// ━━━ 차원별 상세 설명(detail) 생성 ━━━
+
+function generateOhangDetail(
+  oh1: Ohang, oh2: Ohang,
+  name1: string, name2: string,
+): string {
+  const kr1 = OHANG_INFO[oh1].kr;
+  const kr2 = OHANG_INFO[oh2].kr;
+
+  if (oh1 === oh2) {
+    return `${name1}과 ${name2}는 모두 ${oh1}(${kr1})의 기운을 타고났습니다. 같은 원소의 비화(比和) 관계로, 말하지 않아도 통하는 직감적 이해가 있습니다. 하지만 같은 방향으로만 흐르는 에너지는 정체를 만들 수 있으니, 의식적으로 새로운 자극을 도입하는 것이 관계를 신선하게 유지하는 비결입니다.`;
+  }
+  if (SANGSAENG[oh1] === oh2) {
+    return `${oh1}(${kr1})과 ${oh2}(${kr2})의 관계는 ${kr1}이 ${kr2}을 생하는 상생입니다. ${name1}이 ${name2}에게 에너지를 제공하고, ${name2}는 그 에너지를 열정으로 변환합니다. 이 관계에서 ${name1}은 자원 제공자, ${name2}는 실행자 역할을 자연스럽게 맡게 됩니다. 다만 한쪽이 계속 주기만 하면 소진되므로, 감사와 보답의 순환을 만드는 것이 중요합니다.`;
+  }
+  if (SANGSAENG[oh2] === oh1) {
+    return `${oh2}(${kr2})과 ${oh1}(${kr1})의 관계는 ${kr2}이 ${kr1}을 생하는 상생입니다. ${name2}가 ${name1}에게 에너지를 불어넣고, ${name1}은 그 에너지를 받아 성장합니다. 자연의 순환처럼 한 사람의 끝이 다른 사람의 시작이 되는 아름다운 흐름이 있습니다. 이 상생의 고리를 의식적으로 유지하는 것이 관건입니다.`;
+  }
+  if (SANGGEUK[oh1] === oh2 || SANGGEUK[oh2] === oh1) {
+    return `${oh1}(${kr1})과 ${oh2}(${kr2})의 상극은 긴장감이 존재하는 관계입니다. 한쪽이 다른 쪽을 제어하려는 에너지가 흐르기에 갈등의 소지가 있습니다. 하지만 대장간의 불이 무딘 쇳덩이를 명검으로 만들듯, 이 긴장을 단련의 에너지로 승화시키면 어떤 관계보다 강인한 유대가 형성됩니다. 핵심은 상대를 바꾸려 하지 않고, 서로의 강점을 인정하는 것입니다.`;
+  }
+  return `${oh1}(${kr1})과 ${oh2}(${kr2})은 직접적 상생이나 상극이 아닌 간접적 관계에 있습니다. 정해진 공식이 없다는 것은 두 사람만의 고유한 관계 역학을 만들어갈 수 있다는 의미입니다. 서로의 리듬을 이해하는 데 시간이 필요하지만, 일단 그 리듬을 찾으면 예상 밖의 조화가 펼쳐집니다.`;
+}
+
+function generateWesternDetail(
+  el1: WesternElement, sign1: string,
+  el2: WesternElement, sign2: string,
+  name1: string, name2: string,
+): string {
+  if (el1 === el2) {
+    return `${name1}의 ${sign1}(${el1})와 ${name2}의 ${sign2}(${el2})는 같은 원소로, 감정의 깊이에서 즉각적인 공감이 일어납니다. 말하지 않아도 서로의 기분을 읽는 관계입니다. 다만 두 사람 모두 같은 원소적 한계를 공유하므로, 가끔은 의식적으로 다른 원소의 활동이나 관점을 도입하면 관계가 더 풍성해집니다.`;
+  }
+  const key = `${el1}-${el2}`;
+  const score = ELEMENT_COMPAT[key] ?? 65;
+  if (score >= 80) {
+    return `${name1}의 ${sign1}(${el1})와 ${name2}의 ${sign2}(${el2})는 서양 점성술에서 상호보완 원소로 분류됩니다. ${el1}이 ${el2}를 활성화하고, ${el2}가 ${el1}에 안정감을 더하는 자연스러운 시너지가 있습니다. 두 사람이 함께할 때 각자의 별자리 에너지가 증폭되어, 혼자일 때보다 더 큰 힘을 발휘합니다.`;
+  }
+  if (score <= 45) {
+    return `${name1}의 ${sign1}(${el1})와 ${name2}의 ${sign2}(${el2})는 정반대 원소입니다. 물과 불, 흙과 바람처럼 본질적으로 다른 에너지가 만나는 관계입니다. 이 차이는 강한 자력과 같은 끌림을 만들면서도, 일상에서는 마찰로 나타날 수 있습니다. 상대의 원소적 특성을 인정하고 배우려는 자세가 이 관계의 열쇠입니다.`;
+  }
+  return `${name1}의 ${sign1}(${el1})와 ${name2}의 ${sign2}(${el2})는 직접적 충돌도 뚜렷한 시너지도 없는 중립적 관계입니다. 이런 조합에서는 의식적인 노력이 관계를 더 깊게 만듭니다. 서로의 별자리 특성을 학습하고, 상대의 원소적 욕구를 이해하려는 노력이 관계를 한 단계 끌어올립니다.`;
+}
+
+function generateNumerologyDetail(
+  lp1: number, lp1Name: string,
+  lp2: number, lp2Name: string,
+  name1: string, name2: string,
+  score: number,
+): string {
+  if (lp1 === lp2) {
+    return `${name1}과 ${name2}는 동일한 경로수 ${lp1}(${lp1Name})을 가지고 있습니다. 인생의 큰 방향과 핵심 과제가 같기에 깊은 공감이 가능합니다. 하지만 같은 도전을 함께 마주하기에 서로의 거울이 되어 때로는 불편한 진실을 비추기도 합니다.`;
+  }
+  if (score >= 85) {
+    return `경로수 ${lp1}(${lp1Name})과 경로수 ${lp2}(${lp2Name})의 만남은 비전과 표현의 결합입니다. ${lp1}이 큰 그림을 그리면 ${lp2}가 그것을 매력적으로 포장합니다. 수비학적으로 이 두 숫자는 강한 시너지를 만들어내며, 함께할 때 각자의 잠재력이 극대화됩니다.`;
+  }
+  if (score >= 70) {
+    return `경로수 ${lp1}(${lp1Name})과 경로수 ${lp2}(${lp2Name})는 자연스러운 균형을 이루는 숫자 조합입니다. ${name1}의 숫자 에너지가 ${name2}의 약점을 보완하고, 그 반대도 마찬가지입니다. 의식하지 않아도 서로의 빈 곳을 채우는 관계로, 시간이 지날수록 그 보완의 가치를 더 깊이 느끼게 됩니다.`;
+  }
+  return `경로수 ${lp1}(${lp1Name})과 경로수 ${lp2}(${lp2Name})는 각자 다른 인생 리듬을 가진 조합입니다. 서로의 숫자 에너지가 때로는 엇갈리기도 하지만, 그 차이 속에서 배움을 찾는 것이 이 관계의 성장 포인트입니다. 상대의 인생 경로를 판단하지 않고 존중하는 것에서 진정한 연결이 시작됩니다.`;
 }
 
 // ━━━ 특성 분석 ━━━
@@ -568,32 +716,43 @@ function generateConflictPattern(
 export function analyzeCompatibility(input: CompatibilityInput): CompatibilityResult {
   const { person1: p1Input, person2: p2Input } = input;
 
+  // 이름 문자열 (여러 곳에서 사용)
+  const p1NameStr = p1Input.name || "첫 번째 사람";
+  const p2NameStr = p2Input.name || "두 번째 사람";
+
   // 각 사람의 교차점 분석
   const person1 = analyzeCrosspoint(p1Input.year, p1Input.month, p1Input.day, p1Input.name);
   const person2 = analyzeCrosspoint(p2Input.year, p2Input.month, p2Input.day, p2Input.name);
 
-  // 1. 오행 궁합 (40%)
+  // 1. 오행 궁합 (30%)
   const oh1 = person1.saju.day.ohang;
   const oh2 = person2.saju.day.ohang;
   const ohangResult = scoreOhangCompat(oh1, oh2);
 
-  // 2. 별자리 궁합 (30%)
+  // 2. 별자리 궁합 (25%)
   const westernResult = scoreWesternCompat(
     person1.western.element, person1.western.sunSign.name,
     person2.western.element, person2.western.sunSign.name,
   );
 
-  // 3. 수비학 궁합 (30%)
+  // 3. 수비학 궁합 (25%)
   const numResult = scoreNumerologyCompat(
     person1.numerology.lifePath, person1.numerology.lifePathInfo.name,
     person2.numerology.lifePath, person2.numerology.lifePathInfo.name,
   );
 
+  // 4. MBTI 궁합 (20%)
+  const mbtiResult = scoreMbtiCompat(
+    person1.mbti.primaryType, person2.mbti.primaryType,
+    p1NameStr, p2NameStr,
+  );
+
   // 종합 점수
   const overallScore = Math.round(
-    ohangResult.score * 0.4 +
-    westernResult.score * 0.3 +
-    numResult.score * 0.3
+    ohangResult.score * 0.3 +
+    westernResult.score * 0.25 +
+    numResult.score * 0.25 +
+    mbtiResult.score * 0.2
   );
 
   // 아키타입
@@ -611,25 +770,48 @@ export function analyzeCompatibility(input: CompatibilityInput): CompatibilityRe
     description: ohangResult.description,
   };
 
-  // 차원별 점수
+  // 차원별 점수 + 상세 설명(detail)
+  const ohangDetail = generateOhangDetail(oh1, oh2, p1NameStr, p2NameStr);
+  const westernDetail = generateWesternDetail(
+    person1.western.element, person1.western.sunSign.name,
+    person2.western.element, person2.western.sunSign.name,
+    p1NameStr, p2NameStr,
+  );
+  const numDetail = generateNumerologyDetail(
+    person1.numerology.lifePath, person1.numerology.lifePathInfo.name,
+    person2.numerology.lifePath, person2.numerology.lifePathInfo.name,
+    p1NameStr, p2NameStr,
+    numResult.score,
+  );
+
   const dimensions: CompatibilityResult["dimensions"] = [
     {
       name: "오행 궁합",
       score: ohangResult.score,
       description: ohangResult.description,
+      detail: ohangDetail,
       system: "saju",
     },
     {
       name: "별자리 궁합",
       score: westernResult.score,
       description: westernResult.description,
+      detail: westernDetail,
       system: "western",
     },
     {
       name: "수비학 궁합",
       score: numResult.score,
       description: numResult.description,
+      detail: numDetail,
       system: "numerology",
+    },
+    {
+      name: "MBTI 궁합",
+      score: mbtiResult.score,
+      description: mbtiResult.description,
+      detail: mbtiResult.detail,
+      system: "mbti",
     },
   ];
 
@@ -643,9 +825,6 @@ export function analyzeCompatibility(input: CompatibilityInput): CompatibilityRe
   const overallLabel = archetype.name;
 
   // ━━━ 신규 심화 분석 ━━━
-
-  const p1NameStr = p1Input.name || "첫 번째 사람";
-  const p2NameStr = p2Input.name || "두 번째 사람";
 
   const person1Detail = generatePersonDetail(person1, p1NameStr);
   const person2Detail = generatePersonDetail(person2, p2NameStr);

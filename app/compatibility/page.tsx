@@ -163,12 +163,28 @@ const SYSTEM_COLORS: Record<string, string> = {
   saju: "var(--saju)",
   western: "var(--astro)",
   numerology: "var(--numero)",
+  mbti: "var(--mbti)",
 };
 
 const SYSTEM_LABELS: Record<string, string> = {
   saju: "사주 오행",
   western: "서양 별자리",
   numerology: "수비학",
+  mbti: "MBTI",
+};
+
+const SYSTEM_ORIGIN_LABELS: Record<string, string> = {
+  saju: "사주명리학 기반",
+  western: "서양 점성술 기반",
+  numerology: "수비학 기반",
+  mbti: "성격유형론 기반",
+};
+
+const SYSTEM_BORDER_COLORS: Record<string, string> = {
+  saju: "#2D5A27",
+  western: "#1E3A5F",
+  numerology: "#6B3A2A",
+  mbti: "#5B3E8A",
 };
 
 export default function CompatibilityPage() {
@@ -346,6 +362,7 @@ function CompatibilityPageInner() {
               </h1>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
                 두 사람의 생년월일을 입력하면<br />동서양 4개 체계가 궁합을 분석합니다
+
               </p>
             </div>
 
@@ -574,6 +591,7 @@ function CompatibilityPageInner() {
                 ["#2D5A27", "오행"],
                 ["#1E3A5F", "별자리"],
                 ["#6B3A2A", "수비학"],
+                ["#7B4FA0", "MBTI"],
               ] as const).map(([c, v]) => (
                 <span key={v} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-muted)" }}>
                   <Dot color={c} />{v}
@@ -623,7 +641,7 @@ function CompatibilityPageInner() {
               ))}
             </div>
             <div className="flex justify-center gap-4 mt-6">
-              {(["오행", "별자리", "수비학"] as const).map((sys, i) => (
+              {(["오행", "별자리", "수비학", "MBTI"] as const).map((sys, i) => (
                 <span
                   key={sys}
                   className="text-xs font-semibold animate-fade-up"
@@ -789,7 +807,7 @@ function CompatibilityPageInner() {
                       </span>
                     </div>
 
-                    {/* 3 system badges */}
+                    {/* 4 system badges */}
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--saju)" + "15", color: "var(--saju)" }}>
                         {OHANG_INFO[result.person1.saju.day.ohang].kr}({result.person1.saju.day.ohang})
@@ -799,6 +817,9 @@ function CompatibilityPageInner() {
                       </span>
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--numero)" + "15", color: "var(--numero)" }}>
                         LP {result.person1.numerology.lifePath} ({result.person1.numerology.lifePathInfo.name})
+                      </span>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--mbti)" + "15", color: "var(--mbti)" }}>
+                        {result.person1.mbti.primaryType}
                       </span>
                     </div>
 
@@ -811,7 +832,7 @@ function CompatibilityPageInner() {
                     </div>
 
                     {/* Personality Detail */}
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
                       {result.person1Detail}
                     </p>
 
@@ -850,7 +871,7 @@ function CompatibilityPageInner() {
                       </span>
                     </div>
 
-                    {/* 3 system badges */}
+                    {/* 4 system badges */}
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--saju)" + "15", color: "var(--saju)" }}>
                         {OHANG_INFO[result.person2.saju.day.ohang].kr}({result.person2.saju.day.ohang})
@@ -860,6 +881,9 @@ function CompatibilityPageInner() {
                       </span>
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--numero)" + "15", color: "var(--numero)" }}>
                         LP {result.person2.numerology.lifePath} ({result.person2.numerology.lifePathInfo.name})
+                      </span>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--mbti)" + "15", color: "var(--mbti)" }}>
+                        {result.person2.mbti.primaryType}
                       </span>
                     </div>
 
@@ -872,7 +896,7 @@ function CompatibilityPageInner() {
                     </div>
 
                     {/* Personality Detail */}
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
                       {result.person2Detail}
                     </p>
 
@@ -902,21 +926,37 @@ function CompatibilityPageInner() {
                 <SectionHeader
                   color="var(--seal)"
                   title="차원별 궁합"
-                  subtitle="동양 사주, 서양 별자리, 수비학 각각의 시선"
+                  subtitle="동양 사주, 서양 별자리, 수비학, MBTI 각각의 시선"
                 />
 
                 <div className="flex flex-col gap-5">
                   {result.dimensions.map((dim, i) => (
-                    <div key={dim.system}>
+                    <div
+                      key={dim.system}
+                      className="rounded-lg overflow-hidden"
+                      style={{
+                        borderLeft: `3px solid ${SYSTEM_BORDER_COLORS[dim.system] || "var(--ink-muted)"}`,
+                        background: "var(--bg-paper)",
+                        padding: "16px",
+                      }}
+                    >
+                      {/* System origin label */}
+                      <div
+                        className="text-[12px] font-semibold tracking-wider mb-2"
+                        style={{ color: SYSTEM_COLORS[dim.system] || "var(--ink-light)" }}
+                      >
+                        {SYSTEM_ORIGIN_LABELS[dim.system] || dim.system}
+                      </div>
+
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <Dot color={SYSTEM_COLORS[dim.system] || "var(--ink-muted)"} />
-                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+                          <span className="text-[15px] font-bold" style={{ color: "var(--ink)" }}>
                             {dim.name}
                           </span>
                         </div>
                         <span
-                          className="text-sm font-black"
+                          className="text-[15px] font-black"
                           style={{ fontFamily: "var(--font-display)", color: SYSTEM_COLORS[dim.system] || "var(--ink)" }}
                         >
                           {dim.score}%
@@ -924,18 +964,24 @@ function CompatibilityPageInner() {
                       </div>
                       <ScoreBar score={dim.score} color={SYSTEM_COLORS[dim.system] || "var(--ink-muted)"} delay={i * 200} />
 
-                      {/* Expanded description */}
-                      <div
-                        className="mt-3 p-3.5 rounded-lg"
-                        style={{ background: "var(--bg-paper)" }}
-                      >
-                        <div className="text-[10px] font-bold tracking-wider mb-1.5" style={{ color: SYSTEM_COLORS[dim.system] || "var(--ink-light)" }}>
-                          {SYSTEM_LABELS[dim.system] || dim.system} 관점
-                        </div>
-                        <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
-                          {dim.description}
+                      {/* Short description */}
+                      <p className="text-[14px] leading-[1.8] mt-3" style={{ color: "var(--ink-muted)" }}>
+                        {dim.description}
+                      </p>
+
+                      {/* Detail text — serif, smaller */}
+                      {dim.detail && (
+                        <p
+                          className="text-[14px] leading-[1.9] mt-3 pt-3"
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            color: "var(--ink-medium)",
+                            borderTop: "1px solid var(--border)",
+                          }}
+                        >
+                          {dim.detail}
                         </p>
-                      </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1041,7 +1087,7 @@ function CompatibilityPageInner() {
 
                 {/* Basic relation description */}
                 <div
-                  className="mt-4 p-3.5 rounded-lg text-xs leading-relaxed"
+                  className="mt-4 p-3.5 rounded-lg text-[14px] leading-relaxed"
                   style={{ background: "var(--bg-paper)", color: "var(--ink-muted)" }}
                 >
                   {result.elementRelation.description}
@@ -1098,7 +1144,7 @@ function CompatibilityPageInner() {
                           className="p-3.5 rounded-lg"
                           style={{ background: "var(--bg-paper)" }}
                         >
-                          <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                          <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
                             {item.advice}
                           </p>
                         </div>
@@ -1135,7 +1181,7 @@ function CompatibilityPageInner() {
                     </span>
                   </div>
                   <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
                       {result.communicationStyle.person1}
                     </p>
                   </div>
@@ -1155,7 +1201,7 @@ function CompatibilityPageInner() {
                     </span>
                   </div>
                   <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
                       {result.communicationStyle.person2}
                     </p>
                   </div>
@@ -1166,10 +1212,10 @@ function CompatibilityPageInner() {
                   className="p-4 rounded-[10px]"
                   style={{ background: "var(--astro)" + "08", border: "1px solid var(--astro)" + "20" }}
                 >
-                  <div className="text-[10px] font-bold tracking-wider mb-2" style={{ color: "var(--astro)" }}>
+                  <div className="text-[12px] font-bold tracking-wider mb-2" style={{ color: "var(--astro)" }}>
                     소통 팁
                   </div>
-                  <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
+                  <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
                     {result.communicationStyle.tip}
                   </p>
                 </div>
@@ -1200,7 +1246,7 @@ function CompatibilityPageInner() {
                     </span>
                   </div>
                   <div className="p-3.5 rounded-lg" style={{ background: "var(--seal-bg)" }}>
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
                       {result.conflictPattern.trigger}
                     </p>
                   </div>
@@ -1218,7 +1264,7 @@ function CompatibilityPageInner() {
                     </span>
                   </div>
                   <div className="p-3.5 rounded-lg" style={{ background: "var(--saju)" + "08" }}>
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
                       {result.conflictPattern.resolution}
                     </p>
                   </div>
@@ -1244,7 +1290,7 @@ function CompatibilityPageInner() {
                     <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
                       공유 특성
                     </div>
-                    <p className="text-xs mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
                       두 사람이 함께 가지고 있는 특성. 공감의 기반이자 관계의 뿌리입니다.
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -1261,7 +1307,7 @@ function CompatibilityPageInner() {
                     <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
                       상호보완 특성
                     </div>
-                    <p className="text-xs mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
                       한쪽이 부족한 것을 다른 쪽이 채워주는 조합. 함께할 때 더 완전해집니다.
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -1278,7 +1324,7 @@ function CompatibilityPageInner() {
                     <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
                       긴장 포인트
                     </div>
-                    <p className="text-xs mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
                       에너지가 충돌하는 지점. 갈등의 씨앗이지만, 잘 다루면 성장의 촉매가 됩니다.
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -1306,7 +1352,7 @@ function CompatibilityPageInner() {
                 <SectionHeader
                   color="var(--seal)"
                   title="관계 조언"
-                  subtitle="동서양 3체계가 전하는 메시지"
+                  subtitle="동서양 4체계가 전하는 메시지"
                 />
 
                 <blockquote
@@ -1325,10 +1371,10 @@ function CompatibilityPageInner() {
                 {/* Additional contextual advice based on score */}
                 <div className="flex flex-col gap-3 mt-4">
                   <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                    <div className="text-[10px] font-bold tracking-wider mb-1.5" style={{ color: "var(--saju)" }}>
+                    <div className="text-[12px] font-bold tracking-wider mb-1.5" style={{ color: "var(--saju)" }}>
                       오행의 관점
                     </div>
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
                       {result.elementRelation.relation === "상생"
                         ? "상생의 흐름을 타고 있는 관계입니다. 이 자연스러운 에너지를 의식하고 감사하세요. 물이 나무를 기르듯, 서로에게 영양분이 되어주는 관계를 계속 유지하는 것이 중요합니다."
                         : result.elementRelation.relation === "상극"
@@ -1340,10 +1386,10 @@ function CompatibilityPageInner() {
                   </div>
 
                   <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                    <div className="text-[10px] font-bold tracking-wider mb-1.5" style={{ color: "var(--astro)" }}>
+                    <div className="text-[12px] font-bold tracking-wider mb-1.5" style={{ color: "var(--astro)" }}>
                       별자리의 관점
                     </div>
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
                       {result.person1.western.element === result.person2.western.element
                         ? `같은 ${result.person1.western.element} 원소의 두 별자리. 직관적 이해가 깊지만, 같은 한계를 공유하기도 합니다. 다른 원소의 친구나 활동을 통해 균형을 보완하세요.`
                         : `${result.person1.western.sunSign.name}(${result.person1.western.element})과 ${result.person2.western.sunSign.name}(${result.person2.western.element})의 조합은 서로에게 새로운 시각을 선물합니다. 상대의 원소적 특성을 배우려는 열린 마음이 관계를 풍요롭게 만듭니다.`}
@@ -1351,13 +1397,24 @@ function CompatibilityPageInner() {
                   </div>
 
                   <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                    <div className="text-[10px] font-bold tracking-wider mb-1.5" style={{ color: "var(--numero)" }}>
+                    <div className="text-[12px] font-bold tracking-wider mb-1.5" style={{ color: "var(--numero)" }}>
                       수비학의 관점
                     </div>
-                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
                       {result.person1.numerology.lifePath === result.person2.numerology.lifePath
                         ? `같은 생명경로수 ${result.person1.numerology.lifePath}을 가진 두 사람. 인생의 큰 방향이 같기에 깊은 공감이 가능하지만, 같은 도전도 함께 마주합니다. 서로의 거울이 되어주세요.`
                         : `생명경로수 ${result.person1.numerology.lifePath}(${result.person1.numerology.lifePathInfo.name})과 ${result.person2.numerology.lifePath}(${result.person2.numerology.lifePathInfo.name})의 만남. 각자의 인생 여정이 교차하는 지점에서 특별한 배움이 일어납니다. 상대의 여정을 존중하면서 함께 걷는 구간을 소중히 하세요.`}
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                    <div className="text-[12px] font-bold tracking-wider mb-1.5" style={{ color: "var(--mbti)" }}>
+                      MBTI의 관점
+                    </div>
+                    <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                      {result.person1.mbti.primaryType === result.person2.mbti.primaryType
+                        ? `같은 ${result.person1.mbti.primaryType} 유형의 두 사람. 사고방식이 같아 깊이 공감하지만, 동일한 맹점을 공유합니다. 의식적으로 다른 관점을 탐색하세요.`
+                        : `${result.person1.mbti.primaryType}과 ${result.person2.mbti.primaryType}의 만남. 각자의 인지 기능이 교차하는 지점에서 서로를 보완합니다. 상대의 성격 유형을 '다름'이 아닌 '풍요'로 받아들이세요.`}
                     </p>
                   </div>
                 </div>
