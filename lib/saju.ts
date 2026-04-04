@@ -1,5 +1,7 @@
 // src/lib/saju.ts
-// 사주 계산 엔진 — 연주(年柱) 기반 + 간이 일주(日柱) 추정
+// 사주 계산 엔진 — korean-lunar-calendar 기반 정확한 만세력 계산
+
+import KoreanLunarCalendar from 'korean-lunar-calendar';
 
 // ━━━ 천간 (天干) ━━━
 export const CHEONGAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"] as const;
@@ -288,25 +290,60 @@ export const SANGGEUK: Record<Ohang, Ohang> = {
   "木":"土", "火":"金", "土":"水", "金":"木", "水":"火"
 };
 
-// ━━━ 계산 함수 ━━━
+// ━━━ 정확한 만세력 계산 (korean-lunar-calendar) ━━━
 
-/** 연주 (年柱) 천간 계산 */
+// Verification:
+// 1990-01-15 → 己巳年 丁丑月 庚辰日 (confirmed via korean-lunar-calendar)
+// 1995-07-22 → 乙亥年 癸未月 甲寅日 (confirmed)
+// 2000-01-01 → 己卯年 丙子月 戊午日 (confirmed)
+
+/** 정확한 사주 계산 — 만세력 데이터 기반 (입춘 기준 연주 자동 반영) */
+export function getAccurateSaju(year: number, month: number, day: number) {
+  const cal = new KoreanLunarCalendar();
+  cal.setSolarDate(year, month, day);
+  const chinese = cal.getChineseGapja();
+
+  // Parse year pillar: "乙亥年" → cheongan="乙", jiji="亥"
+  const yearStr = chinese.year;
+  const yearCg = yearStr[0] as Cheongan;
+  const yearJj = yearStr[1] as Jiji;
+
+  // Parse month pillar: "癸未月" → cheongan="癸", jiji="未"
+  const monthStr = chinese.month;
+  const monthCg = monthStr[0] as Cheongan;
+  const monthJj = monthStr[1] as Jiji;
+
+  // Parse day pillar: "甲寅日" → cheongan="甲", jiji="寅"
+  const dayStr = chinese.day;
+  const dayCg = dayStr[0] as Cheongan;
+  const dayJj = dayStr[1] as Jiji;
+
+  return {
+    year: { cheongan: yearCg, jiji: yearJj },
+    month: { cheongan: monthCg, jiji: monthJj },
+    day: { cheongan: dayCg, jiji: dayJj },
+  };
+}
+
+// ━━━ 계산 함수 (deprecated — 하위 호환용, 수학적 근사치) ━━━
+
+/** @deprecated getAccurateSaju 사용 권장. 연주 (年柱) 천간 계산 — 태양력 기반 근사치 */
 export function getYearCheongan(year: number): Cheongan {
   return CHEONGAN[(year - 4) % 10];
 }
 
-/** 연주 (年柱) 지지 계산 */
+/** @deprecated getAccurateSaju 사용 권장. 연주 (年柱) 지지 계산 */
 export function getYearJiji(year: number): Jiji {
   return JIJI[(year - 4) % 12];
 }
 
-/** 연주 오행 */
+/** @deprecated getAccurateSaju 사용 권장. 연주 오행 */
 export function getYearOhang(year: number): Ohang {
   const cgIdx = (year - 4) % 10;
   return OHANG_LIST[Math.floor(cgIdx / 2)];
 }
 
-/** 간이 일주 (日柱) 추정 — 정확한 만세력 대체용 */
+/** @deprecated getAccurateSaju 사용 권장. 간이 일주 (日柱) 추정 */
 export function estimateDayCheongan(year: number, month: number, day: number): Cheongan {
   // 기준일: 1900년 1월 1일 = 甲子일 (갑자일)
   // 이후 60일 주기로 순환
@@ -381,6 +418,7 @@ function generateHourPersonality(hourCheongan: Cheongan, hourJiji: Jiji, hourOha
 // ━━━ 결과 타입 ━━━
 export interface SajuResult {
   year: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang };
+  month: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang };
   day: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang };
   hour?: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang };
   hourPersonality?: string;
@@ -391,18 +429,28 @@ export interface SajuResult {
 
 /** 사주 종합 분석 */
 export function analyzeSaju(year: number, month: number, day: number, hour?: number): SajuResult {
-  const yCg = getYearCheongan(year);
-  const yJj = getYearJiji(year);
-  const yOh = getYearOhang(year);
-  const dCg = estimateDayCheongan(year, month, day);
-  const dJj = estimateDayJiji(year, month, day);
-  const dOh = OHANG_LIST[Math.floor(CHEONGAN.indexOf(dCg) / 2)];
+  // 정확한 만세력 데이터 사용
+  const accurate = getAccurateSaju(year, month, day);
 
-  // 간이 오행 밸런스 (연주 + 일주 기준)
+  const yCg = accurate.year.cheongan;
+  const yJj = accurate.year.jiji;
+  const yOh = CHEONGAN_INFO[yCg].ohang;
+
+  const mCg = accurate.month.cheongan;
+  const mJj = accurate.month.jiji;
+  const mOh = CHEONGAN_INFO[mCg].ohang;
+
+  const dCg = accurate.day.cheongan;
+  const dJj = accurate.day.jiji;
+  const dOh = CHEONGAN_INFO[dCg].ohang;
+
+  // 오행 밸런스 (연주 + 월주 + 일주 기준)
   const balance: Record<Ohang, number> = { "木":0, "火":0, "土":0, "金":0, "水":0 };
   balance[yOh] += 1;
-  balance[dOh] += 1;
   balance[JIJI_INFO[yJj].ohang] += 1;
+  balance[mOh] += 1;
+  balance[JIJI_INFO[mJj].ohang] += 1;
+  balance[dOh] += 1;
   balance[JIJI_INFO[dJj].ohang] += 1;
 
   // 시주 (時柱) 계산 — hour가 제공된 경우
@@ -424,6 +472,7 @@ export function analyzeSaju(year: number, month: number, day: number, hour?: num
 
   return {
     year: { cheongan: yCg, jiji: yJj, ohang: yOh },
+    month: { cheongan: mCg, jiji: mJj, ohang: mOh },
     day: { cheongan: dCg, jiji: dJj, ohang: dOh },
     hour: hourPillar,
     hourPersonality,

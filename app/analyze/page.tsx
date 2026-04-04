@@ -1191,6 +1191,7 @@ function AnalyzePageInner() {
                         style={{ background: "rgba(45,90,39,0.08)", color: "var(--saju)" }}
                       >
                         <div className="flex-1">年柱</div>
+                        <div className="flex-1" style={{ borderLeft: "1px solid rgba(45,90,39,0.15)" }}>月柱</div>
                         <div className="flex-1" style={{ borderLeft: "1px solid rgba(45,90,39,0.15)", borderRight: "1px solid rgba(45,90,39,0.15)" }}>日柱</div>
                         {result.saju.hour && <div className="flex-1">時柱</div>}
                       </div>
@@ -1202,6 +1203,15 @@ function AnalyzePageInner() {
                             style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.year.ohang].color }}
                           >
                             {result.saju.year.cheongan}
+                          </div>
+                          <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>천간</div>
+                        </div>
+                        <div className="flex-1 py-3" style={{ borderLeft: "1px solid var(--border)" }}>
+                          <div
+                            className="text-[26px] font-black"
+                            style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.month.ohang].color }}
+                          >
+                            {result.saju.month.cheongan}
                           </div>
                           <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>천간</div>
                         </div>
@@ -1237,6 +1247,15 @@ function AnalyzePageInner() {
                           </div>
                           <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>지지</div>
                         </div>
+                        <div className="flex-1 py-3" style={{ borderLeft: "1px solid var(--border)" }}>
+                          <div
+                            className="text-[26px] font-black"
+                            style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.month.ohang].color }}
+                          >
+                            {result.saju.month.jiji}
+                          </div>
+                          <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>지지</div>
+                        </div>
                         <div className="flex-1 py-3" style={{ borderLeft: "1px solid var(--border)", borderRight: result.saju.hour ? "1px solid var(--border)" : "none" }}>
                           <div className="flex items-center justify-center gap-1">
                             <Dot color={OHANG_INFO[result.saju.day.ohang].color} />
@@ -1267,6 +1286,10 @@ function AnalyzePageInner() {
                       >
                         <span style={{ color: OHANG_INFO[result.saju.year.ohang].color }}>
                           {result.saju.year.ohang} {OHANG_INFO[result.saju.year.ohang].kr}
+                        </span>
+                        <span style={{ color: "var(--ink-faint)" }}>|</span>
+                        <span style={{ color: OHANG_INFO[result.saju.month.ohang].color }}>
+                          {result.saju.month.ohang} {OHANG_INFO[result.saju.month.ohang].kr}
                         </span>
                         <span style={{ color: "var(--ink-faint)" }}>|</span>
                         <span style={{ color: OHANG_INFO[result.saju.day.ohang].color }}>
