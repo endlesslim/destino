@@ -16,9 +16,14 @@ const TAB_ITEMS = [
     icon: CompatibilityIcon,
   },
   {
-    label: "오늘의 운세",
+    label: "운세",
     href: "/daily",
     icon: DailyIcon,
+  },
+  {
+    label: "전체",
+    href: "/services",
+    icon: ServicesIcon,
   },
   {
     label: "기록",
@@ -79,6 +84,18 @@ function DailyIcon({ color }: { color: string }) {
       <line x1="15.3" y1="15.3" x2="17.4" y2="17.4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
       <line x1="17.4" y1="4.6" x2="15.3" y2="6.7" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
       <line x1="6.7" y1="15.3" x2="4.6" y2="17.4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** 2x2 dot grid — services menu */
+function ServicesIcon({ color }: { color: string }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="2.5" fill={color} />
+      <circle cx="15" cy="7" r="2.5" fill={color} />
+      <circle cx="7" cy="15" r="2.5" fill={color} />
+      <circle cx="15" cy="15" r="2.5" fill={color} />
     </svg>
   );
 }
