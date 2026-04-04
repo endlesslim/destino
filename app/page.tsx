@@ -130,6 +130,8 @@ export default function Home() {
           <div className="flex justify-center gap-4 text-[12px]" style={{ color: "var(--ink-light)" }}>
             <a href="/analyze" className="hover:underline">미니 분석 도구</a>
             <span style={{ color: "var(--border)" }}>|</span>
+            <a href="/daily" className="hover:underline">오늘의 운세</a>
+            <span style={{ color: "var(--border)" }}>|</span>
             <a href="mailto:hello@destino.me" className="hover:underline">문의</a>
           </div>
         </footer>

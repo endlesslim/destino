@@ -1167,11 +1167,38 @@ export default function AnalyzePage() {
               </div>
             </StaggerSection>
 
-            {/* Coming Soon */}
+            {/* 궁합 분석 CTA */}
             <StaggerSection index={9}>
+              <Link
+                href="/compatibility"
+                className="flex items-center gap-3 p-4 rounded-xl mb-3 no-underline transition-opacity hover:opacity-85"
+                style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
+              >
+                <div
+                  className="flex items-center justify-center w-9 h-9 rounded-[3px] shrink-0 -rotate-[3deg]"
+                  style={{ border: "2px solid var(--seal)", color: "var(--seal)", fontFamily: "var(--font-display)" }}
+                >
+                  <span className="text-sm font-black">合</span>
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold" style={{ color: "var(--seal)" }}>
+                    궁합 분석
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
+                    두 사람의 교차점을 비교합니다
+                  </div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                  <path d="M6 4l4 4-4 4" stroke="var(--seal)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </StaggerSection>
+
+            {/* Coming Soon */}
+            <StaggerSection index={10}>
               <div
                 className="flex items-center gap-3 p-4 rounded-xl mb-4"
-                style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
+                style={{ background: "var(--bg-warm)", border: "1.5px solid var(--border)" }}
               >
                 <div
                   className="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
@@ -1180,7 +1207,7 @@ export default function AnalyzePage() {
                   <Dot color="#C53D43" size={10} />
                 </div>
                 <div>
-                  <div className="text-sm font-bold" style={{ color: "var(--seal)" }}>
+                  <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>
                     관상 / 타로 / 점성술 심화
                   </div>
                   <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
@@ -1191,7 +1218,7 @@ export default function AnalyzePage() {
             </StaggerSection>
 
             {/* Actions */}
-            <StaggerSection index={10}>
+            <StaggerSection index={11}>
               <div className="flex flex-col gap-2.5">
                 <button
                   onClick={reset}
