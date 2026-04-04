@@ -175,15 +175,10 @@ export default function PaymentGate({ result, children }: PaymentGateProps) {
           position: "relative",
         }}
       >
-        <div
-          style={{
-            filter: "blur(6px)",
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          {children}
-        </div>
+        {/* Skeleton blocks that look like content but contain no real data */}
+        <div style={{ height: 200, background: "var(--bg-warm)", borderRadius: 14, marginBottom: 14 }} />
+        <div style={{ height: 150, background: "var(--bg-warm)", borderRadius: 14, marginBottom: 14 }} />
+        <div style={{ height: 180, background: "var(--bg-warm)", borderRadius: 14, marginBottom: 14 }} />
 
         {/* 페이드 그라디언트 오버레이 */}
         <div
@@ -192,9 +187,8 @@ export default function PaymentGate({ result, children }: PaymentGateProps) {
             bottom: 0,
             left: 0,
             right: 0,
-            height: "300px",
-            background:
-              "linear-gradient(to bottom, transparent, var(--bg-paper) 85%)",
+            height: 200,
+            background: "linear-gradient(transparent, var(--bg-paper))",
             pointerEvents: "none",
           }}
         />

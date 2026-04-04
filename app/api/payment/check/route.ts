@@ -3,6 +3,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import type { PaymentCheckResponse } from "@/lib/payment";
+import crypto from "crypto";
+
+const TOKEN_SECRET = process.env.TOKEN_SECRET || "destino-secret-key-change-in-production";
 
 interface TokenPayload {
   paymentId: string;
@@ -11,26 +14,22 @@ interface TokenPayload {
   type: string;
 }
 
-/** base64url 토큰을 디코딩하여 검증 */
+/** HMAC-SHA256 서명된 토큰을 검증 */
 function validateToken(token: string): boolean {
+  const [payloadStr, signature] = token.split(".");
+  if (!payloadStr || !signature) return false;
+
+  const expectedSig = crypto.createHmac("sha256", TOKEN_SECRET).update(payloadStr).digest("base64url");
+  if (signature !== expectedSig) return false;
+
   try {
-    const decoded = Buffer.from(token, "base64url").toString("utf-8");
-    const payload: TokenPayload = JSON.parse(decoded);
+    const payload: TokenPayload = JSON.parse(Buffer.from(payloadStr, "base64url").toString());
 
     // 타입 확인
-    if (payload.type !== "destino_report_access") {
-      return false;
-    }
+    if (payload.type !== "destino_report_access") return false;
 
     // 만료 확인 (24시간)
-    if (Date.now() > payload.expiresAt) {
-      return false;
-    }
-
-    // paymentId 형식 확인
-    if (!payload.paymentId || !payload.paymentId.startsWith("destino_")) {
-      return false;
-    }
+    if (Date.now() > payload.expiresAt) return false;
 
     return true;
   } catch {

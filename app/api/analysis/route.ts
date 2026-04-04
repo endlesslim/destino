@@ -46,6 +46,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Input validation
+    const y = Number(year), m = Number(month), d = Number(day);
+    if (!Number.isInteger(y) || y < 1900 || y > 2030 ||
+        !Number.isInteger(m) || m < 1 || m > 12 ||
+        !Number.isInteger(d) || d < 1 || d > 31) {
+      return NextResponse.json(
+        { error: "invalid_fields", message: "유효하지 않은 날짜입니다." },
+        { status: 400 },
+      );
+    }
+
+    if (JSON.stringify(resultJson).length >= 50000) {
+      return NextResponse.json(
+        { error: "payload_too_large", message: "결과 데이터가 너무 큽니다." },
+        { status: 400 },
+      );
+    }
+
     if (isSupabaseConfigured()) {
       const { data, error } = await supabase
         .from("analyses")

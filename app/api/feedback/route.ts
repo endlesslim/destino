@@ -50,6 +50,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Input validation: year/month/day must be valid numbers
+    const y = Number(year), m = Number(month), d = Number(day);
+    if (!Number.isInteger(y) || y < 1900 || y > 2030 ||
+        !Number.isInteger(m) || m < 1 || m > 12 ||
+        !Number.isInteger(d) || d < 1 || d > 31) {
+      return NextResponse.json(
+        { error: "invalid_fields", message: "유효하지 않은 날짜입니다." },
+        { status: 400 },
+      );
+    }
+
+    // Sanitize comment length
+    const sanitizedComment = comment?.slice(0, 500);
+
     if (isSupabaseConfigured()) {
       const { error } = await supabase.from("feedback").insert({
         year,
@@ -58,7 +72,7 @@ export async function POST(request: NextRequest) {
         convergence_rate: convergenceRate,
         archetype,
         rating,
-        comment: comment || null,
+        comment: sanitizedComment || null,
       });
 
       if (error) throw error;
@@ -72,7 +86,7 @@ export async function POST(request: NextRequest) {
         convergenceRate,
         archetype,
         rating,
-        comment: comment || undefined,
+        comment: sanitizedComment || undefined,
         created_at: new Date().toISOString(),
       });
       writeFeedback(entries);

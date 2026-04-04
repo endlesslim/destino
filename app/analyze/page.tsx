@@ -506,8 +506,9 @@ function AnalyzePageInner() {
     const m = parseInt(month);
     const d = parseInt(day);
 
-    if (!y || y < 1924 || y > 2025) {
-      setValidationError("1924~2025년 사이를 입력해주세요");
+    const currentYear = new Date().getFullYear();
+    if (!y || y < 1924 || y > currentYear) {
+      setValidationError(`1924~${currentYear}년 사이를 입력해주세요`);
       return;
     }
     if (!m || m < 1 || m > 12) {

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
-import path from "path";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 const DATA_PATH = "/tmp/destino-waitlist.json";

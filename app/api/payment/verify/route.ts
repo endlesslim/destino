@@ -6,10 +6,13 @@ import { PAYMENT_CONFIG, type PaymentVerifyResponse } from "@/lib/payment";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import * as fs from "fs";
 import * as path from "path";
+import crypto from "crypto";
 
 const PAYMENTS_FILE = path.join("/tmp", "destino-payments.json");
 
-/** Access token 생성 (base64 인코딩된 JSON) */
+const TOKEN_SECRET = process.env.TOKEN_SECRET || "destino-secret-key-change-in-production";
+
+/** Access token 생성 (HMAC-SHA256 서명된 토큰) */
 function createAccessToken(paymentId: string): string {
   const payload = {
     paymentId,
@@ -17,7 +20,9 @@ function createAccessToken(paymentId: string): string {
     expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24시간
     type: "destino_report_access",
   };
-  return Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const payloadStr = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const signature = crypto.createHmac("sha256", TOKEN_SECRET).update(payloadStr).digest("base64url");
+  return `${payloadStr}.${signature}`;
 }
 
 /** 결제 기록 저장 (파일 기반, 프로덕션에서는 DB 사용) */

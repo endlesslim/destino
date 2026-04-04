@@ -273,8 +273,9 @@ function CompatibilityPageInner() {
     const y1 = parseInt(year1), m1 = parseInt(month1), d1 = parseInt(day1);
     const y2 = parseInt(year2), m2 = parseInt(month2), d2 = parseInt(day2);
 
-    if (!y1 || y1 < 1924 || y1 > 2025 || !y2 || y2 < 1924 || y2 > 2025) {
-      setValidationError("1924~2025년 사이를 입력해주세요");
+    const currentYear = new Date().getFullYear();
+    if (!y1 || y1 < 1924 || y1 > currentYear || !y2 || y2 < 1924 || y2 > currentYear) {
+      setValidationError(`1924~${currentYear}년 사이를 입력해주세요`);
       return;
     }
     if (!m1 || m1 < 1 || m1 > 12 || !m2 || m2 < 1 || m2 > 12) {
