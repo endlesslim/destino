@@ -64,13 +64,20 @@ function StaggerSection({
 }
 
 // ━━━ 섹션 헤더 ━━━
-function SectionHeader({ color, title }: { color: string; title: string }) {
+function SectionHeader({ color, title, subtitle }: { color: string; title: string; subtitle?: string }) {
   return (
-    <div className="flex items-center gap-2 mb-4">
-      <Dot color={color} size={8} />
-      <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
-        {title}
-      </span>
+    <div className="mb-4">
+      <div className="flex items-center gap-2">
+        <Dot color={color} size={8} />
+        <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+          {title}
+        </span>
+      </div>
+      {subtitle && (
+        <p className="text-xs mt-1 ml-4" style={{ color: "var(--ink-light)" }}>
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 }
@@ -142,11 +149,26 @@ function CompatScoreCounter({ score }: { score: number }) {
   );
 }
 
+// ━━━ 타임라인 단계 아이콘 ━━━
+const TIMELINE_ICONS: Record<string, string> = {
+  "만남": "🌱",
+  "연애 초기": "🌸",
+  "깊어지는 시기": "🌳",
+  "위기": "🌊",
+  "성숙": "🏔",
+};
+
 // ━━━ 시스템 컬러 ━━━
 const SYSTEM_COLORS: Record<string, string> = {
   saju: "var(--saju)",
   western: "var(--astro)",
   numerology: "var(--numero)",
+};
+
+const SYSTEM_LABELS: Record<string, string> = {
+  saju: "사주 오행",
+  western: "서양 별자리",
+  numerology: "수비학",
 };
 
 export default function CompatibilityPage() {
@@ -323,7 +345,7 @@ function CompatibilityPageInner() {
                 궁합 분석
               </h1>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                두 사람의 생년월일을 입력하면<br />동서양 3개 체계가 궁합을 분석합니다
+                두 사람의 생년월일을 입력하면<br />동서양 4개 체계가 궁합을 분석합니다
               </p>
             </div>
 
@@ -621,14 +643,14 @@ function CompatibilityPageInner() {
         {result && (
           <>
             {/* Section Label */}
-            <StaggerSection index={0} className="flex justify-end items-center mb-5">
+            <ScrollReveal delay={0} className="flex justify-end items-center mb-5">
               <span className="text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
                 궁합 분석
               </span>
-            </StaggerSection>
+            </ScrollReveal>
 
-            {/* Overall Score Hero */}
-            <StaggerSection index={1}>
+            {/* ━━━ 1. Overall Score Hero ━━━ */}
+            <ScrollReveal delay={80}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -716,10 +738,10 @@ function CompatibilityPageInner() {
                   </div>
                 </div>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
-            {/* Archetype */}
-            <StaggerSection index={2}>
+            {/* ━━━ Archetype ━━━ */}
+            <ScrollReveal delay={160}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
@@ -737,17 +759,153 @@ function CompatibilityPageInner() {
                   {result.archetypeDesc}
                 </p>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
-            {/* Dimension Cards */}
-            <StaggerSection index={3}>
+            {/* ━━━ 2. 두 사람의 프로파일 비교 ━━━ */}
+            <ScrollReveal delay={240}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
               >
-                <SectionHeader color="var(--seal)" title="차원별 궁합" />
+                <SectionHeader
+                  color="var(--seal)"
+                  title="두 사람의 프로파일 비교"
+                  subtitle="동서양 4개 체계로 본 각자의 성격"
+                />
 
-                <div className="flex flex-col gap-4">
+                {/* Side by side detailed profiles */}
+                <div className="flex flex-col gap-3">
+                  {/* Person 1 Detail Card */}
+                  <div className="p-4 rounded-[10px]" style={{ background: "var(--bg-paper)" }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black"
+                        style={{ background: "var(--seal)", color: "#fff" }}
+                      >
+                        1
+                      </div>
+                      <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+                        {p1Name}
+                      </span>
+                    </div>
+
+                    {/* 3 system badges */}
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--saju)" + "15", color: "var(--saju)" }}>
+                        {OHANG_INFO[result.person1.saju.day.ohang].kr}({result.person1.saju.day.ohang})
+                      </span>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--astro)" + "15", color: "var(--astro)" }}>
+                        {result.person1.western.sunSign.name} ({result.person1.western.element})
+                      </span>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--numero)" + "15", color: "var(--numero)" }}>
+                        LP {result.person1.numerology.lifePath} ({result.person1.numerology.lifePathInfo.name})
+                      </span>
+                    </div>
+
+                    {/* Archetype */}
+                    <div
+                      className="text-sm font-bold mb-2"
+                      style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                    >
+                      {result.person1.archetype}
+                    </div>
+
+                    {/* Personality Detail */}
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                      {result.person1Detail}
+                    </p>
+
+                    {/* Top traits */}
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {result.person1.matches.slice(0, 4).map((m) => (
+                        <span
+                          key={m.trait}
+                          className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                          style={{ background: "var(--bg-white)", color: "var(--ink-muted)" }}
+                        >
+                          {m.trait} ({m.strength})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="flex items-center gap-3 px-4">
+                    <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+                    <span className="text-[10px] font-bold tracking-widest" style={{ color: "var(--ink-faint)" }}>VS</span>
+                    <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+                  </div>
+
+                  {/* Person 2 Detail Card */}
+                  <div className="p-4 rounded-[10px]" style={{ background: "var(--bg-paper)" }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black"
+                        style={{ background: "var(--ink)", color: "var(--bg-paper)" }}
+                      >
+                        2
+                      </div>
+                      <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+                        {p2Name}
+                      </span>
+                    </div>
+
+                    {/* 3 system badges */}
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--saju)" + "15", color: "var(--saju)" }}>
+                        {OHANG_INFO[result.person2.saju.day.ohang].kr}({result.person2.saju.day.ohang})
+                      </span>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--astro)" + "15", color: "var(--astro)" }}>
+                        {result.person2.western.sunSign.name} ({result.person2.western.element})
+                      </span>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--numero)" + "15", color: "var(--numero)" }}>
+                        LP {result.person2.numerology.lifePath} ({result.person2.numerology.lifePathInfo.name})
+                      </span>
+                    </div>
+
+                    {/* Archetype */}
+                    <div
+                      className="text-sm font-bold mb-2"
+                      style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                    >
+                      {result.person2.archetype}
+                    </div>
+
+                    {/* Personality Detail */}
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                      {result.person2Detail}
+                    </p>
+
+                    {/* Top traits */}
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {result.person2.matches.slice(0, 4).map((m) => (
+                        <span
+                          key={m.trait}
+                          className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                          style={{ background: "var(--bg-white)", color: "var(--ink-muted)" }}
+                        >
+                          {m.trait} ({m.strength})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* ━━━ 3. Dimension Cards ━━━ */}
+            <ScrollReveal delay={320}>
+              <div
+                className="rounded-[14px] p-6 mb-3.5"
+                style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+              >
+                <SectionHeader
+                  color="var(--seal)"
+                  title="차원별 궁합"
+                  subtitle="동양 사주, 서양 별자리, 수비학 각각의 시선"
+                />
+
+                <div className="flex flex-col gap-5">
                   {result.dimensions.map((dim, i) => (
                     <div key={dim.system}>
                       <div className="flex items-center justify-between mb-2">
@@ -765,24 +923,39 @@ function CompatibilityPageInner() {
                         </span>
                       </div>
                       <ScoreBar score={dim.score} color={SYSTEM_COLORS[dim.system] || "var(--ink-muted)"} delay={i * 200} />
-                      <p className="text-xs leading-relaxed mt-2" style={{ color: "var(--ink-muted)" }}>
-                        {dim.description}
-                      </p>
+
+                      {/* Expanded description */}
+                      <div
+                        className="mt-3 p-3.5 rounded-lg"
+                        style={{ background: "var(--bg-paper)" }}
+                      >
+                        <div className="text-[10px] font-bold tracking-wider mb-1.5" style={{ color: SYSTEM_COLORS[dim.system] || "var(--ink-light)" }}>
+                          {SYSTEM_LABELS[dim.system] || dim.system} 관점
+                        </div>
+                        <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                          {dim.description}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
-            {/* Element Relation */}
-            <StaggerSection index={4}>
+            {/* ━━━ 4. 원소 이야기 ━━━ */}
+            <ScrollReveal delay={400}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
               >
-                <SectionHeader color="var(--saju)" title="오행 관계" />
+                <SectionHeader
+                  color="var(--saju)"
+                  title="원소 이야기"
+                  subtitle="두 사람의 원소가 만나 빚어내는 서사"
+                />
 
-                <div className="flex items-center justify-center gap-3 mb-4">
+                {/* Element visual */}
+                <div className="flex items-center justify-center gap-3 mb-5">
                   <div className="text-center">
                     <div
                       className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-2"
@@ -852,22 +1025,218 @@ function CompatibilityPageInner() {
                   </div>
                 </div>
 
+                {/* Literary blockquote */}
+                <blockquote
+                  className="text-sm leading-[2.1] italic"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "var(--ink-medium)",
+                    borderLeft: "3px solid var(--saju)",
+                    paddingLeft: "16px",
+                    margin: 0,
+                  }}
+                >
+                  {result.elementStory}
+                </blockquote>
+
+                {/* Basic relation description */}
                 <div
-                  className="p-3.5 rounded-lg text-sm leading-relaxed"
+                  className="mt-4 p-3.5 rounded-lg text-xs leading-relaxed"
                   style={{ background: "var(--bg-paper)", color: "var(--ink-muted)" }}
                 >
                   {result.elementRelation.description}
                 </div>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
-            {/* Trait Analysis */}
-            <StaggerSection index={5}>
+            {/* ━━━ 5. 관계 타임라인 ━━━ */}
+            <ScrollReveal delay={480}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
               >
-                <SectionHeader color="var(--ink)" title="특성 분석" />
+                <SectionHeader
+                  color="var(--seal)"
+                  title="관계 타임라인"
+                  subtitle="관계의 다섯 단계, 각 시기에 필요한 지혜"
+                />
+
+                {/* Timeline */}
+                <div className="relative">
+                  {/* Vertical line */}
+                  <div
+                    className="absolute left-[15px] top-[24px] bottom-[24px] w-px"
+                    style={{ background: "var(--border-strong)" }}
+                  />
+
+                  <div className="flex flex-col gap-0">
+                    {result.timelineAdvice.map((item, i) => (
+                      <div key={item.phase} className="relative pl-10 pb-5">
+                        {/* Dot on timeline */}
+                        <div
+                          className="absolute left-[8px] top-[2px] w-[15px] h-[15px] rounded-full border-2 flex items-center justify-center"
+                          style={{
+                            borderColor: i === 0 ? "var(--seal)" : i === result.timelineAdvice.length - 1 ? "var(--saju)" : "var(--border-strong)",
+                            background: i === 0 ? "var(--seal)" : i === result.timelineAdvice.length - 1 ? "var(--saju)" : "var(--bg-white)",
+                          }}
+                        >
+                          {(i === 0 || i === result.timelineAdvice.length - 1) && (
+                            <div className="w-[5px] h-[5px] rounded-full" style={{ background: "#fff" }} />
+                          )}
+                        </div>
+
+                        {/* Phase label */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-[11px] font-black tracking-wider" style={{ color: "var(--ink)" }}>
+                            {item.phase}
+                          </span>
+                          <span className="text-sm">{TIMELINE_ICONS[item.phase] || ""}</span>
+                        </div>
+
+                        {/* Advice */}
+                        <div
+                          className="p-3.5 rounded-lg"
+                          style={{ background: "var(--bg-paper)" }}
+                        >
+                          <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                            {item.advice}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* ━━━ 6. 소통 스타일 ━━━ */}
+            <ScrollReveal delay={560}>
+              <div
+                className="rounded-[14px] p-6 mb-3.5"
+                style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+              >
+                <SectionHeader
+                  color="var(--astro)"
+                  title="소통 스타일"
+                  subtitle="두 사람은 어떻게 다르게 말하고, 어떻게 연결될 수 있는가"
+                />
+
+                {/* Person 1 communication */}
+                <div className="mb-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div
+                      className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black"
+                      style={{ background: "var(--seal)", color: "#fff" }}
+                    >
+                      1
+                    </div>
+                    <span className="text-[11px] font-bold tracking-wider" style={{ color: "var(--ink-light)" }}>
+                      {p1Name}의 소통 방식
+                    </span>
+                  </div>
+                  <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                      {result.communicationStyle.person1}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Person 2 communication */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div
+                      className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black"
+                      style={{ background: "var(--ink)", color: "var(--bg-paper)" }}
+                    >
+                      2
+                    </div>
+                    <span className="text-[11px] font-bold tracking-wider" style={{ color: "var(--ink-light)" }}>
+                      {p2Name}의 소통 방식
+                    </span>
+                  </div>
+                  <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                      {result.communicationStyle.person2}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Communication tip */}
+                <div
+                  className="p-4 rounded-[10px]"
+                  style={{ background: "var(--astro)" + "08", border: "1px solid var(--astro)" + "20" }}
+                >
+                  <div className="text-[10px] font-bold tracking-wider mb-2" style={{ color: "var(--astro)" }}>
+                    소통 팁
+                  </div>
+                  <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
+                    {result.communicationStyle.tip}
+                  </p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* ━━━ 7. 갈등 패턴 ━━━ */}
+            <ScrollReveal delay={640}>
+              <div
+                className="rounded-[14px] p-6 mb-3.5"
+                style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+              >
+                <SectionHeader
+                  color="var(--face)"
+                  title="갈등 패턴"
+                  subtitle="무엇이 충돌을 만들고, 어떻게 풀어갈 수 있는가"
+                />
+
+                {/* Trigger */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="var(--seal)" strokeWidth="1.5"/>
+                      <path d="M7 4v3.5M7 9.5v.5" stroke="var(--seal)" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    <span className="text-[11px] font-bold tracking-wider" style={{ color: "var(--seal-dark)" }}>
+                      갈등의 시작점
+                    </span>
+                  </div>
+                  <div className="p-3.5 rounded-lg" style={{ background: "var(--seal-bg)" }}>
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
+                      {result.conflictPattern.trigger}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Resolution */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="var(--saju)" strokeWidth="1.5"/>
+                      <path d="M4.5 7l2 2 3-3.5" stroke="var(--saju)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span className="text-[11px] font-bold tracking-wider" style={{ color: "var(--saju)" }}>
+                      해결의 열쇠
+                    </span>
+                  </div>
+                  <div className="p-3.5 rounded-lg" style={{ background: "var(--saju)" + "08" }}>
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
+                      {result.conflictPattern.resolution}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* ━━━ 8. Trait Analysis ━━━ */}
+            <ScrollReveal delay={720}>
+              <div
+                className="rounded-[14px] p-6 mb-3.5"
+                style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+              >
+                <SectionHeader
+                  color="var(--ink)"
+                  title="특성 분석"
+                  subtitle="공유 특성, 보완 특성, 긴장 포인트"
+                />
 
                 {/* Shared */}
                 {result.sharedTraits.length > 0 && (
@@ -875,6 +1244,9 @@ function CompatibilityPageInner() {
                     <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
                       공유 특성
                     </div>
+                    <p className="text-xs mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                      두 사람이 함께 가지고 있는 특성. 공감의 기반이자 관계의 뿌리입니다.
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {result.sharedTraits.map((t) => (
                         <Chip key={t} label={t} color="var(--saju)" />
@@ -889,6 +1261,9 @@ function CompatibilityPageInner() {
                     <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
                       상호보완 특성
                     </div>
+                    <p className="text-xs mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                      한쪽이 부족한 것을 다른 쪽이 채워주는 조합. 함께할 때 더 완전해집니다.
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {result.complementaryTraits.map((t) => (
                         <Chip key={t} label={t} color="var(--astro)" />
@@ -903,6 +1278,9 @@ function CompatibilityPageInner() {
                     <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
                       긴장 포인트
                     </div>
+                    <p className="text-xs mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                      에너지가 충돌하는 지점. 갈등의 씨앗이지만, 잘 다루면 성장의 촉매가 됩니다.
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {result.tensionTraits.map((t) => (
                         <Chip key={t} label={t} color="var(--face)" />
@@ -917,77 +1295,22 @@ function CompatibilityPageInner() {
                   </p>
                 )}
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
-            {/* Individual Summaries */}
-            <StaggerSection index={6}>
+            {/* ━━━ 9. 관계 조언 (Expanded) ━━━ */}
+            <ScrollReveal delay={800}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
               >
-                <SectionHeader color="var(--seal)" title="개인 프로필 비교" />
+                <SectionHeader
+                  color="var(--seal)"
+                  title="관계 조언"
+                  subtitle="동서양 3체계가 전하는 메시지"
+                />
 
-                <div className="flex gap-2.5">
-                  {/* Person 1 */}
-                  <div className="flex-1 p-3.5 rounded-[10px]" style={{ background: "var(--bg-paper)" }}>
-                    <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
-                      {p1Name}
-                    </div>
-                    <div className="text-sm font-bold mb-1" style={{ fontFamily: "var(--font-display)" }}>
-                      {result.person1.archetype}
-                    </div>
-                    <div className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
-                      {result.person1.saju.personality.nature}
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {result.person1.matches.slice(0, 3).map((m) => (
-                        <span
-                          key={m.trait}
-                          className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                          style={{ background: "var(--bg-white)", color: "var(--ink-muted)" }}
-                        >
-                          {m.trait}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Person 2 */}
-                  <div className="flex-1 p-3.5 rounded-[10px]" style={{ background: "var(--bg-paper)" }}>
-                    <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
-                      {p2Name}
-                    </div>
-                    <div className="text-sm font-bold mb-1" style={{ fontFamily: "var(--font-display)" }}>
-                      {result.person2.archetype}
-                    </div>
-                    <div className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
-                      {result.person2.saju.personality.nature}
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {result.person2.matches.slice(0, 3).map((m) => (
-                        <span
-                          key={m.trait}
-                          className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                          style={{ background: "var(--bg-white)", color: "var(--ink-muted)" }}
-                        >
-                          {m.trait}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </StaggerSection>
-
-            {/* Advice */}
-            <StaggerSection index={7}>
-              <div
-                className="rounded-[14px] p-6 mb-3.5"
-                style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
-              >
-                <SectionHeader color="var(--seal)" title="관계 조언" />
                 <blockquote
-                  className="text-sm leading-[2] italic"
+                  className="text-sm leading-[2.1] italic mb-5"
                   style={{
                     fontFamily: "var(--font-display)",
                     color: "var(--ink-medium)",
@@ -998,11 +1321,51 @@ function CompatibilityPageInner() {
                 >
                   {result.advice}
                 </blockquote>
-              </div>
-            </StaggerSection>
 
-            {/* Share */}
-            <StaggerSection index={8}>
+                {/* Additional contextual advice based on score */}
+                <div className="flex flex-col gap-3 mt-4">
+                  <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                    <div className="text-[10px] font-bold tracking-wider mb-1.5" style={{ color: "var(--saju)" }}>
+                      오행의 관점
+                    </div>
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                      {result.elementRelation.relation === "상생"
+                        ? "상생의 흐름을 타고 있는 관계입니다. 이 자연스러운 에너지를 의식하고 감사하세요. 물이 나무를 기르듯, 서로에게 영양분이 되어주는 관계를 계속 유지하는 것이 중요합니다."
+                        : result.elementRelation.relation === "상극"
+                        ? "상극의 에너지는 강한 변화를 만듭니다. 서로를 깎아내리는 것이 아니라, 더 단단하게 만드는 과정으로 바라보세요. 대장간의 불이 명검을 만들듯, 이 관계는 두 사람을 단련시킵니다."
+                        : result.elementRelation.relation === "비화"
+                        ? "같은 원소의 공명은 깊은 이해를 가져오지만, 같은 약점도 공유합니다. 의식적으로 다른 경험을 추구하고, 서로의 미세한 차이에서 배움을 찾으세요."
+                        : "직접적 연결이 없는 원소 관계는 오히려 자유를 줍니다. 정해진 공식 없이 두 사람만의 관계를 만들어가세요. 그 과정 자체가 이 관계의 아름다움입니다."}
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                    <div className="text-[10px] font-bold tracking-wider mb-1.5" style={{ color: "var(--astro)" }}>
+                      별자리의 관점
+                    </div>
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                      {result.person1.western.element === result.person2.western.element
+                        ? `같은 ${result.person1.western.element} 원소의 두 별자리. 직관적 이해가 깊지만, 같은 한계를 공유하기도 합니다. 다른 원소의 친구나 활동을 통해 균형을 보완하세요.`
+                        : `${result.person1.western.sunSign.name}(${result.person1.western.element})과 ${result.person2.western.sunSign.name}(${result.person2.western.element})의 조합은 서로에게 새로운 시각을 선물합니다. 상대의 원소적 특성을 배우려는 열린 마음이 관계를 풍요롭게 만듭니다.`}
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                    <div className="text-[10px] font-bold tracking-wider mb-1.5" style={{ color: "var(--numero)" }}>
+                      수비학의 관점
+                    </div>
+                    <p className="text-xs leading-[1.9]" style={{ color: "var(--ink-muted)" }}>
+                      {result.person1.numerology.lifePath === result.person2.numerology.lifePath
+                        ? `같은 생명경로수 ${result.person1.numerology.lifePath}을 가진 두 사람. 인생의 큰 방향이 같기에 깊은 공감이 가능하지만, 같은 도전도 함께 마주합니다. 서로의 거울이 되어주세요.`
+                        : `생명경로수 ${result.person1.numerology.lifePath}(${result.person1.numerology.lifePathInfo.name})과 ${result.person2.numerology.lifePath}(${result.person2.numerology.lifePathInfo.name})의 만남. 각자의 인생 여정이 교차하는 지점에서 특별한 배움이 일어납니다. 상대의 여정을 존중하면서 함께 걷는 구간을 소중히 하세요.`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* ━━━ 10. Share ━━━ */}
+            <ScrollReveal delay={880}>
               <div
                 className="rounded-[14px] p-5 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1040,10 +1403,10 @@ function CompatibilityPageInner() {
                   </div>
                 </div>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* Actions */}
-            <StaggerSection index={9}>
+            <ScrollReveal delay={960}>
               <div className="flex flex-col gap-2.5">
                 <button
                   onClick={reset}
@@ -1060,7 +1423,7 @@ function CompatibilityPageInner() {
                   개인 분석하기
                 </Link>
               </div>
-            </StaggerSection>
+            </ScrollReveal>
 
             {/* Bottom Spacer */}
             <div className="h-10" />

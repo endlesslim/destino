@@ -293,7 +293,7 @@ function AnalyzePageInner() {
   const topRef = useRef<HTMLDivElement>(null);
   const valid = year.length === 4 && month !== "" && day !== "";
 
-  const loadingSteps = ["사주 분석 중", "별자리 확인 중", "수비학 계산 중", "교차점 발견 중"];
+  const loadingSteps = ["사주 분석 중", "별자리 확인 중", "수비학 계산 중", "MBTI 매칭 중", "교차점 발견 중"];
 
   // Read share URL params on mount
   useEffect(() => {
@@ -392,7 +392,7 @@ function AnalyzePageInner() {
           elementHarmony: r.element_harmony.relation,
         });
       } catch {}
-    }, 2000);
+    }, 2500);
   };
 
   const reset = () => {
@@ -415,7 +415,7 @@ function AnalyzePageInner() {
   }, [year, month, day]);
 
   const shareToTwitter = () => {
-    const text = `동서양 3개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
+    const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
     const url = `${window.location.origin}/analyze`;
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
@@ -424,7 +424,7 @@ function AnalyzePageInner() {
   };
 
   const shareToThreads = () => {
-    const text = `동서양 3개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}% ${window.location.origin}/analyze`;
+    const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}% ${window.location.origin}/analyze`;
     window.open(
       `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -455,7 +455,7 @@ function AnalyzePageInner() {
                 운명의 교차점
               </h1>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                생년월일을 입력하면<br />동서양 3개 체계가 동시에 분석합니다
+                생년월일을 입력하면<br />동서양 4개 체계가 동시에 분석합니다
               </p>
             </div>
 
@@ -1479,8 +1479,157 @@ function AnalyzePageInner() {
                   </div>
                 </ScrollReveal>
 
+                {/* B5.5: MBTI 교차분석 */}
+                <ScrollReveal delay={360}>
+                  <div
+                    className="rounded-[14px] p-6 mb-3.5"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <SectionHeader color="var(--mbti)" title="MBTI 교차분석" />
+
+                    <div className="text-center py-2">
+                      {/* MBTI Type Badge */}
+                      <div
+                        className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-3"
+                        style={{ background: "var(--mbti)" + "15" }}
+                      >
+                        <span
+                          className="text-2xl font-black tracking-wide"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--mbti)" }}
+                        >
+                          {result.mbti.primaryType}
+                        </span>
+                      </div>
+
+                      {/* Secondary Type */}
+                      <div className="flex items-center justify-center gap-2 mb-3">
+                        <span
+                          className="inline-block px-3 py-1 rounded-full text-sm font-bold"
+                          style={{ background: "var(--mbti)" + "12", color: "var(--mbti)" }}
+                        >
+                          {result.mbti.primaryType}
+                        </span>
+                        <span className="text-xs" style={{ color: "var(--ink-light)" }}>or</span>
+                        <span
+                          className="inline-block px-3 py-1 rounded-full text-sm font-bold"
+                          style={{ background: "var(--bg-paper)", color: "var(--ink-muted)" }}
+                        >
+                          {result.mbti.secondaryType}
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <p
+                        className="text-[15px] leading-[1.9] mb-4 text-left"
+                        style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                      >
+                        {result.mbti.description}
+                      </p>
+
+                      {/* Strengths */}
+                      <div className="mb-3 text-left">
+                        <div className="text-[11px] font-semibold mb-2" style={{ color: "var(--ink-light)" }}>
+                          강점
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {result.mbti.strengths.map((s) => (
+                            <Chip key={s} label={s} color="var(--mbti)" />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Weaknesses */}
+                      <div className="mb-4 text-left">
+                        <div className="text-[11px] font-semibold mb-2" style={{ color: "var(--ink-light)" }}>
+                          약점
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {result.mbti.weaknesses.map((w) => (
+                            <Chip key={w} label={w} color="var(--ink-light)" />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Saju Alignment */}
+                      <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="var(--saju)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>사주와의 연결</span>
+                        </div>
+                        <p
+                          className="text-[15px] leading-[2]"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {result.mbti.sajuAlignment}
+                        </p>
+                      </div>
+
+                      {/* Zodiac Alignment */}
+                      <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="var(--astro)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>별자리와의 연결</span>
+                        </div>
+                        <p
+                          className="text-[15px] leading-[2]"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {result.mbti.zodiacAlignment}
+                        </p>
+                      </div>
+
+                      {/* Love Style */}
+                      <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="var(--seal)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>연애 스타일</span>
+                        </div>
+                        <p
+                          className="text-[15px] leading-[2]"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {result.mbti.loveStyle}
+                        </p>
+                      </div>
+
+                      {/* Career */}
+                      <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Dot color="var(--face)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>추천 직업</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {result.mbti.career.map((c) => (
+                            <Chip key={c} label={c} color="var(--mbti)" />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Compatibility */}
+                      <div className="text-left p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Dot color="var(--mbti)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>MBTI 궁합</span>
+                        </div>
+                        <div className="mb-2">
+                          <span className="text-xs font-semibold" style={{ color: "var(--saju)" }}>최고 궁합: </span>
+                          <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
+                            {result.mbti.compatibility_best.join(", ")}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs font-semibold" style={{ color: "var(--seal)" }}>도전적 궁합: </span>
+                          <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
+                            {result.mbti.compatibility_worst.join(", ")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ScrollReveal>
+
                 {/* B6: 성격 종합 */}
-                <ScrollReveal delay={400}>
+                <ScrollReveal delay={440}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1557,7 +1706,7 @@ function AnalyzePageInner() {
 
                 {/* B7: 교차점 일치 특성 */}
                 {result.matches.length > 0 && (
-                  <ScrollReveal delay={480}>
+                  <ScrollReveal delay={520}>
                     <div
                       className="rounded-[14px] p-5 mb-3.5"
                       style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
@@ -1645,7 +1794,7 @@ function AnalyzePageInner() {
                 )}
 
                 {/* B8: AI 맞춤 해석 */}
-                <ScrollReveal delay={560}>
+                <ScrollReveal delay={600}>
                   <AIInterpretation result={result} />
                 </ScrollReveal>
 

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Serif_KR } from "next/font/google";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import BottomTab from "@/components/BottomTab";
 import "./globals.css";
 
 const notoSerifKR = Noto_Serif_KR({
@@ -82,9 +83,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`${notoSerifKR.variable} h-full`}>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col pb-16 md:pb-0">
         <GoogleAnalytics measurementId={GA_MEASUREMENT_ID} />
         {children}
+        <BottomTab />
       </body>
     </html>
   );

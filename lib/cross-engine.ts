@@ -4,6 +4,7 @@
 import { analyzeSaju, type SajuResult, type Ohang, OHANG_LIST, OHANG_INFO, SANGSAENG, CHEONGAN_INFO, JIJI_INFO } from "./saju";
 import { analyzeWestern, type WesternResult, ELEMENT_TO_OHANG } from "./western";
 import { analyzeNumerology, type NumerologyResult, LIFEPATH_TO_CHEONGAN } from "./numerology";
+import { analyzeMBTI, type MBTIResult, MBTI_TRAIT_MAP } from "./mbti";
 
 // ━━━ 성격 키워드 축 (20개) ━━━
 export const TRAIT_AXES = [
@@ -172,6 +173,7 @@ export interface CrosspointResult {
   saju: SajuResult;
   western: WesternResult;
   numerology: NumerologyResult;
+  mbti: MBTIResult;
 
   // 교차점 분석
   matches: CrosspointMatch[];        // 일치하는 특성들 (count >= 2)
@@ -206,7 +208,7 @@ export interface ElementHarmony {
 
 // ━━━ 교차점 분석 로직 ━━━
 
-function extractTraits(saju: SajuResult, western: WesternResult, numerology: NumerologyResult): Map<TraitAxis, string[]> {
+function extractTraits(saju: SajuResult, western: WesternResult, numerology: NumerologyResult, mbti: MBTIResult): Map<TraitAxis, string[]> {
   const traitMap = new Map<TraitAxis, string[]>();
 
   function addTraits(traits: TraitAxis[], source: string) {
@@ -286,6 +288,12 @@ function extractTraits(saju: SajuResult, western: WesternResult, numerology: Num
   const lpStrengthDirect = numerology.lifePathInfo.strength
     .filter((t): t is TraitAxis => TRAIT_AXES.includes(t as TraitAxis));
   addTraits(lpStrengthDirect, "수비학");
+
+  // 11. MBTI — 유형별 특성
+  const mbtiTraits = MBTI_TRAIT_MAP[mbti.primaryType] || [];
+  const mbtiMappedTraits = mbtiTraits
+    .filter((t): t is TraitAxis => TRAIT_AXES.includes(t as TraitAxis));
+  addTraits(mbtiMappedTraits, "MBTI");
 
   return traitMap;
 }
@@ -600,6 +608,7 @@ function generateCrossMessage(
   saju: SajuResult,
   western: WesternResult,
   numerology: NumerologyResult,
+  mbti: MBTIResult,
 ): string {
   const topTraits = matches.slice(0, 3).map(m => m.trait);
   const strongCount = matches.filter(m => m.strength === "강").length;
@@ -615,13 +624,13 @@ function generateCrossMessage(
 
   // 문장 1-2: 전체 패턴 인식
   if (strongCount >= 2) {
-    msg += `세 가지 문명의 지혜가 당신을 바라본 결과, '${topTraits.slice(0, 2).join("'과 '")}'이라는 키워드에서 놀라울 만큼 강한 수렴이 일어났습니다. `;
-    msg += `이는 동양과 서양, 그리고 고대의 수(數)의 체계가 각자의 언어로 같은 결론에 도달했다는 의미로, 당신의 핵심 기질이 매우 뚜렷하게 각인되어 있음을 보여줍니다. `;
+    msg += `네 가지 문명의 지혜가 당신을 바라본 결과, '${topTraits.slice(0, 2).join("'과 '")}'이라는 키워드에서 놀라울 만큼 강한 수렴이 일어났습니다. `;
+    msg += `이는 동양과 서양, 고대의 수(數)의 체계, 그리고 현대 심리학(MBTI)이 각자의 언어로 같은 결론에 도달했다는 의미로, 당신의 핵심 기질이 매우 뚜렷하게 각인되어 있음을 보여줍니다. `;
   } else if (strongCount === 1) {
-    msg += `사주명리, 서양 점성술, 수비학이 각각 다른 렌즈로 당신을 들여다본 결과, '${topTraits[0]}'이라는 공통의 실마리가 발견되었습니다. `;
-    msg += `하나의 특성이 세 문명에서 동시에 포착된다는 것은 우연이 아니라, 당신 존재의 핵심에 새겨진 고유한 패턴입니다. `;
+    msg += `사주명리, 서양 점성술, 수비학, 그리고 MBTI가 각각 다른 렌즈로 당신을 들여다본 결과, '${topTraits[0]}'이라는 공통의 실마리가 발견되었습니다. `;
+    msg += `하나의 특성이 네 체계에서 동시에 포착된다는 것은 우연이 아니라, 당신 존재의 핵심에 새겨진 고유한 패턴입니다. `;
   } else {
-    msg += `세 가지 체계가 당신을 각자의 고유한 방식으로 해석하며, 언뜻 다른 이야기를 하는 듯 보이지만 '${topTraits[0] || "잠재력"}'이라는 깊은 층위에서 만나고 있습니다. `;
+    msg += `네 가지 체계가 당신을 각자의 고유한 방식으로 해석하며, 언뜻 다른 이야기를 하는 듯 보이지만 '${topTraits[0] || "잠재력"}'이라는 깊은 층위에서 만나고 있습니다. `;
     msg += `이처럼 다양한 각도에서 조명되는 성격은 그만큼 복합적이고 풍부한 내면을 가졌다는 증거입니다. `;
   }
 
@@ -641,14 +650,14 @@ function generateCrossMessage(
     msg += `여러 문명이 당신을 서로 다른 빛깔로 그리지만, 바로 그 다양성이야말로 복합적이고 매혹적인 인격의 근거입니다. `;
   }
 
-  // 문장 5-6: 실질적 의미 (직업, 관계)
-  msg += `${animalKr}띠의 본능적 감각과 수비학 경로수 ${lpNumber}(${lpName})의 인생 방향이 더해지면, `;
+  // 문장 5-6: 실질적 의미 (직업, 관계) + MBTI
+  msg += `${animalKr}띠의 본능적 감각, 수비학 경로수 ${lpNumber}(${lpName})의 인생 방향, 그리고 MBTI ${mbti.primaryType}의 성격 유형이 더해지면, `;
   msg += `당신은 직업적으로 자신의 고유한 가치를 발휘할 수 있는 독자적 영역을 만들 때 가장 크게 빛나며, `;
   msg += `관계에서는 ${CHEONGAN_INFO[saju.day.cheongan].relationship.split('.')[0]}의 패턴을 보입니다. `;
 
   // 문장 7-8: 교차점만이 드러내는 고유 통찰
-  msg += `이 세 체계의 교차점에서만 발견되는 당신의 아키타입 '${archetype}'은 `;
-  msg += `단일 체계로는 절대 포착되지 않는, 오직 동서양의 지혜가 만나는 지점에서만 드러나는 당신만의 운명적 패턴입니다. `;
+  msg += `이 네 체계의 교차점에서만 발견되는 당신의 아키타입 '${archetype}'은 `;
+  msg += `단일 체계로는 절대 포착되지 않는, 오직 동서양의 지혜와 현대 심리학이 만나는 지점에서만 드러나는 당신만의 운명적 패턴입니다. `;
   msg += `이것이 DESTINO가 발견한 당신의 고유한 교차점이며, 이 패턴을 의식적으로 살릴 때 삶의 만족도와 성취가 가장 높아집니다.`;
 
   return msg;
@@ -675,9 +684,10 @@ export function analyzeCrosspoint(
   const saju = analyzeSaju(year, month, day);
   const western = analyzeWestern(month, day);
   const numerology = analyzeNumerology(year, month, day, name);
+  const mbti = analyzeMBTI(saju.day.cheongan, western.sunSign.name, western.element);
 
   // 특성 추출 & 교차점 찾기
-  const traitMap = extractTraits(saju, western, numerology);
+  const traitMap = extractTraits(saju, western, numerology, mbti);
 
   const matches: CrosspointMatch[] = [];
   for (const [trait, sources] of traitMap) {
@@ -704,7 +714,7 @@ export function analyzeCrosspoint(
   const matchedTraits = matches.length;
   const strongMatches = matches.filter(m => m.strength === "강").length;
 
-  // 기본값: 3개 체계를 비교한다는 것 자체에 기본 점수
+  // 기본값: 4개 체계를 비교한다는 것 자체에 기본 점수
   const baseRate = 35;
   // 매칭 비율 기여 (최대 30점)
   const matchRatio = Math.min(30, (matchedTraits / Math.max(totalTraits, 1)) * 40);
@@ -721,7 +731,7 @@ export function analyzeCrosspoint(
   const convergenceRate = Math.min(95, Math.max(40, Math.round(rawRate)));
 
   // 교차 메시지 생성 (심화)
-  const crossMessage = generateCrossMessage(matches, elementHarmony, archetype.name, saju, western, numerology);
+  const crossMessage = generateCrossMessage(matches, elementHarmony, archetype.name, saju, western, numerology, mbti);
 
   // 오행 시각화
   const ohangVisual = buildOhangVisual(saju);
@@ -739,13 +749,14 @@ export function analyzeCrosspoint(
     saju,
     western,
     numerology,
+    mbti,
     matches,
     top_match: matches[0] || null,
     convergence_rate: convergenceRate,
     element_harmony: elementHarmony,
     archetype: archetype.name,
     archetype_desc: archetype.desc,
-    system_count: 3,
+    system_count: 4,
     cross_message: crossMessage,
     ohang_visual: ohangVisual,
     career_crosspoint: careerCrosspoint,

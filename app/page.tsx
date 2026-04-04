@@ -6,7 +6,7 @@ const features = [
   {
     color: "var(--seal)",
     title: "교차 분석",
-    description: "동서양 3개 체계가 같은 답을 내리는 교차점",
+    description: "동서양 4개 체계가 같은 답을 내리는 교차점",
     href: "/analyze",
   },
   {
@@ -25,7 +25,7 @@ const features = [
 
 const steps = [
   { number: "1", title: "생년월일 입력", description: "30초면 충분합니다" },
-  { number: "2", title: "3개 체계 동시 분석", description: "사주 \u00B7 별자리 \u00B7 수비학" },
+  { number: "2", title: "4개 체계 동시 분석", description: "사주 \u00B7 별자리 \u00B7 수비학 \u00B7 MBTI" },
   { number: "3", title: "교차점 발견", description: "여러 문명이 같은 답을 내린 지점" },
 ];
 
@@ -33,7 +33,7 @@ const systems = [
   { label: "사주", sub: "천간\u00B7지지\u00B7오행", color: "var(--saju)", active: true },
   { label: "서양 점성술", sub: "태양궁\u00B7상승궁\u00B7달궁", color: "var(--astro)", active: true },
   { label: "수비학", sub: "생명경로수\u00B7표현수", color: "var(--numero)", active: true },
-  { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)", active: false },
+  { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)", active: true },
   { label: "관상", sub: "오관\u00B7오행 체형", color: "var(--face)", active: false },
   { label: "타로", sub: "메이저 아르카나", color: "var(--tarot)", active: false },
 ];
@@ -68,7 +68,7 @@ export default function Home() {
             className="text-[15px] leading-[1.8]"
             style={{ color: "var(--ink-muted)" }}
           >
-            사주 · 별자리 · 수비학이 당신에 대해<br />
+            사주 · 별자리 · 수비학 · MBTI가 당신에 대해<br />
             같은 결론을 내리는 교차점을 찾습니다
           </p>
 
@@ -261,6 +261,14 @@ export default function Home() {
             <Link href="/daily" className="hover:underline">오늘의 운세</Link>
             <span style={{ color: "var(--border)" }}>|</span>
             <a href="mailto:hello@destino.me" className="hover:underline">문의</a>
+          </div>
+          <div
+            className="flex justify-center gap-4 text-[12px]"
+            style={{ color: "var(--ink-faint)" }}
+          >
+            <Link href="/terms" className="hover:underline">이용약관</Link>
+            <span style={{ color: "var(--border)" }}>|</span>
+            <Link href="/privacy" className="hover:underline">개인정보처리방침</Link>
           </div>
           <p className="text-[12px]" style={{ color: "var(--ink-faint)" }}>
             &copy; {new Date().getFullYear()} DESTINO. All rights reserved.

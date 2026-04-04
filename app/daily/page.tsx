@@ -5,6 +5,7 @@ import Link from "next/link";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
 import Nav from "@/components/Nav";
+import ScrollReveal from "@/components/ScrollReveal";
 import Button from "@/components/ui/Button";
 import { generateDailyFortune, type DailyFortune } from "@/lib/daily-fortune";
 
@@ -400,115 +401,128 @@ function FortuneDisplay({ fortune }: { fortune: DailyFortune }) {
     <div className="flex flex-col gap-8 animate-fade-up">
 
       {/* 날짜 */}
-      <div className="flex flex-col items-center gap-2">
-        <p
-          className="text-[11px] tracking-[0.1em] uppercase font-medium"
-          style={{ color: "var(--ink-light)" }}
-        >
-          오늘의 운세
-        </p>
-        <h2
-          className="text-[20px] font-bold"
-          style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
-        >
-          {formatKoreanDate(fortune.date)}
-        </h2>
-        <p className="text-[12px]" style={{ color: "var(--ink-faint)" }}>
-          일주: {fortune.dayPillar.cheongan}{fortune.dayPillar.jiji} ({fortune.dayPillar.ohang})
-        </p>
-      </div>
+      <ScrollReveal delay={0}>
+        <div className="flex flex-col items-center gap-2">
+          <p
+            className="text-[11px] tracking-[0.1em] uppercase font-medium"
+            style={{ color: "var(--ink-light)" }}
+          >
+            오늘의 운세
+          </p>
+          <h2
+            className="text-[20px] font-bold"
+            style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+          >
+            {formatKoreanDate(fortune.date)}
+          </h2>
+          <p className="text-[12px]" style={{ color: "var(--ink-faint)" }}>
+            일주: {fortune.dayPillar.cheongan}{fortune.dayPillar.jiji} ({fortune.dayPillar.ohang})
+          </p>
+        </div>
+      </ScrollReveal>
 
       {/* 종합 점수 */}
-      <div className="flex flex-col items-center gap-3">
-        <ScoreGauge score={fortune.overall.score} label={fortune.overall.label} />
-        <p
-          className="text-[14px] text-center leading-[1.7] max-w-[320px]"
-          style={{ color: "var(--ink-muted)" }}
-        >
-          {fortune.overall.description}
-        </p>
-      </div>
+      <ScrollReveal delay={80}>
+        <div className="flex flex-col items-center gap-3">
+          <ScoreGauge score={fortune.overall.score} label={fortune.overall.label} />
+          <p
+            className="text-[14px] text-center leading-[1.7] max-w-[320px]"
+            style={{ color: "var(--ink-muted)" }}
+          >
+            {fortune.overall.description}
+          </p>
+        </div>
+      </ScrollReveal>
 
       <Divider />
 
       {/* 4 카테고리 */}
-      <div className="flex flex-col gap-3">
-        <p
-          className="text-[11px] tracking-[0.1em] uppercase font-medium"
-          style={{ color: "var(--ink-light)" }}
-        >
-          분야별 운세
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          {fortune.categories.map((cat) => (
-            <CategoryCard key={cat.name} cat={cat} />
-          ))}
+      <ScrollReveal delay={160}>
+        <div className="flex flex-col gap-3">
+          <p
+            className="text-[11px] tracking-[0.1em] uppercase font-medium"
+            style={{ color: "var(--ink-light)" }}
+          >
+            분야별 운세
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {fortune.categories.map((cat) => (
+              <CategoryCard key={cat.name} cat={cat} />
+            ))}
+          </div>
         </div>
-      </div>
+      </ScrollReveal>
 
       <Divider />
 
       {/* 행운 스트립 */}
-      <div className="flex flex-col gap-3">
-        <p
-          className="text-[11px] tracking-[0.1em] uppercase font-medium"
-          style={{ color: "var(--ink-light)" }}
-        >
-          오늘의 행운
-        </p>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "행운의 숫자", value: String(fortune.luckyNumber) },
-            { label: "행운의 방향", value: fortune.luckyDirection },
-            { label: "행운의 아이템", value: fortune.luckyItem },
-          ].map(({ label, value }) => (
-            <div
-              key={label}
-              className="rounded-lg p-3 flex flex-col items-center gap-1.5 text-center"
-              style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
-            >
-              <span
-                className="text-[10px] tracking-[0.05em] font-medium"
-                style={{ color: "var(--ink-faint)" }}
+      <ScrollReveal delay={240}>
+        <div className="flex flex-col gap-3">
+          <p
+            className="text-[11px] tracking-[0.1em] uppercase font-medium"
+            style={{ color: "var(--ink-light)" }}
+          >
+            오늘의 행운
+          </p>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: "행운의 숫자", value: String(fortune.luckyNumber) },
+              { label: "행운의 방향", value: fortune.luckyDirection },
+              { label: "행운의 아이템", value: fortune.luckyItem },
+            ].map(({ label, value }) => (
+              <div
+                key={label}
+                className="rounded-lg p-3 flex flex-col items-center gap-1.5 text-center"
+                style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
               >
-                {label}
-              </span>
-              <span
-                className="text-[14px] font-bold leading-snug"
-                style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
-              >
-                {value}
-              </span>
-            </div>
-          ))}
+                <span
+                  className="text-[10px] tracking-[0.05em] font-medium"
+                  style={{ color: "var(--ink-faint)" }}
+                >
+                  {label}
+                </span>
+                <span
+                  className="text-[14px] font-bold leading-snug"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                >
+                  {value}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </ScrollReveal>
 
       <Divider />
 
       {/* 오행 비교 */}
-      <ElementComparison fortune={fortune} />
+      <ScrollReveal delay={320}>
+        <ElementComparison fortune={fortune} />
+      </ScrollReveal>
 
       {/* 종합 해석 블록쿼트 */}
-      <blockquote
-        className="border-l-2 pl-4 py-2"
-        style={{ borderColor: "var(--seal)", background: "transparent" }}
-      >
-        <p
-          className="text-[14px] leading-[1.8]"
-          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+      <ScrollReveal delay={400}>
+        <blockquote
+          className="border-l-2 pl-4 py-2"
+          style={{ borderColor: "var(--seal)", background: "transparent" }}
         >
-          {fortune.crossMessage}
-        </p>
-      </blockquote>
+          <p
+            className="text-[14px] leading-[1.8]"
+            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+          >
+            {fortune.crossMessage}
+          </p>
+        </blockquote>
+      </ScrollReveal>
 
       <Divider />
 
       {/* 구독 CTA */}
-      <div
-        className="rounded-lg p-6 flex flex-col gap-4 relative overflow-hidden"
-        style={{ background: "var(--bg-white)", border: "1.5px solid var(--seal)" }}
-      >
+      <ScrollReveal delay={480}>
+        <div
+          className="rounded-lg p-6 flex flex-col gap-4 relative overflow-hidden"
+          style={{ background: "var(--bg-white)", border: "1.5px solid var(--seal)" }}
+        >
         <div className="absolute top-3 right-3 opacity-20">
           <Seal size="sm" char="運" />
         </div>
@@ -545,22 +559,25 @@ function FortuneDisplay({ fortune }: { fortune: DailyFortune }) {
             Coming Soon
           </span>
         </div>
-      </div>
+        </div>
+      </ScrollReveal>
 
       {/* 전체 분석 링크 */}
-      <Link href="/analyze" className="block">
-        <div
-          className="rounded-md py-4 text-center text-[15px] font-bold tracking-wider transition-opacity hover:opacity-80"
-          style={{
-            background: "transparent",
-            color: "var(--ink)",
-            border: "1.5px solid var(--border-strong)",
-            fontFamily: "var(--font-display)",
-          }}
-        >
-          전체 분석 보기
-        </div>
-      </Link>
+      <ScrollReveal delay={560}>
+        <Link href="/analyze" className="block">
+          <div
+            className="rounded-md py-4 text-center text-[15px] font-bold tracking-wider transition-opacity hover:opacity-80"
+            style={{
+              background: "transparent",
+              color: "var(--ink)",
+              border: "1.5px solid var(--border-strong)",
+              fontFamily: "var(--font-display)",
+            }}
+          >
+            전체 분석 보기
+          </div>
+        </Link>
+      </ScrollReveal>
     </div>
   );
 }

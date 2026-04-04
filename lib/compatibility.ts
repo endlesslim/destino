@@ -47,6 +47,24 @@ export interface CompatibilityResult {
 
   // Advice
   advice: string;
+
+  // ━━━ 신규 심화 분석 필드 ━━━
+
+  // 개인 성격 요약
+  person1Detail: string;
+  person2Detail: string;
+
+  // 원소 이야기 (3-4문장 문학적 서술)
+  elementStory: string;
+
+  // 관계 타임라인 조언
+  timelineAdvice: { phase: string; advice: string }[];
+
+  // 소통 스타일 비교
+  communicationStyle: { person1: string; person2: string; tip: string };
+
+  // 갈등 패턴
+  conflictPattern: { trigger: string; resolution: string };
 }
 
 // ━━━ 오행 궁합 (40%) ━━━
@@ -362,6 +380,189 @@ function generateAdvice(
   return parts.join(" ");
 }
 
+// ━━━ 개인 성격 요약 생성 ━━━
+
+function generatePersonDetail(p: CrosspointResult, name: string): string {
+  const ohang = p.saju.day.ohang;
+  const sign = p.western.sunSign.name;
+  const lp = p.numerology.lifePathInfo;
+  const nature = p.saju.personality.nature;
+  const traits = p.matches.slice(0, 3).map(m => m.trait).join(", ");
+
+  return `${name}은(는) ${OHANG_INFO[ohang].kr}(${ohang})의 기운을 타고난 ${sign}자리입니다. ` +
+    `사주의 일간이 보여주는 본성은 "${nature}"이며, ` +
+    `수비학 생명경로수 ${lp.number}번(${lp.name})의 에너지가 삶의 방향을 이끕니다. ` +
+    `가장 두드러지는 특성은 ${traits}이며, ${lp.personality}`;
+}
+
+// ━━━ 원소 이야기 생성 ━━━
+
+function generateElementStory(
+  oh1: Ohang, oh2: Ohang,
+  el1: string, el2: string,
+  sign1: string, sign2: string,
+  relation: "상생" | "상극" | "비화" | "상합",
+): string {
+  const kr1 = OHANG_INFO[oh1].kr;
+  const kr2 = OHANG_INFO[oh2].kr;
+
+  const stories: Record<string, string> = {
+    "상생": `${kr1}이 ${kr2}를 생하는 흐름 속에, ${sign1}의 ${el1} 에너지와 ${sign2}의 ${el2} 에너지가 서로를 감싸 안습니다. ` +
+      `한 사람의 끝이 다른 사람의 시작이 되는, 물이 나무를 키우듯 자연스러운 순환의 이야기입니다. ` +
+      `동양의 상생과 서양의 원소가 같은 방향을 가리킬 때, 그 관계에는 우주적 리듬이 깃듭니다. ` +
+      `이 흐름을 거스르지 않는 것, 그것이 두 사람에게 주어진 가장 큰 축복입니다.`,
+    "상극": `${kr1}과 ${kr2}이 마주할 때, 불이 금을 녹이듯 강렬한 변형의 에너지가 생겨납니다. ` +
+      `${sign1}(${el1})과 ${sign2}(${el2})의 만남 역시 정반대의 극성이 부딪치는 드라마를 암시합니다. ` +
+      `하지만 대장간의 불이 무딘 쇳덩이를 명검으로 만들듯, 이 긴장은 파괴가 아닌 단련의 힘입니다. ` +
+      `서로를 깨뜨리는 것이 아니라 서로를 빚어내는 관계 — 그것이 상극의 진짜 의미입니다.`,
+    "비화": `같은 ${kr1}의 기운을 가진 두 사람. 거울을 마주 보듯, 상대에게서 자기 자신을 발견합니다. ` +
+      `${sign1}과 ${sign2}, ${el1}과 ${el2}의 공명이 이 유사성을 더욱 깊게 만듭니다. ` +
+      `같은 파장이 만나면 증폭되듯, 두 사람의 에너지는 함께할 때 배가됩니다. ` +
+      `다만 같은 방향으로만 흐르는 물은 고이기 쉽습니다 — 의식적으로 새로운 물줄기를 만드는 것이 관건입니다.`,
+    "상합": `${kr1}과 ${kr2} 사이에는 직접적 충돌도, 뚜렷한 상생도 없는 미묘한 간격이 있습니다. ` +
+      `${sign1}(${el1})과 ${sign2}(${el2})의 조합이 이 간격에 색을 입힙니다. ` +
+      `쉽게 읽히지 않는 관계이기에, 서로를 이해하려는 노력 하나하나가 보석이 됩니다. ` +
+      `정해진 공식이 없다는 것은 두 사람만의 공식을 쓸 수 있다는 뜻이기도 합니다.`,
+  };
+
+  return stories[relation] || stories["상합"];
+}
+
+// ━━━ 관계 타임라인 조언 ━━━
+
+function generateTimelineAdvice(
+  score: number,
+  relation: "상생" | "상극" | "비화" | "상합",
+  shared: string[],
+  tension: string[],
+): { phase: string; advice: string }[] {
+  const sharedStr = shared.length > 0 ? shared.slice(0, 2).join(", ") : "공통된 가치";
+  const tensionStr = tension.length > 0 ? tension[0] : "서로의 차이";
+
+  if (score >= 80) {
+    return [
+      { phase: "만남", advice: `첫 만남에서부터 자연스러운 편안함을 느낄 수 있습니다. ${sharedStr}에 대한 공감이 빠르게 형성됩니다. 하지만 이 편안함에 안주하지 말고, 상대의 독특한 면을 발견하려는 호기심을 유지하세요.` },
+      { phase: "연애 초기", advice: `서로의 리듬이 잘 맞아 함께하는 시간이 자연스럽습니다. 이 시기에 각자의 가치관과 미래 비전을 솔직하게 나누세요. 좋은 궁합일수록 초기에 깊은 대화가 관계의 기반을 단단하게 만듭니다.` },
+      { phase: "깊어지는 시기", advice: `${sharedStr}이라는 공통분모가 관계의 단단한 뿌리가 됩니다. 이 시기에는 함께 성장할 수 있는 공동 목표를 세워보세요. 두 사람의 시너지가 가장 빛나는 때입니다.` },
+      { phase: "위기", advice: `높은 조화도에도 위기는 찾아옵니다. ${tensionStr}에서 오는 마찰은 피하지 말고 정면으로 마주하세요. 서로를 너무 잘 안다는 착각이 가장 큰 적입니다. 매번 새롭게 상대를 발견하려는 자세가 필요합니다.` },
+      { phase: "성숙", advice: `오래된 관계일수록 서로의 성장 공간을 지켜주는 것이 중요합니다. 함께하는 시간만큼 각자만의 시간도 소중히 하세요. 이 관계는 세월이 흐를수록 더 깊어지는 종류의 인연입니다.` },
+    ];
+  }
+  if (score >= 60) {
+    return [
+      { phase: "만남", advice: `처음에는 서로의 다름에 호기심을 느낍니다. 완전히 같지 않기에 오히려 탐구하고 싶은 매력이 있습니다. 첫인상에 너무 많은 의미를 두지 말고, 천천히 알아가세요.` },
+      { phase: "연애 초기", advice: `서로의 리듬을 맞추는 데 약간의 노력이 필요합니다. ${sharedStr}에서 접점을 찾되, 차이점도 인정하는 연습을 시작하세요. 이 시기의 소통이 관계의 방향을 결정합니다.` },
+      { phase: "깊어지는 시기", advice: `서로의 보완적 특성이 빛을 발하기 시작합니다. 한쪽이 부족한 부분을 다른 쪽이 채워주는 경험이 신뢰를 쌓습니다. 감사를 표현하는 습관을 만드세요.` },
+      { phase: "위기", advice: `${tensionStr}이 수면 위로 올라올 수 있습니다. 이때 중요한 것은 승패를 가리는 것이 아니라, 서로의 입장을 충분히 듣는 것입니다. 48시간 룰 — 큰 결정은 이틀 후에 내리세요.` },
+      { phase: "성숙", advice: `차이를 극복한 경험이 관계의 가장 큰 자산이 됩니다. 서로의 다름을 존중하면서도 함께하는 의미를 잃지 않는 것, 그것이 이 관계의 성숙한 모습입니다.` },
+    ];
+  }
+  return [
+    { phase: "만남", advice: `강렬한 첫인상이거나, 반대로 서로를 이해하기 어려울 수 있습니다. 어느 쪽이든 판단을 유보하고, 상대를 있는 그대로 관찰하세요. 이 관계는 시간이 필요한 종류입니다.` },
+    { phase: "연애 초기", advice: `서로의 세계가 매우 다르다는 것을 실감하는 시기입니다. 차이에 놀라기보다, "왜 그렇게 생각하는지"를 물어보세요. 이해하려는 노력 자체가 이 관계의 언어입니다.` },
+    { phase: "깊어지는 시기", advice: `${sharedStr}이라는 작은 공통분모에서 출발하세요. 큰 것을 함께하기보다 작은 것을 꾸준히 함께하는 것이 유효합니다. 서로의 페이스를 존중하는 것이 핵심입니다.` },
+    { phase: "위기", advice: `${tensionStr}의 충돌이 깊어질 수 있습니다. 하지만 이 관계에서의 위기는 곧 성장의 기회입니다. 서로를 바꾸려 하지 말고, 자신이 변화할 수 있는 부분을 찾으세요.` },
+    { phase: "성숙", advice: `이 관계를 유지해왔다면, 그 자체가 대단한 성취입니다. 쉽지 않았기에 더 강하고, 힘들었기에 더 소중한 관계. 서로에 대한 존경을 잃지 마세요. 이 관계는 두 사람을 가장 크게 성장시킵니다.` },
+  ];
+}
+
+// ━━━ 소통 스타일 생성 ━━━
+
+function generateCommunicationStyle(
+  p1: CrosspointResult, p2: CrosspointResult,
+  name1: string, name2: string,
+): { person1: string; person2: string; tip: string } {
+  const oh1 = p1.saju.day.ohang;
+  const oh2 = p2.saju.day.ohang;
+  const el1 = p1.western.element;
+  const el2 = p2.western.element;
+
+  const commStyles: Record<Ohang, string> = {
+    "木": "나무처럼 위로 뻗어나가는 소통을 합니다. 비전과 이상을 말하고, 성장 가능성에 대해 이야기하는 것을 좋아합니다. 직선적이고 진솔하지만, 때때로 자기 주장이 강할 수 있습니다.",
+    "火": "불꽃처럼 열정적으로 소통합니다. 감정을 즉시 표현하고, 분위기를 주도하며, 칭찬과 인정에 민감합니다. 대화에 에너지를 불어넣지만, 감정적으로 과열될 수 있습니다.",
+    "土": "대지처럼 안정적으로 소통합니다. 경청을 잘하고, 실질적인 조언을 선호하며, 일관성 있는 태도를 유지합니다. 신뢰감을 주지만, 변화에 대한 저항이 있을 수 있습니다.",
+    "金": "금속처럼 명확하고 날카롭게 소통합니다. 핵심을 짚고, 논리적으로 말하며, 효율을 중시합니다. 명쾌하지만, 감정적 여유가 부족해 보일 수 있습니다.",
+    "水": "물처럼 유연하고 깊이 있게 소통합니다. 분위기를 읽고, 상대의 감정에 공감하며, 직감적으로 이해합니다. 깊은 연결을 만들지만, 자기 의견을 명확히 밝히지 않을 수 있습니다.",
+  };
+
+  const westernTips: Record<string, string> = {
+    "Fire": "열정과 즉각적 반응을 보입니다",
+    "Earth": "현실적이고 구체적인 대화를 선호합니다",
+    "Air": "아이디어와 토론을 즐깁니다",
+    "Water": "감정과 직관에 기반한 소통을 합니다",
+  };
+
+  const p1Style = `${commStyles[oh1]} 서양 별자리의 ${el1} 원소가 더해져, ${westernTips[el1] || "독특한 소통 패턴을 보입니다"}.`;
+  const p2Style = `${commStyles[oh2]} 서양 별자리의 ${el2} 원소가 더해져, ${westernTips[el2] || "독특한 소통 패턴을 보입니다"}.`;
+
+  // Generate tip based on combination
+  let tip: string;
+  if (oh1 === oh2) {
+    tip = `두 사람의 소통 파장이 비슷해 말하지 않아도 통하는 부분이 많습니다. 하지만 같은 스타일이기에 놓치는 부분도 같을 수 있습니다. 의식적으로 "상대가 말하지 않은 것"에 주의를 기울여 보세요. 서로의 약점이 겹칠 때, 제3자의 시선을 빌리는 것도 방법입니다.`;
+  } else if (SANGSAENG[oh1] === oh2 || SANGSAENG[oh2] === oh1) {
+    tip = `한 사람이 시작한 대화를 다른 사람이 자연스럽게 발전시키는 흐름이 있습니다. ${name1}의 ${OHANG_INFO[oh1].kr} 에너지가 ${name2}의 ${OHANG_INFO[oh2].kr} 에너지를 활성화합니다. 이 자연스러운 흐름을 활용하되, 받는 쪽만 되지 않도록 역할을 번갈아 하는 연습을 하세요.`;
+  } else if (SANGGEUK[oh1] === oh2 || SANGGEUK[oh2] === oh1) {
+    tip = `소통 방식의 차이가 가장 크게 느껴지는 조합입니다. ${name1}이(가) 중요하게 생각하는 것과 ${name2}이(가) 중요하게 생각하는 것이 다릅니다. 상대의 소통 방식을 "틀린 것"이 아닌 "다른 것"으로 받아들이세요. 대화 전 "지금 나는 감정을 나누고 싶은지, 해결책을 원하는지"를 먼저 말해주면 오해가 줄어듭니다.`;
+  } else {
+    tip = `서로의 소통 스타일이 다르지만, 직접적 충돌보다는 미묘한 엇갈림으로 나타납니다. 중요한 대화는 충분한 시간을 확보하고 시작하세요. "나는 이렇게 느꼈어"로 시작하는 아이-메시지(I-message)가 이 관계에서 특히 효과적입니다.`;
+  }
+
+  return { person1: p1Style, person2: p2Style, tip };
+}
+
+// ━━━ 갈등 패턴 생성 ━━━
+
+function generateConflictPattern(
+  p1: CrosspointResult, p2: CrosspointResult,
+  score: number,
+  tension: string[],
+  relation: "상생" | "상극" | "비화" | "상합",
+): { trigger: string; resolution: string } {
+  const oh1 = OHANG_INFO[p1.saju.day.ohang].kr;
+  const oh2 = OHANG_INFO[p2.saju.day.ohang].kr;
+  const tensionStr = tension.length > 0 ? tension[0] : "가치관의 차이";
+
+  let trigger: string;
+  let resolution: string;
+
+  if (relation === "상극") {
+    trigger = `${oh1}과 ${oh2}의 상극 에너지는 "${tensionStr}" 영역에서 가장 두드러지게 충돌합니다. ` +
+      `한쪽이 주도하려 할 때 다른 쪽이 저항하고, 해결 방식의 차이가 감정적 골을 만들 수 있습니다. ` +
+      `특히 피로하거나 스트레스가 쌓였을 때, 이 상극의 에너지가 증폭됩니다. ` +
+      `일상적인 결정(식사, 여행, 소비 습관)에서부터 마찰이 시작되는 경우가 많습니다.`;
+    resolution = `상극은 파괴가 아닌 변환의 에너지입니다. 갈등이 시작되면 즉시 해결하려 하지 말고, 각자 30분의 냉각 시간을 가지세요. ` +
+      `"네가 틀렸어"가 아닌 "나는 이렇게 느꼈어"로 대화를 시작하세요. ` +
+      `주간 체크인 — 매주 한 번, 부담 없는 환경에서 서로의 감정 온도를 확인하는 시간을 만들면, 작은 불씨가 큰불로 번지는 것을 막을 수 있습니다.`;
+  } else if (relation === "비화") {
+    trigger = `같은 ${oh1}의 기운을 가진 두 사람은 역설적으로 "너무 같기에" 갈등이 생깁니다. ` +
+      `서로의 약점이 동일하기 때문에 보완이 되지 않고, 같은 문제 앞에서 둘 다 막히는 상황이 반복됩니다. ` +
+      `"당연히 알아줄 거야"라는 기대가 좌절될 때 실망이 크고, ` +
+      `비슷한 자존심 구조가 화해를 어렵게 만들 수 있습니다.`;
+    resolution = `"같음"을 당연시하지 마세요. 같은 원소라도 각자의 표현 방식은 다릅니다. ` +
+      `의식적으로 새로운 경험을 함께 시도하고, 서로의 미세한 차이를 발견하는 즐거움을 찾으세요. ` +
+      `갈등 시에는 제3자(신뢰할 수 있는 친구나 전문가)의 시선이 특히 도움이 됩니다. ` +
+      `"우리는 같으니까"라는 전제를 내려놓는 것이 해결의 첫걸음입니다.`;
+  } else if (relation === "상생") {
+    trigger = `상생 관계에서의 갈등은 "주는 사람"과 "받는 사람"의 역할이 고정될 때 발생합니다. ` +
+      `${oh1}이 ${oh2}를 생하는 흐름이 지속되면, 한쪽은 소진을, 다른 쪽은 의존을 경험하게 됩니다. ` +
+      `"${tensionStr}" 영역에서 이 불균형이 가장 먼저 드러납니다. ` +
+      `감사가 줄어들고 당연함이 늘어날 때, 상생의 에너지가 한쪽으로만 빠져나갑니다.`;
+    resolution = `역할을 의식적으로 교대하세요. 항상 주는 쪽이 때로는 받을 수 있어야 하고, 받는 쪽도 능동적으로 줄 수 있어야 합니다. ` +
+      `감사를 구체적으로 표현하는 습관 — "고마워"보다 "네가 이렇게 해줘서 내가 이런 기분이 들었어"가 효과적입니다. ` +
+      `분기에 한 번, 관계의 에너지 밸런스를 점검하는 솔직한 대화 시간을 가져보세요.`;
+  } else {
+    trigger = `간접적 관계에서의 갈등은 서로의 의도를 오해하는 데서 시작됩니다. ` +
+      `${oh1}과 ${oh2}는 직접적으로 연결되지 않기에, 상대의 행동을 자신의 프레임으로 해석하는 오류가 잦습니다. ` +
+      `"${tensionStr}" 상황에서 "왜 저렇게 행동하지?"라는 의문이 불신으로 번질 수 있습니다. ` +
+      `소통의 빈도가 줄어들면 이 간격이 더 벌어집니다.`;
+    resolution = `의도를 명시적으로 말하세요. "이런 의도로 한 건데, 어떻게 느꼈어?"라고 물어보는 것이 이 관계의 황금 질문입니다. ` +
+      `서로의 세계를 이해하기 위한 "체험"을 만드세요 — 상대가 좋아하는 것을 함께 해보는 경험이 말보다 효과적입니다. ` +
+      `갈등이 깊어지기 전에 "나 요즘 이런 점이 아쉬워"라고 작은 신호를 보내는 연습을 하세요.`;
+  }
+
+  return { trigger, resolution };
+}
+
 // ━━━ 메인 분석 함수 ━━━
 
 export function analyzeCompatibility(input: CompatibilityInput): CompatibilityResult {
@@ -441,6 +642,36 @@ export function analyzeCompatibility(input: CompatibilityInput): CompatibilityRe
   // 라벨
   const overallLabel = archetype.name;
 
+  // ━━━ 신규 심화 분석 ━━━
+
+  const p1NameStr = p1Input.name || "첫 번째 사람";
+  const p2NameStr = p2Input.name || "두 번째 사람";
+
+  const person1Detail = generatePersonDetail(person1, p1NameStr);
+  const person2Detail = generatePersonDetail(person2, p2NameStr);
+
+  const elementStory = generateElementStory(
+    oh1, oh2,
+    person1.western.element, person2.western.element,
+    person1.western.sunSign.name, person2.western.sunSign.name,
+    relation,
+  );
+
+  const timelineAdvice = generateTimelineAdvice(
+    overallScore, relation,
+    traits.shared, traits.tension,
+  );
+
+  const communicationStyle = generateCommunicationStyle(
+    person1, person2,
+    p1NameStr, p2NameStr,
+  );
+
+  const conflictPattern = generateConflictPattern(
+    person1, person2,
+    overallScore, traits.tension, relation,
+  );
+
   return {
     person1,
     person2,
@@ -454,5 +685,11 @@ export function analyzeCompatibility(input: CompatibilityInput): CompatibilityRe
     archetypeDesc: archetype.desc,
     elementRelation,
     advice,
+    person1Detail,
+    person2Detail,
+    elementStory,
+    timelineAdvice,
+    communicationStyle,
+    conflictPattern,
   };
 }

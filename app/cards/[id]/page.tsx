@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Seal from "@/components/ui/Seal";
 import { CARDS, getCardById } from "@/lib/cards-data";
+import CardScaleWrapper from "@/components/CardScaleWrapper";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -33,6 +34,7 @@ export default async function CardPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "var(--bg-warm)" }}>
+      <CardScaleWrapper>
       {/* 1080x1080 card viewport */}
       <div
         className="relative overflow-hidden"
@@ -153,6 +155,7 @@ export default async function CardPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+      </CardScaleWrapper>
     </div>
   );
 }
@@ -207,7 +210,7 @@ function TextureDots() {
       aria-hidden="true"
     >
       {dots.map((dot, i) => (
-        <circle key={i} cx={dot.cx} cy={dot.cy} r={1.5} fill="#1C1917" />
+        <circle key={i} cx={dot.cx} cy={dot.cy} r={1.5} fill="var(--ink)" />
       ))}
     </svg>
   );
