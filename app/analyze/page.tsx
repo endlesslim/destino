@@ -702,13 +702,12 @@ function AnalyzePageInner() {
                 </label>
                 <input
                   className={inputClass}
-                  style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)", opacity: 0.5 }}
+                  style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)" }}
                   placeholder="예: 14 (24시간제)"
                   value={hour}
                   onChange={(e) => setHour(e.target.value.replace(/\D/g, "").slice(0, 2))}
                   onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
                   onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
-                  disabled
                 />
                 <p className="text-[11px] mt-1" style={{ color: "var(--ink-light)" }}>
                   시간 입력 시 시주(내면의 자아)까지 분석합니다
