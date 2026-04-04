@@ -27,58 +27,73 @@ const TAB_ITEMS = [
   },
 ];
 
-/* ── Brush-stroke SVG icons ────────────────────────────────────
- *  Thin 1.5px strokes evoking calligraphy / traditional 東洋 forms.
- *  "과거와 현대를 연결하는 느낌" — classical shapes, modern precision.
+/* ── Celestial SVG icons ───────────────────────────────────────
+ *  Thin 1.5px strokes evoking astronomical charts / old star maps.
+ *  Astrology-themed: zodiac symbols, moon phases, stars, planetary symbols.
  * ──────────────────────────────────────────────────────────────── */
 
-/** 四柱 — four pillars forming a grid */
+/** Compass star — 4-pointed star with cross through center (celestial navigation) */
 function AnalyzeIcon({ color }: { color: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-      {/* Vertical strokes */}
-      <line x1="7" y1="3" x2="7" y2="19" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="15" y1="3" x2="15" y2="19" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      {/* Horizontal strokes */}
-      <line x1="3" y1="7" x2="19" y2="7" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="3" y1="15" x2="19" y2="15" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      {/* Cross through center */}
+      <line x1="11" y1="2" x2="11" y2="20" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="11" x2="20" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      {/* Four diamond points */}
+      <path d="M11 2 L13.5 8.5 L11 5 L8.5 8.5 Z" stroke={color} strokeWidth="1" strokeLinejoin="round" fill="none" />
+      <path d="M20 11 L13.5 8.5 L17 11 L13.5 13.5 Z" stroke={color} strokeWidth="1" strokeLinejoin="round" fill="none" />
+      <path d="M11 20 L8.5 13.5 L11 17 L13.5 13.5 Z" stroke={color} strokeWidth="1" strokeLinejoin="round" fill="none" />
+      <path d="M2 11 L8.5 13.5 L5 11 L8.5 8.5 Z" stroke={color} strokeWidth="1" strokeLinejoin="round" fill="none" />
+      {/* Center dot */}
+      <circle cx="11" cy="11" r="1.2" stroke={color} strokeWidth="1" />
     </svg>
   );
 }
 
-/** 合 — two shapes meeting, overlapping circles */
+/** Twin crescent moons — ☽ ☾ facing each other (union of celestial bodies) */
 function CompatibilityIcon({ color }: { color: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-      <circle cx="8.5" cy="11" r="5.5" stroke={color} strokeWidth="1.5" />
-      <circle cx="13.5" cy="11" r="5.5" stroke={color} strokeWidth="1.5" />
+      {/* Left crescent ☽ — waning moon */}
+      <path d="M9 4.5 A6 6 0 0 1 9 17.5 A4.2 4.2 0 0 0 9 4.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Right crescent ☾ — waxing moon */}
+      <path d="M13 4.5 A6 6 0 0 0 13 17.5 A4.2 4.2 0 0 1 13 4.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-/** 日 — sun, simplified from the character form */
+/** Sun with rays — ☉ solar symbol (classic astrology) */
 function DailyIcon({ color }: { color: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-      {/* Outer rectangle — 日 */}
-      <rect x="5" y="3" width="12" height="16" rx="1" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Middle horizontal — dividing line */}
-      <line x1="5" y1="11" x2="17" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      {/* Central sun circle */}
+      <circle cx="11" cy="11" r="4" stroke={color} strokeWidth="1.5" />
+      {/* Inner dot */}
+      <circle cx="11" cy="11" r="1" stroke={color} strokeWidth="1" />
+      {/* 8 radiating rays */}
+      <line x1="11" y1="2" x2="11" y2="5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="11" y1="17" x2="11" y2="20" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="11" x2="5" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="17" y1="11" x2="20" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="4.6" y1="4.6" x2="6.7" y2="6.7" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="15.3" y1="15.3" x2="17.4" y2="17.4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="17.4" y1="4.6" x2="15.3" y2="6.7" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="6.7" y1="15.3" x2="4.6" y2="17.4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }
 
-/** 竹簡 — bamboo scroll / record */
+/** Open book with star — celestial grimoire / record of the heavens */
 function HistoryIcon({ color }: { color: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-      {/* Three vertical bamboo strips */}
-      <line x1="7" y1="3" x2="7" y2="19" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="11" y1="3" x2="11" y2="19" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="15" y1="3" x2="15" y2="19" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      {/* Binding threads */}
-      <line x1="5" y1="6" x2="17" y2="6" stroke={color} strokeWidth="1" strokeLinecap="round" />
-      <line x1="5" y1="16" x2="17" y2="16" stroke={color} strokeWidth="1" strokeLinecap="round" />
+      {/* Open book — two curved pages */}
+      <path d="M11 6 C11 6 9 4 4 4 L4 17 C9 17 11 18.5 11 18.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11 6 C11 6 13 4 18 4 L18 17 C13 17 11 18.5 11 18.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Spine */}
+      <line x1="11" y1="6" x2="11" y2="18.5" stroke={color} strokeWidth="1" strokeLinecap="round" />
+      {/* Small 4-pointed star on right page */}
+      <path d="M14.5 9 L15 10.5 L16.5 11 L15 11.5 L14.5 13 L14 11.5 L12.5 11 L14 10.5 Z" stroke={color} strokeWidth="1" strokeLinejoin="round" />
     </svg>
   );
 }

@@ -439,7 +439,13 @@ function AnalyzePageInner() {
   const topRef = useRef<HTMLDivElement>(null);
   const valid = year.length === 4 && month !== "" && day !== "";
 
-  const loadingSteps = ["사주 분석 중", "별자리 확인 중", "수비학 계산 중", "MBTI 매칭 중", "교차점 발견 중"];
+  const loadingSteps = [
+    "동아시아 사주명리학 분석 중",
+    "바빌로니아 점성술 확인 중",
+    "피타고라스 수비학 계산 중",
+    "칼 융 성격유형 매칭 중",
+    "4개 문명의 교차점 발견 중",
+  ];
 
   // Read share URL params on mount
   useEffect(() => {
@@ -604,8 +610,33 @@ function AnalyzePageInner() {
                 운명의 교차점
               </h1>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                생년월일을 입력하면<br />동서양 4개 체계가 동시에 분석합니다
+                생년월일 하나로, 4개 문명이 동시에 분석합니다
               </p>
+            </div>
+
+            {/* 4개 문명 소개 */}
+            <div className="grid grid-cols-2 gap-2 mb-4 animate-fade-up" style={{ animationDelay: "0.03s" }}>
+              {[
+                { name: "사주명리학", origin: "동아시아 3,000년", color: "var(--saju)" },
+                { name: "서양 점성술", origin: "바빌로니아 4,000년", color: "var(--astro)" },
+                { name: "수비학", origin: "그리스 2,500년", color: "var(--numero)" },
+                { name: "MBTI", origin: "칼 융 심리학", color: "var(--mbti)" },
+              ].map((civ) => (
+                <div
+                  key={civ.name}
+                  className="flex items-center gap-2 p-2.5 rounded-lg"
+                  style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
+                >
+                  <span
+                    className="inline-block w-2 h-2 rounded-full shrink-0"
+                    style={{ background: civ.color }}
+                  />
+                  <div>
+                    <div className="text-[13px] font-bold" style={{ color: "var(--ink)" }}>{civ.name}</div>
+                    <div className="text-[11px]" style={{ color: "var(--ink-light)" }}>{civ.origin}</div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div
