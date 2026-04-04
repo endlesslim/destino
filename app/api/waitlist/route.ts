@@ -60,7 +60,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   // Resolve client IP
   const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded?.split(",")[0]?.trim() ?? "unknown";
+  const realIp = request.headers.get("x-real-ip");
+  const ip = forwarded?.split(",")[0]?.trim() ?? realIp ?? "127.0.0.1";
 
   // Rate limit check
   if (isRateLimited(ip)) {

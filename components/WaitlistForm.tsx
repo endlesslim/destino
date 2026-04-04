@@ -105,8 +105,12 @@ export default function WaitlistForm() {
           </p>
         </div>
 
-        <a href="/analyze">
-          <Button variant="secondary">미니 도구 먼저 체험하기</Button>
+        <a
+          href="/analyze"
+          className="w-full rounded-md py-4 text-[15px] font-bold tracking-wider transition-all cursor-pointer text-center block border-[1.5px] hover:opacity-80 active:opacity-60"
+          style={{ background: "transparent", color: "var(--ink)", borderColor: "var(--border-strong)", fontFamily: "var(--font-display)" }}
+        >
+          미니 도구 먼저 체험하기
         </a>
       </section>
     );
@@ -174,8 +178,12 @@ export default function WaitlistForm() {
         </Button>
       </form>
 
-      <a href="/analyze">
-        <Button variant="secondary">미니 도구 먼저 체험하기</Button>
+      <a
+        href="/analyze"
+        className="w-full rounded-md py-4 text-[15px] font-bold tracking-wider transition-all cursor-pointer text-center block border-[1.5px] hover:opacity-80 active:opacity-60"
+        style={{ background: "transparent", color: "var(--ink)", borderColor: "var(--border-strong)", fontFamily: "var(--font-display)" }}
+      >
+        미니 도구 먼저 체험하기
       </a>
     </section>
   );
