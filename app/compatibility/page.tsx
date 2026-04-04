@@ -13,6 +13,7 @@ import { playStampSound } from "@/lib/sound";
 import Dot from "@/components/ui/Dot";
 import StaggerSection from "@/components/ui/StaggerSection";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { SajuIcon, AstroIcon, NumeroIcon, MBTIIcon, FaceIcon, TarotIcon, SystemIcon, StarIcon, TwinMoonsIcon } from "@/components/ui/SystemIcons";
 import { useCountUp } from "@/hooks/useCountUp";
 
 // ━━━ 칩 컴포넌트 ━━━
@@ -610,13 +611,13 @@ function CompatibilityPageInner() {
 
             <div className="flex justify-center gap-3 mt-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
               {([
-                ["var(--saju)", "오행"],
-                ["var(--astro)", "별자리"],
-                ["var(--numero)", "수비학"],
-                ["var(--mbti)", "MBTI"],
-              ] as const).map(([c, v]) => (
+                ["saju", "var(--saju)", "오행"],
+                ["astro", "var(--astro)", "별자리"],
+                ["numero", "var(--numero)", "수비학"],
+                ["mbti", "var(--mbti)", "MBTI"],
+              ] as const).map(([type, c, v]) => (
                 <span key={v} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-muted)" }}>
-                  <Dot color={c} />{v}
+                  <SystemIcon type={type} color={c} size={12} />{v}
                 </span>
               ))}
             </div>
@@ -696,7 +697,7 @@ function CompatibilityPageInner() {
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
               >
                 <div className="flex items-center gap-2 mb-5">
-                  <Dot color="var(--seal)" size={10} />
+                  <TwinMoonsIcon color="var(--seal)" size={14} />
                   <span className="text-sm font-bold tracking-wider" style={{ color: "var(--seal)" }}>궁합</span>
                 </div>
 
@@ -811,6 +812,7 @@ function CompatibilityPageInner() {
                   color="var(--seal)"
                   title="두 사람의 프로파일 비교"
                   subtitle="동서양 4개 체계로 본 각자의 성격"
+                  icon={<TwinMoonsIcon color="var(--seal)" size={14} />}
                 />
 
                 {/* Side by side detailed profiles */}
@@ -831,16 +833,16 @@ function CompatibilityPageInner() {
 
                     {/* 4 system badges */}
                     <div className="flex flex-wrap gap-1.5 mb-3">
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--saju)" + "15", color: "var(--saju)" }}>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--saju) 12%, transparent)", color: "var(--saju)" }}>
                         {OHANG_INFO[result.person1.saju.day.ohang].kr}({result.person1.saju.day.ohang})
                       </span>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--astro)" + "15", color: "var(--astro)" }}>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--astro) 12%, transparent)", color: "var(--astro)" }}>
                         {result.person1.western.sunSign.name} ({result.person1.western.element})
                       </span>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--numero)" + "15", color: "var(--numero)" }}>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--numero) 12%, transparent)", color: "var(--numero)" }}>
                         LP {result.person1.numerology.lifePath} ({result.person1.numerology.lifePathInfo.name})
                       </span>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--mbti)" + "15", color: "var(--mbti)" }}>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--mbti) 12%, transparent)", color: "var(--mbti)" }}>
                         {result.person1.mbti.primaryType}
                       </span>
                     </div>
@@ -895,16 +897,16 @@ function CompatibilityPageInner() {
 
                     {/* 4 system badges */}
                     <div className="flex flex-wrap gap-1.5 mb-3">
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--saju)" + "15", color: "var(--saju)" }}>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--saju) 12%, transparent)", color: "var(--saju)" }}>
                         {OHANG_INFO[result.person2.saju.day.ohang].kr}({result.person2.saju.day.ohang})
                       </span>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--astro)" + "15", color: "var(--astro)" }}>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--astro) 12%, transparent)", color: "var(--astro)" }}>
                         {result.person2.western.sunSign.name} ({result.person2.western.element})
                       </span>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--numero)" + "15", color: "var(--numero)" }}>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--numero) 12%, transparent)", color: "var(--numero)" }}>
                         LP {result.person2.numerology.lifePath} ({result.person2.numerology.lifePathInfo.name})
                       </span>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--mbti)" + "15", color: "var(--mbti)" }}>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--mbti) 12%, transparent)", color: "var(--mbti)" }}>
                         {result.person2.mbti.primaryType}
                       </span>
                     </div>
@@ -949,6 +951,7 @@ function CompatibilityPageInner() {
                   color="var(--seal)"
                   title="차원별 궁합"
                   subtitle="동양 사주, 서양 별자리, 수비학, MBTI 각각의 시선"
+                  icon={<StarIcon color="var(--seal)" size={14} />}
                 />
 
                 <div className="flex flex-col gap-5">
@@ -972,7 +975,7 @@ function CompatibilityPageInner() {
 
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <Dot color={SYSTEM_COLORS[dim.system] || "var(--ink-muted)"} />
+                          <SystemIcon type={dim.system} color={SYSTEM_COLORS[dim.system] || "var(--ink-muted)"} size={12} />
                           <span className="text-[15px] font-bold" style={{ color: "var(--ink)" }}>
                             {dim.name}
                           </span>
@@ -1020,6 +1023,7 @@ function CompatibilityPageInner() {
                   color="var(--saju)"
                   title="원소 이야기"
                   subtitle="두 사람의 원소가 만나 빚어내는 서사"
+                  icon={<SajuIcon color="var(--saju)" size={14} />}
                 />
 
                 {/* Element visual */}
@@ -1048,10 +1052,10 @@ function CompatibilityPageInner() {
                     <span
                       className="inline-block px-3 py-1 rounded-full text-xs font-black mb-1"
                       style={{
-                        background: result.elementRelation.relation === "상생" ? "var(--saju)" + "18"
-                          : result.elementRelation.relation === "비화" ? "var(--face)" + "18"
-                          : result.elementRelation.relation === "상극" ? "var(--seal)" + "18"
-                          : "var(--astro)" + "18",
+                        background: result.elementRelation.relation === "상생" ? "color-mix(in srgb, var(--saju) 12%, transparent)"
+                          : result.elementRelation.relation === "비화" ? "color-mix(in srgb, var(--face) 12%, transparent)"
+                          : result.elementRelation.relation === "상극" ? "color-mix(in srgb, var(--seal) 12%, transparent)"
+                          : "color-mix(in srgb, var(--astro) 12%, transparent)",
                         color: result.elementRelation.relation === "상생" ? "var(--saju)"
                           : result.elementRelation.relation === "비화" ? "var(--face)"
                           : result.elementRelation.relation === "상극" ? "var(--seal)"
@@ -1127,6 +1131,7 @@ function CompatibilityPageInner() {
                   color="var(--seal)"
                   title="관계 타임라인"
                   subtitle="관계의 다섯 단계, 각 시기에 필요한 지혜"
+                  icon={<TwinMoonsIcon color="var(--seal)" size={14} />}
                 />
 
                 {/* Timeline */}
@@ -1187,6 +1192,7 @@ function CompatibilityPageInner() {
                   color="var(--astro)"
                   title="소통 스타일"
                   subtitle="두 사람은 어떻게 다르게 말하고, 어떻게 연결될 수 있는가"
+                  icon={<AstroIcon color="var(--astro)" size={14} />}
                 />
 
                 {/* Person 1 communication */}
@@ -1232,7 +1238,7 @@ function CompatibilityPageInner() {
                 {/* Communication tip */}
                 <div
                   className="p-4 rounded-[10px]"
-                  style={{ background: "var(--astro)" + "08", border: "1px solid var(--astro)" + "20" }}
+                  style={{ background: "color-mix(in srgb, var(--astro) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--astro) 20%, transparent)" }}
                 >
                   <div className="text-[12px] font-bold tracking-wider mb-2" style={{ color: "var(--astro)" }}>
                     소통 팁
@@ -1254,6 +1260,7 @@ function CompatibilityPageInner() {
                   color="var(--face)"
                   title="갈등 패턴"
                   subtitle="무엇이 충돌을 만들고, 어떻게 풀어갈 수 있는가"
+                  icon={<FaceIcon color="var(--face)" size={14} />}
                 />
 
                 {/* Trigger */}
@@ -1285,7 +1292,7 @@ function CompatibilityPageInner() {
                       해결의 열쇠
                     </span>
                   </div>
-                  <div className="p-3.5 rounded-lg" style={{ background: "var(--saju)" + "08" }}>
+                  <div className="p-3.5 rounded-lg" style={{ background: "color-mix(in srgb, var(--saju) 8%, transparent)" }}>
                     <p className="text-[14px] leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
                       {result.conflictPattern.resolution}
                     </p>
@@ -1304,6 +1311,7 @@ function CompatibilityPageInner() {
                   color="var(--ink)"
                   title="특성 분석"
                   subtitle="공유 특성, 보완 특성, 긴장 포인트"
+                  icon={<StarIcon color="var(--ink)" size={14} />}
                 />
 
                 {/* Shared */}
@@ -1375,6 +1383,7 @@ function CompatibilityPageInner() {
                   color="var(--seal)"
                   title="관계 조언"
                   subtitle="동서양 4체계가 전하는 메시지"
+                  icon={<TwinMoonsIcon color="var(--seal)" size={14} />}
                 />
 
                 <blockquote

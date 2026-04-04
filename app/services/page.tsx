@@ -4,6 +4,7 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import ScrollReveal from "@/components/ScrollReveal";
 import Seal from "@/components/ui/Seal";
+import { ServiceIcon } from "@/components/ui/SystemIcons";
 
 /* ── Service data ──────────────────────────────────────────────── */
 
@@ -13,25 +14,26 @@ interface Service {
   href: string;
   price: string;
   color: string;
+  type: string;
 }
 
 const coreServices: Service[] = [
-  { name: "교차 분석", desc: "동서양 4개 문명 교차 분석 리포트", href: "/analyze", price: "₩29,900", color: "var(--seal)" },
-  { name: "궁합 분석", desc: "두 사람의 교차점 비교", href: "/compatibility", price: "₩9,900", color: "var(--astro)" },
-  { name: "결혼 궁합", desc: "결혼 5대 차원 심화 분석", href: "/marriage", price: "₩29,900", color: "var(--seal)" },
+  { name: "교차 분석", desc: "동서양 4개 문명 교차 분석 리포트", href: "/analyze", price: "₩29,900", color: "var(--seal)", type: "default" },
+  { name: "궁합 분석", desc: "두 사람의 교차점 비교", href: "/compatibility", price: "₩9,900", color: "var(--astro)", type: "compatibility" },
+  { name: "결혼 궁합", desc: "결혼 5대 차원 심화 분석", href: "/marriage", price: "₩29,900", color: "var(--seal)", type: "marriage" },
 ];
 
 const deepServices: Service[] = [
-  { name: "커리어 심화", desc: "TOP 5 추천 직업 + 연대별 조언", href: "/career", price: "₩9,900", color: "var(--saju)" },
-  { name: "연애 심화", desc: "이상형 + 연애 패턴 + 인연 시기", href: "/love", price: "₩9,900", color: "var(--seal)" },
-  { name: "가족 분석", desc: "가족 구성원 관계 분석", href: "/family", price: "₩19,900", color: "var(--face)" },
-  { name: "이름 풀이", desc: "한글 이름 획수 + 오행 분석", href: "/name-analysis", price: "₩9,900", color: "var(--numero)" },
+  { name: "커리어 심화", desc: "TOP 5 추천 직업 + 연대별 조언", href: "/career", price: "₩9,900", color: "var(--saju)", type: "career" },
+  { name: "연애 심화", desc: "이상형 + 연애 패턴 + 인연 시기", href: "/love", price: "₩9,900", color: "var(--seal)", type: "love" },
+  { name: "가족 분석", desc: "가족 구성원 관계 분석", href: "/family", price: "₩19,900", color: "var(--face)", type: "face" },
+  { name: "이름 풀이", desc: "한글 이름 획수 + 오행 분석", href: "/name-analysis", price: "₩9,900", color: "var(--numero)", type: "default" },
 ];
 
 const freeServices: Service[] = [
-  { name: "오늘의 운세", desc: "매일 달라지는 오행의 기운", href: "/daily", price: "무료", color: "var(--astro)" },
-  { name: "타로 리딩", desc: "탄생 카드 + 올해의 카드", href: "/tarot", price: "무료", color: "var(--tarot)" },
-  { name: "관상 분석", desc: "얼굴에서 읽는 오행", href: "/face", price: "무료", color: "var(--face)" },
+  { name: "오늘의 운세", desc: "매일 달라지는 오행의 기운", href: "/daily", price: "무료", color: "var(--astro)", type: "daily" },
+  { name: "타로 리딩", desc: "탄생 카드 + 올해의 카드", href: "/tarot", price: "무료", color: "var(--tarot)", type: "tarot" },
+  { name: "관상 분석", desc: "얼굴에서 읽는 오행", href: "/face", price: "무료", color: "var(--face)", type: "face" },
 ];
 
 const sections = [
@@ -62,13 +64,11 @@ function ServiceCard({ service }: { service: Service }) {
         e.currentTarget.style.boxShadow = "none";
       }}
     >
-      {/* Left: dot + text */}
+      {/* Left: icon + text */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        <span
-          className="shrink-0 w-3 h-3 rounded-full"
-          style={{ background: service.color }}
-          aria-hidden="true"
-        />
+        <span className="shrink-0 flex items-center justify-center" aria-hidden="true">
+          <ServiceIcon type={service.type} color={service.color} />
+        </span>
         <div className="min-w-0">
           <p
             className="text-[15px] font-bold leading-snug"

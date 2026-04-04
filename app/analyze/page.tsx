@@ -21,6 +21,7 @@ import ChatConsultation from "@/components/ChatConsultation";
 import Dot from "@/components/ui/Dot";
 import StaggerSection from "@/components/ui/StaggerSection";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { SajuIcon, AstroIcon, NumeroIcon, MBTIIcon, FaceIcon, TarotIcon, SystemIcon, StarIcon } from "@/components/ui/SystemIcons";
 import { useCountUp } from "@/hooks/useCountUp";
 
 // ━━━ Canvas 유틸 (인스타 카드용) ━━━
@@ -238,7 +239,7 @@ function CivilizationHeader({
       <div className="mt-3">
         <span
           className="inline-block text-[10px] tracking-[0.04em] font-semibold px-2.5 py-1 rounded"
-          style={{ background: `${color}10`, color, border: `1px solid ${color}20` }}
+          style={{ background: `color-mix(in srgb, ${color} 12%, transparent)`, color, border: `1px solid color-mix(in srgb, ${color} 20%, transparent)` }}
         >
           {basis}
         </span>
@@ -369,7 +370,7 @@ function AIInterpretation({ result }: { result: CrosspointResult }) {
       className="rounded-[14px] p-6 mb-3.5"
       style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
     >
-      <SectionHeader color="var(--seal)" title="AI 맞춤 해석" />
+      <SectionHeader color="var(--seal)" title="AI 맞춤 해석" icon={<StarIcon color="var(--seal)" size={14} />} />
       {loading && <InterpretationSkeleton />}
       {error && (
         <p className="text-sm leading-[1.8]" style={{ color: "var(--ink-muted)" }}>
@@ -925,13 +926,13 @@ function AnalyzePageInner() {
 
             <div className="flex justify-center gap-3 mt-4 animate-fade-up" style={{ animationDelay: "0.15s" }}>
               {([
-                ["var(--saju)", "사주"],
-                ["var(--astro)", "별자리"],
-                ["var(--mbti)", "수비학"],
-                ["var(--face)", "띠"],
-              ] as const).map(([c, v]) => (
+                ["saju", "var(--saju)", "사주"],
+                ["astro", "var(--astro)", "별자리"],
+                ["mbti", "var(--mbti)", "수비학"],
+                ["face", "var(--face)", "띠"],
+              ] as const).map(([type, c, v]) => (
                 <span key={v} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-muted)" }}>
-                  <Dot color={c} />{v}
+                  <SystemIcon type={type} color={c} size={12} />{v}
                 </span>
               ))}
             </div>
@@ -1012,7 +1013,7 @@ function AnalyzePageInner() {
               >
                 <div className="flex flex-col gap-1 mb-5">
                   <div className="flex items-center gap-2">
-                    <Dot color="var(--seal)" size={10} />
+                    <StarIcon color="var(--seal)" size={14} />
                     <span className="text-sm font-bold tracking-wider" style={{ color: "var(--seal)" }}>교차점</span>
                   </div>
                   <p className="text-[12px] leading-snug ml-[18px]" style={{ color: "var(--ink-light)" }}>
@@ -1148,7 +1149,7 @@ function AnalyzePageInner() {
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
                   >
-                    <SectionHeader color="var(--seal)" title="아키타입 상세" />
+                    <SectionHeader color="var(--seal)" title="아키타입 상세" icon={<StarIcon color="var(--seal)" size={14} />} />
                     <h3
                       className="text-lg font-black mb-2"
                       style={{ fontFamily: "var(--font-display)", color: "var(--seal-dark)" }}
@@ -1272,7 +1273,7 @@ function AnalyzePageInner() {
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
                   >
-                    <SectionHeader color="var(--saju)" title="오행 밸런스" />
+                    <SectionHeader color="var(--saju)" title="오행 밸런스" icon={<SajuIcon color="var(--saju)" size={14} />} />
                     <div className="flex justify-center gap-3 mb-4">
                       {(["木", "火", "土", "金", "水"] as const).map((oh) => (
                         <span
@@ -1868,7 +1869,7 @@ function AnalyzePageInner() {
                     <div className="text-center py-2">
                       <div
                         className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3"
-                        style={{ background: "var(--numero)" + "15" }}
+                        style={{ background: "color-mix(in srgb, var(--numero) 12%, transparent)" }}
                       >
                         <span
                           className="text-2xl font-black"
@@ -2130,7 +2131,7 @@ function AnalyzePageInner() {
                       {/* MBTI Type Badge */}
                       <div
                         className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-3"
-                        style={{ background: "var(--mbti)" + "15" }}
+                        style={{ background: "color-mix(in srgb, var(--mbti) 12%, transparent)" }}
                       >
                         <span
                           className="text-2xl font-black tracking-wide"
@@ -2144,7 +2145,7 @@ function AnalyzePageInner() {
                       <div className="flex items-center justify-center gap-2 mb-3">
                         <span
                           className="inline-block px-3 py-1 rounded-full text-sm font-bold"
-                          style={{ background: "var(--mbti)" + "12", color: "var(--mbti)" }}
+                          style={{ background: "color-mix(in srgb, var(--mbti) 12%, transparent)", color: "var(--mbti)" }}
                         >
                           {result.mbti.primaryType}
                         </span>
@@ -2276,7 +2277,7 @@ function AnalyzePageInner() {
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
                   >
-                    <SectionHeader color="var(--ink)" title="성격 종합" />
+                    <SectionHeader color="var(--ink)" title="성격 종합" icon={<StarIcon color="var(--ink)" size={14} />} />
 
                     {/* Nature Header */}
                     <div className="flex items-center gap-3 mb-4">
@@ -2574,7 +2575,7 @@ function AnalyzePageInner() {
                   className="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
                   style={{ background: "color-mix(in srgb, var(--tarot) 10%, transparent)" }}
                 >
-                  <Dot color="var(--tarot)" size={10} />
+                  <TarotIcon color="var(--tarot)" size={16} />
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>
@@ -2681,7 +2682,7 @@ function MonthlyForecastSection({ year, month, day }: { year: number; month: num
   return (
     <ScrollReveal delay={650}>
       <div className="mb-3.5">
-        <SectionHeader color="var(--astro)" title="2026년 월별 운세" />
+        <SectionHeader color="var(--astro)" title="2026년 월별 운세" icon={<AstroIcon color="var(--astro)" size={14} />} />
 
         {/* Year Summary */}
         <div
