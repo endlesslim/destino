@@ -50,6 +50,10 @@ export default function Home() {
             교차하는 지점은 하나입니다.
           </p>
 
+          <p className="text-sm font-medium" style={{ color: "var(--ink-medium)" }}>
+            생년월일만 입력하면, 무료로 체험할 수 있습니다
+          </p>
+
           <ScrollToWaitlistButton />
 
           <WaitlistCounter />
@@ -74,10 +78,10 @@ export default function Home() {
             {[
               { label: "사주", sub: "천간·지지·오행", color: "var(--saju)" },
               { label: "서양 점성술", sub: "태양궁·상승궁·달궁", color: "var(--astro)" },
-              { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)" },
-              { label: "관상", sub: "오관·오행 체형", color: "var(--face)" },
+              { label: "MBTI (곧 출시)", sub: "16가지 성격 유형", color: "var(--mbti)" },
+              { label: "관상 (곧 출시)", sub: "오관·오행 체형", color: "var(--face)" },
               { label: "수비학", sub: "생명경로수·표현수", color: "var(--numero)" },
-              { label: "타로", sub: "메이저 아르카나", color: "var(--tarot)" },
+              { label: "타로 (곧 출시)", sub: "메이저 아르카나", color: "var(--tarot)" },
             ].map(({ label, sub, color }) => (
               <div
                 key={label}

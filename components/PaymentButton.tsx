@@ -244,8 +244,8 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
         aria-busy={isProcessing}
         style={{
           background: isProcessing
-            ? "linear-gradient(135deg, #8B7E74, #6B5E53)"
-            : "linear-gradient(135deg, var(--seal), var(--seal-dark))",
+            ? "var(--ink-light)"
+            : "var(--seal)",
           color: "#FFFDF7",
           border: "none",
           borderRadius: "14px",

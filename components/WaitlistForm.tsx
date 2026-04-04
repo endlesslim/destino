@@ -89,7 +89,10 @@ export default function WaitlistForm() {
             className="text-[28px] mb-3"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            {"\uD83C\uDF89"}
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="16" r="14" stroke="var(--seal)" strokeWidth="2"/>
+              <path d="M10 16l4 4 8-8" stroke="var(--seal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
           <p
             className="text-lg font-bold mb-1"

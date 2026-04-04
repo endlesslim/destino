@@ -16,7 +16,7 @@ export default function WaitlistCounter() {
       });
   }, []);
 
-  if (count === null || count === 0) return null;
+  if (count === null || count < 50) return null;
 
   return (
     <p

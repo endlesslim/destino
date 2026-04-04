@@ -265,17 +265,6 @@ function AIInterpretation({ result }: { result: CrosspointResult }) {
   );
 }
 
-// ━━━ 소셜 프루프 카운터 (가짜 수치) ━━━
-function useSocialProofCount() {
-  const [count] = useState(() => {
-    // 날짜 기반 시드로 일관된 숫자 생성
-    const today = new Date();
-    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-    return 1247 + (seed % 300);
-  });
-  return count;
-}
-
 export default function AnalyzePage() {
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
@@ -285,21 +274,34 @@ export default function AnalyzePage() {
   const [result, setResult] = useState<CrosspointResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
-  const socialCount = useSocialProofCount();
-
   const valid = year.length === 4 && month !== "" && day !== "";
 
   const analyze = () => {
     const y = parseInt(year);
     const m = parseInt(month);
     const d = parseInt(day);
-    if (!y || !m || !d || y < 1924 || y > 2025 || m < 1 || m > 12 || d < 1 || d > 31) return;
+
+    if (!y || y < 1924 || y > 2025) {
+      setValidationError("1924~2025년 사이를 입력해주세요");
+      return;
+    }
+    if (!m || m < 1 || m > 12) {
+      setValidationError("1~12월 사이를 입력해주세요");
+      return;
+    }
+    if (!d || d < 1 || d > 31) {
+      setValidationError("1~31일 사이를 입력해주세요");
+      return;
+    }
+
+    setValidationError(null);
     setLoading(true);
     setTimeout(() => {
       setResult(analyzeCrosspoint(y, m, d, name || undefined));
       setLoading(false);
-    }, 1200);
+    }, 2000);
   };
 
   const reset = () => {
@@ -322,7 +324,7 @@ export default function AnalyzePage() {
   }, [year, month, day]);
 
   const shareToTwitter = () => {
-    const text = `동서양 4개 문명이 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
+    const text = `동서양 3개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
     const url = `${window.location.origin}/analyze`;
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
@@ -331,7 +333,7 @@ export default function AnalyzePage() {
   };
 
   const shareToThreads = () => {
-    const text = `동서양 4개 문명이 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}% ${window.location.origin}/analyze`;
+    const text = `동서양 3개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}% ${window.location.origin}/analyze`;
     window.open(
       `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -361,7 +363,7 @@ export default function AnalyzePage() {
                 운명의 교차점
               </h1>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                생년월일을 입력하면<br />4개 문명이 동시에 분석합니다
+                생년월일을 입력하면<br />동서양 3개 체계가 동시에 분석합니다
               </p>
             </div>
 
@@ -407,6 +409,7 @@ export default function AnalyzePage() {
                   className={inputClass}
                   style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)" }}
                   placeholder="예: 1990"
+                  inputMode="numeric"
                   value={year}
                   onChange={(e) => setYear(e.target.value.replace(/\D/g, "").slice(0, 4))}
                   onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
@@ -424,6 +427,7 @@ export default function AnalyzePage() {
                     className={inputClass}
                     style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)" }}
                     placeholder="3"
+                    inputMode="numeric"
                     value={month}
                     onChange={(e) => setMonth(e.target.value.replace(/\D/g, "").slice(0, 2))}
                     onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
@@ -438,6 +442,7 @@ export default function AnalyzePage() {
                     className={inputClass}
                     style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)" }}
                     placeholder="15"
+                    inputMode="numeric"
                     value={day}
                     onChange={(e) => setDay(e.target.value.replace(/\D/g, "").slice(0, 2))}
                     onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
@@ -449,7 +454,7 @@ export default function AnalyzePage() {
               {/* 시간 (선택) */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold mb-1.5" style={{ color: "var(--ink-medium)" }}>
-                  태어난 시간
+                  태어난 시간 (준비 중)
                   <span
                     className="text-[10px] font-normal px-1.5 py-0.5 rounded"
                     style={{ background: "var(--bg-paper)", color: "var(--ink-light)" }}
@@ -459,15 +464,16 @@ export default function AnalyzePage() {
                 </label>
                 <input
                   className={inputClass}
-                  style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)" }}
+                  style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)", opacity: 0.5 }}
                   placeholder="예: 14 (24시간제)"
                   value={hour}
                   onChange={(e) => setHour(e.target.value.replace(/\D/g, "").slice(0, 2))}
                   onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
                   onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+                  disabled
                 />
                 <p className="text-[11px] mt-1" style={{ color: "var(--ink-light)" }}>
-                  시간 입력 시 시주까지 분석 (추후 업데이트)
+                  시주 분석은 다음 업데이트에 추가됩니다
                 </p>
               </div>
             </div>
@@ -485,6 +491,16 @@ export default function AnalyzePage() {
             >
               {valid ? "교차점 발견하기" : "생년월일을 입력해주세요"}
             </button>
+
+            {validationError && (
+              <p
+                className="text-sm font-medium mt-3 text-center"
+                style={{ color: "var(--seal)" }}
+                role="alert"
+              >
+                {validationError}
+              </p>
+            )}
 
             <div className="flex justify-center gap-3 mt-4 animate-fade-up" style={{ animationDelay: "0.15s" }}>
               {([
@@ -515,7 +531,7 @@ export default function AnalyzePage() {
               className="text-base font-bold mt-3"
               style={{ color: "var(--ink)", fontFamily: "var(--font-display)" }}
             >
-              4개 문명이 분석 중
+              동서양 체계 분석 중
             </p>
             <div className="flex justify-center gap-1 mt-3">
               {[0, 1, 2].map((i) => (
@@ -598,7 +614,7 @@ export default function AnalyzePage() {
                     className="h-full rounded-full animate-bar-grow"
                     style={{
                       width: `${result.convergence_rate}%`,
-                      background: "linear-gradient(90deg, var(--seal-dark), var(--seal), var(--seal-light))",
+                      background: "var(--seal)",
                     }}
                   />
                 </div>
@@ -668,7 +684,7 @@ export default function AnalyzePage() {
                 style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
               >
                 <div className="text-[11px] font-semibold tracking-widest mb-2" style={{ color: "var(--ink-light)" }}>
-                  ARCHETYPE
+                  교차점 유형
                 </div>
                 <h2
                   className="text-[22px] font-black leading-snug"
@@ -677,20 +693,6 @@ export default function AnalyzePage() {
                   {result.archetype}
                 </h2>
               </div>
-            </StaggerSection>
-
-            {/* Social Proof */}
-            <StaggerSection index={3}>
-              <p
-                className="text-center text-sm font-semibold mb-5"
-                style={{ color: "var(--ink-muted)" }}
-              >
-                이미{" "}
-                <span style={{ color: "var(--seal)", fontFamily: "var(--font-display)" }}>
-                  {socialCount.toLocaleString()}명
-                </span>
-                이 전체 리포트를 받았습니다
-              </p>
             </StaggerSection>
 
             {/* ═══════════════════════════════════════════
@@ -1182,7 +1184,7 @@ export default function AnalyzePage() {
                     관상 / 타로 / 점성술 심화
                   </div>
                   <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
-                    6개 문명 전체 분석 곧 공개
+                    추가 체계 분석 곧 공개
                   </div>
                 </div>
               </div>
