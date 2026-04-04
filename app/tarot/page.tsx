@@ -7,6 +7,7 @@ import Divider from "@/components/ui/Divider";
 import Button from "@/components/ui/Button";
 import ScrollReveal from "@/components/ScrollReveal";
 import Seal from "@/components/ui/Seal";
+import TarotCardVisual from "@/components/TarotCardVisual";
 import {
   generateTarotReading,
   toRomanNumeral,
@@ -14,7 +15,7 @@ import {
   type TarotReading,
 } from "@/lib/tarot";
 
-// ━━━ 타로 카드 비주얼 ━━━
+// ━━━ 타로 카드 비주얼 (wrapper) ━━━
 
 function CardVisual({
   card,
@@ -23,96 +24,26 @@ function CardVisual({
   card: TarotCard;
   size?: "lg" | "sm";
 }) {
-  const isLarge = size === "lg";
+  // Map "sm" to "md" for TarotCardVisual
+  const visualSize = size === "lg" ? "lg" : "md";
+  // Slight random-feeling rotation based on card number
+  const rotation = card.number % 2 === 0 ? -0.8 : 0.7;
 
   return (
     <div
-      className={`relative flex flex-col items-center justify-center rounded-lg border-2 ${
-        isLarge ? "w-[200px] h-[310px]" : "w-[150px] h-[232px]"
-      }`}
       style={{
-        borderColor: "var(--tarot)",
-        background: "var(--bg-white)",
+        transform: `rotate(${rotation}deg)`,
+        filter: "drop-shadow(0 4px 12px rgba(28, 25, 23, 0.08)) drop-shadow(0 1px 3px rgba(28, 25, 23, 0.06))",
+        transition: "transform 0.3s ease",
       }}
     >
-      {/* Inner border */}
-      <div
-        className={`absolute rounded border ${
-          isLarge ? "inset-3" : "inset-2"
-        }`}
-        style={{ borderColor: "var(--border)" }}
+      <TarotCardVisual
+        number={card.number}
+        name={card.name}
+        nameEn={card.nameEn}
+        element={card.element}
+        size={visualSize}
       />
-
-      {/* Roman numeral */}
-      <span
-        className={`${
-          isLarge ? "text-[14px]" : "text-[11px]"
-        } tracking-[0.2em] font-medium`}
-        style={{
-          color: "var(--tarot)",
-          fontFamily: "var(--font-display)",
-        }}
-      >
-        {toRomanNumeral(card.number)}
-      </span>
-
-      {/* Decorative line */}
-      <div
-        className={`${isLarge ? "w-10 my-3" : "w-7 my-2"} h-px`}
-        style={{ background: "var(--tarot)" }}
-      />
-
-      {/* Card name KR */}
-      <span
-        className={`${
-          isLarge ? "text-[28px]" : "text-[20px]"
-        } font-black leading-tight`}
-        style={{
-          fontFamily: "var(--font-display)",
-          color: "var(--ink)",
-        }}
-      >
-        {card.name}
-      </span>
-
-      {/* Card name EN */}
-      <span
-        className={`${
-          isLarge ? "text-[11px] mt-2" : "text-[9px] mt-1"
-        } tracking-[0.08em] font-medium`}
-        style={{
-          color: "var(--ink-light)",
-          fontFamily: "var(--font-display)",
-        }}
-      >
-        {card.nameEn}
-      </span>
-
-      {/* Element + Planet */}
-      <div
-        className={`flex items-center gap-2 ${
-          isLarge ? "mt-4" : "mt-3"
-        }`}
-      >
-        <span
-          className="text-[10px] tracking-[0.05em] font-medium px-2 py-0.5 rounded"
-          style={{
-            background: "var(--bg-warm)",
-            color: "var(--ink-light)",
-          }}
-        >
-          {card.element}
-        </span>
-        <span
-          className="text-[10px] tracking-[0.05em] font-medium px-2 py-0.5 rounded"
-          style={{
-            background: "var(--bg-warm)",
-            color: "var(--ink-light)",
-          }}
-        >
-          {card.planet}
-        </span>
-      </div>
     </div>
   );
 }
