@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
+import PaymentGate from "@/components/PaymentGate";
 import { analyzeCrosspoint, type CrosspointResult } from "@/lib/cross-engine";
 import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
 
@@ -188,7 +189,92 @@ function Chip({
   );
 }
 
-type TabKey = "saju" | "star" | "num" | "person";
+// ━━━ 섹션 헤더 ━━━
+function SectionHeader({ color, title }: { color: string; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <Dot color={color} size={8} />
+      <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+        {title}
+      </span>
+    </div>
+  );
+}
+
+// ━━━ AI 해석 로딩 스켈레톤 ━━━
+function InterpretationSkeleton() {
+  return (
+    <div className="flex flex-col gap-3 animate-pulse">
+      <div className="h-4 rounded-full" style={{ background: "var(--border)", width: "100%" }} />
+      <div className="h-4 rounded-full" style={{ background: "var(--border)", width: "92%" }} />
+      <div className="h-4 rounded-full" style={{ background: "var(--border)", width: "85%" }} />
+      <div className="h-4 rounded-full" style={{ background: "var(--border)", width: "70%" }} />
+    </div>
+  );
+}
+
+// ━━━ AI 해석 컴포넌트 ━━━
+function AIInterpretation({ result }: { result: CrosspointResult }) {
+  const [interpretation, setInterpretation] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const fetched = useRef(false);
+
+  useEffect(() => {
+    if (fetched.current) return;
+    fetched.current = true;
+
+    async function fetchInterpretation() {
+      try {
+        const res = await fetch("/api/interpret", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(result),
+        });
+        if (!res.ok) throw new Error("fetch failed");
+        const data = await res.json();
+        setInterpretation(data.interpretation);
+      } catch {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchInterpretation();
+  }, [result]);
+
+  return (
+    <div
+      className="rounded-[14px] p-6 mb-3.5"
+      style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+    >
+      <SectionHeader color="var(--seal)" title="AI 맞춤 해석" />
+      {loading && <InterpretationSkeleton />}
+      {error && (
+        <p className="text-sm leading-[1.8]" style={{ color: "var(--ink-muted)" }}>
+          해석을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.
+        </p>
+      )}
+      {interpretation && (
+        <p className="text-sm leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
+          {interpretation}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ━━━ 소셜 프루프 카운터 (가짜 수치) ━━━
+function useSocialProofCount() {
+  const [count] = useState(() => {
+    // 날짜 기반 시드로 일관된 숫자 생성
+    const today = new Date();
+    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    return 1247 + (seed % 300);
+  });
+  return count;
+}
 
 export default function AnalyzePage() {
   const [year, setYear] = useState("");
@@ -198,9 +284,9 @@ export default function AnalyzePage() {
   const [name, setName] = useState("");
   const [result, setResult] = useState<CrosspointResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState<TabKey>("saju");
   const [copied, setCopied] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
+  const socialCount = useSocialProofCount();
 
   const valid = year.length === 4 && month !== "" && day !== "";
 
@@ -223,7 +309,6 @@ export default function AnalyzePage() {
     setDay("");
     setHour("");
     setName("");
-    setTab("saju");
     setCopied(false);
     topRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -464,6 +549,10 @@ export default function AnalyzePage() {
         {/* ━━━ RESULT ━━━ */}
         {result && (
           <>
+            {/* ═══════════════════════════════════════════
+                SECTION A: FREE PREVIEW (always visible)
+               ═══════════════════════════════════════════ */}
+
             {/* Header */}
             <StaggerSection index={0} className="flex justify-between items-center mb-5">
               <div className="flex items-center gap-2">
@@ -475,7 +564,7 @@ export default function AnalyzePage() {
               </span>
             </StaggerSection>
 
-            {/* ━━━ CONVERGENCE HERO ━━━ */}
+            {/* Convergence Hero */}
             <StaggerSection index={1}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
@@ -572,7 +661,7 @@ export default function AnalyzePage() {
               </div>
             </StaggerSection>
 
-            {/* ━━━ ARCHETYPE SECTION ━━━ */}
+            {/* Archetype Name ONLY (no description in free preview) */}
             <StaggerSection index={2}>
               <div
                 className="rounded-[14px] p-6 mb-3.5"
@@ -582,109 +671,102 @@ export default function AnalyzePage() {
                   ARCHETYPE
                 </div>
                 <h2
-                  className="text-[22px] font-black mb-2 leading-snug"
+                  className="text-[22px] font-black leading-snug"
                   style={{ fontFamily: "var(--font-display)", color: "var(--seal-dark)" }}
                 >
                   {result.archetype}
                 </h2>
-                <p className="text-sm leading-[1.8]" style={{ color: "var(--ink-medium)" }}>
-                  {result.archetype_desc}
-                </p>
               </div>
             </StaggerSection>
 
-            {/* ━━━ CROSS MESSAGE (from engine, optional) ━━━ */}
-            {typeof (result as unknown as Record<string, unknown>)?.cross_message === "string" && (
-              <StaggerSection index={3}>
-                <div
-                  className="rounded-[14px] p-6 mb-3.5"
-                  style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
-                >
-                  <blockquote
-                    className="text-base leading-[2] italic"
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      color: "var(--ink-medium)",
-                      borderLeft: "3px solid var(--seal)",
-                      paddingLeft: "16px",
-                      margin: 0,
-                    }}
-                  >
-                    {String((result as unknown as Record<string, unknown>).cross_message)}
-                  </blockquote>
-                </div>
-              </StaggerSection>
-            )}
-
-            {/* ━━━ OHANG BALANCE ━━━ */}
-            <StaggerSection index={4}>
-              <div
-                className="rounded-[14px] p-6 mb-3.5"
-                style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+            {/* Social Proof */}
+            <StaggerSection index={3}>
+              <p
+                className="text-center text-sm font-semibold mb-5"
+                style={{ color: "var(--ink-muted)" }}
               >
-                <div className="flex items-center gap-2 mb-4">
-                  <Dot color="var(--saju)" size={8} />
-                  <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>오행 밸런스</span>
-                </div>
-                <OhangBars balance={result.saju.ohang_balance} />
-
-                {/* Ohang visual from engine (optional) */}
-                {typeof (result as unknown as Record<string, unknown>)?.ohang_visual === "string" && (
-                  <div
-                    className="mt-4 p-3 rounded-lg text-sm"
-                    style={{ background: "var(--bg-paper)", color: "var(--ink-muted)" }}
-                  >
-                    {String((result as unknown as Record<string, unknown>).ohang_visual)}
-                  </div>
-                )}
-              </div>
+                이미{" "}
+                <span style={{ color: "var(--seal)", fontFamily: "var(--font-display)" }}>
+                  {socialCount.toLocaleString()}명
+                </span>
+                이 전체 리포트를 받았습니다
+              </p>
             </StaggerSection>
 
-            {/* ━━━ TABS ━━━ */}
-            <StaggerSection index={5}>
-              <div className="grid grid-cols-4 gap-1.5 mb-3.5">
-                {([
-                  ["saju", "사주"],
-                  ["star", "별자리"],
-                  ["num", "수비학"],
-                  ["person", "성격"],
-                ] as [TabKey, string][]).map(([k, v]) => {
-                  const active = tab === k;
-                  return (
-                    <button
-                      key={k}
-                      onClick={() => setTab(k)}
-                      className="flex flex-col items-center gap-1 py-2.5 rounded-[10px] cursor-pointer transition-all"
-                      style={{
-                        border: active ? "2px solid var(--seal)" : "2px solid transparent",
-                        background: active ? "var(--seal-bg)" : "var(--bg-white)",
-                        fontFamily: "inherit",
-                      }}
+            {/* ═══════════════════════════════════════════
+                SECTION B: PREMIUM REPORT (PaymentGate)
+               ═══════════════════════════════════════════ */}
+            <PaymentGate result={JSON.stringify(result)}>
+              <div className="flex flex-col gap-0">
+
+                {/* B1: 아키타입 상세 */}
+                <StaggerSection index={0}>
+                  <div
+                    className="rounded-[14px] p-6 mb-3.5"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <SectionHeader color="var(--seal)" title="아키타입 상세" />
+                    <h3
+                      className="text-lg font-black mb-2"
+                      style={{ fontFamily: "var(--font-display)", color: "var(--seal-dark)" }}
                     >
-                      <TabIcon type={k} active={active} />
-                      <span
-                        className="text-xs"
+                      {result.archetype}
+                    </h3>
+                    <p className="text-sm leading-[1.9] mb-4" style={{ color: "var(--ink-medium)" }}>
+                      {result.archetype_desc}
+                    </p>
+
+                    {/* cross_message blockquote */}
+                    {result.cross_message && (
+                      <blockquote
+                        className="text-sm leading-[2] italic"
                         style={{
-                          fontWeight: active ? 700 : 500,
-                          color: active ? "var(--seal)" : "var(--ink-muted)",
+                          fontFamily: "var(--font-display)",
+                          color: "var(--ink-medium)",
+                          borderLeft: "3px solid var(--seal)",
+                          paddingLeft: "16px",
+                          margin: 0,
                         }}
                       >
-                        {v}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </StaggerSection>
+                        {result.cross_message}
+                      </blockquote>
+                    )}
+                  </div>
+                </StaggerSection>
 
-            {/* ━━━ TAB CONTENT ━━━ */}
-            <StaggerSection index={6}>
-              <div
-                className="rounded-[14px] p-5 mb-3.5"
-                style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
-              >
-                {tab === "saju" && (
-                  <div className="animate-fade-up">
+                {/* B2: 오행 밸런스 */}
+                <StaggerSection index={1}>
+                  <div
+                    className="rounded-[14px] p-6 mb-3.5"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <SectionHeader color="var(--saju)" title="오행 밸런스" />
+                    <div className="flex justify-center gap-3 mb-4">
+                      {(["木", "火", "土", "金", "水"] as const).map((oh) => (
+                        <span
+                          key={oh}
+                          className="text-xs font-semibold px-2 py-1 rounded"
+                          style={{
+                            background: OHANG_BAR_COLORS[oh] + "15",
+                            color: OHANG_BAR_COLORS[oh],
+                          }}
+                        >
+                          {oh} {OHANG_INFO[oh].kr}
+                        </span>
+                      ))}
+                    </div>
+                    <OhangBars balance={result.saju.ohang_balance} />
+                  </div>
+                </StaggerSection>
+
+                {/* B3: 사주 상세분석 */}
+                <StaggerSection index={2}>
+                  <div
+                    className="rounded-[14px] p-6 mb-3.5"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <SectionHeader color="var(--saju)" title="사주 상세분석" />
+
                     {/* Pillar Cards */}
                     <div className="flex gap-2.5 mb-3.5">
                       <div className="flex-1 text-center p-3.5 rounded-[10px]" style={{ background: "var(--bg-paper)" }}>
@@ -713,16 +795,8 @@ export default function AnalyzePage() {
                       </div>
                     </div>
 
-                    {/* Animal Sign */}
-                    <div className="text-center p-3 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
-                      <span className="text-[15px] font-bold">{result.saju.animal.animal_kr}띠</span>
-                      <span className="text-sm ml-2" style={{ color: "var(--ink-light)" }}>
-                        {result.saju.year.jiji}
-                      </span>
-                    </div>
-
                     {/* Personality description */}
-                    <div className="p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                    <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
                       <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
                         일간의 성격
                       </div>
@@ -741,11 +815,25 @@ export default function AnalyzePage() {
                         &ldquo;{result.saju.personality.image}&rdquo;
                       </div>
                     </div>
-                  </div>
-                )}
 
-                {tab === "star" && (
-                  <div className="animate-fade-up">
+                    {/* Animal Sign */}
+                    <div className="text-center p-3 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                      <span className="text-[15px] font-bold">{result.saju.animal.animal_kr}띠</span>
+                      <span className="text-sm ml-2" style={{ color: "var(--ink-light)" }}>
+                        {result.saju.year.jiji}
+                      </span>
+                    </div>
+                  </div>
+                </StaggerSection>
+
+                {/* B4: 별자리 상세 */}
+                <StaggerSection index={3}>
+                  <div
+                    className="rounded-[14px] p-6 mb-3.5"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <SectionHeader color={result.western.sunSign.color} title="별자리 상세" />
+
                     <div className="text-center py-2">
                       <div
                         className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3"
@@ -761,13 +849,6 @@ export default function AnalyzePage() {
                       </div>
                       <div className="text-sm mb-4 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
                         {result.western.sunSign.personality}
-                      </div>
-
-                      {/* Trait Chips */}
-                      <div className="flex flex-wrap justify-center gap-2 mb-4">
-                        {result.western.sunSign.trait.map((t) => (
-                          <Chip key={t} label={t} color={result.western.sunSign.color} />
-                        ))}
                       </div>
 
                       {/* Element & Modality */}
@@ -786,7 +867,14 @@ export default function AnalyzePage() {
                         </span>
                       </div>
 
-                      {/* Modality Explanation */}
+                      {/* Trait Chips */}
+                      <div className="flex flex-wrap justify-center gap-2 mb-4">
+                        {result.western.sunSign.trait.map((t) => (
+                          <Chip key={t} label={t} color={result.western.sunSign.color} />
+                        ))}
+                      </div>
+
+                      {/* Ruler & Modality Explanation */}
                       <div
                         className="text-left p-3.5 rounded-lg text-sm leading-[1.8]"
                         style={{ background: "var(--bg-paper)", color: "var(--ink-muted)" }}
@@ -807,10 +895,16 @@ export default function AnalyzePage() {
                       </div>
                     </div>
                   </div>
-                )}
+                </StaggerSection>
 
-                {tab === "num" && (
-                  <div className="animate-fade-up">
+                {/* B5: 수비학 상세 */}
+                <StaggerSection index={4}>
+                  <div
+                    className="rounded-[14px] p-6 mb-3.5"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <SectionHeader color="var(--numero)" title="수비학 상세" />
+
                     <div className="text-center py-2">
                       <div
                         className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3"
@@ -890,10 +984,16 @@ export default function AnalyzePage() {
                       )}
                     </div>
                   </div>
-                )}
+                </StaggerSection>
 
-                {tab === "person" && (
-                  <div className="animate-fade-up">
+                {/* B6: 성격 종합 */}
+                <StaggerSection index={5}>
+                  <div
+                    className="rounded-[14px] p-6 mb-3.5"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <SectionHeader color="var(--ink)" title="성격 종합" />
+
                     {/* Nature Header */}
                     <div className="flex items-center gap-3 mb-4">
                       <div
@@ -917,11 +1017,6 @@ export default function AnalyzePage() {
                       </div>
                     </div>
 
-                    {/* Personality Description */}
-                    <p className="text-sm leading-[1.9] mb-4" style={{ color: "var(--ink-medium)" }}>
-                      {result.saju.personality.personality}
-                    </p>
-
                     {/* Trait Chips */}
                     <div className="flex flex-wrap gap-2 mb-4">
                       {result.saju.personality.trait.map((t) => (
@@ -938,9 +1033,6 @@ export default function AnalyzePage() {
                       </div>
                       <div className="text-[17px] font-black" style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}>
                         {result.archetype}
-                      </div>
-                      <div className="text-sm mt-1.5 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                        {result.archetype_desc}
                       </div>
                     </div>
 
@@ -968,59 +1060,71 @@ export default function AnalyzePage() {
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
-            </StaggerSection>
+                </StaggerSection>
 
-            {/* ━━━ CROSSPOINT MATCHES ━━━ */}
-            {result.matches.length > 0 && (
-              <StaggerSection index={7}>
-                <div
-                  className="rounded-[14px] p-5 mb-3.5"
-                  style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <Dot color="#C53D43" size={8} />
-                    <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>일치하는 특성</span>
-                    <span className="text-xs ml-auto" style={{ color: "var(--ink-light)" }}>
-                      {result.matches.length}개 발견
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    {result.matches.slice(0, 6).map((m) => (
-                      <div
-                        key={m.trait}
-                        className="flex items-center justify-between p-3 rounded-lg"
-                        style={{ background: "var(--bg-paper)" }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="w-1.5 h-6 rounded-full"
-                            style={{
-                              background: m.strength === "강" ? "var(--seal)" : "var(--border-strong)",
-                            }}
-                          />
-                          <div>
-                            <span className="text-sm font-bold">{m.trait}</span>
-                            <span
-                              className="text-xs ml-2 font-semibold"
-                              style={{ color: m.strength === "강" ? "var(--seal)" : "var(--ink-light)" }}
-                            >
-                              {m.strength}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-xs" style={{ color: "var(--ink-muted)" }}>
-                          {m.sources.join(" / ")}
-                        </div>
+                {/* B7: 교차점 일치 특성 */}
+                {result.matches.length > 0 && (
+                  <StaggerSection index={6}>
+                    <div
+                      className="rounded-[14px] p-5 mb-3.5"
+                      style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                    >
+                      <div className="flex items-center gap-2 mb-3">
+                        <Dot color="#C53D43" size={8} />
+                        <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>교차점 일치 특성</span>
+                        <span className="text-xs ml-auto" style={{ color: "var(--ink-light)" }}>
+                          {result.matches.length}개 발견
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </StaggerSection>
-            )}
+                      <div className="flex flex-col gap-2">
+                        {result.matches
+                          .filter((m) => m.strength === "강" || m.strength === "중")
+                          .map((m) => (
+                            <div
+                              key={m.trait}
+                              className="flex items-center justify-between p-3 rounded-lg"
+                              style={{ background: "var(--bg-paper)" }}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className="w-1.5 h-6 rounded-full"
+                                  style={{
+                                    background: m.strength === "강" ? "var(--seal)" : "var(--border-strong)",
+                                  }}
+                                />
+                                <div>
+                                  <span className="text-sm font-bold">{m.trait}</span>
+                                  <span
+                                    className="text-xs ml-2 font-semibold"
+                                    style={{ color: m.strength === "강" ? "var(--seal)" : "var(--ink-light)" }}
+                                  >
+                                    {m.strength}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-xs" style={{ color: "var(--ink-muted)" }}>
+                                {m.sources.join(" / ")}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  </StaggerSection>
+                )}
 
-            {/* ━━━ SHARE ━━━ */}
+                {/* B8: AI 맞춤 해석 */}
+                <StaggerSection index={7}>
+                  <AIInterpretation result={result} />
+                </StaggerSection>
+
+              </div>
+            </PaymentGate>
+
+            {/* ═══════════════════════════════════════════
+                SECTION C: BOTTOM (always visible)
+               ═══════════════════════════════════════════ */}
+
+            {/* Share */}
             <StaggerSection index={8}>
               <div
                 className="rounded-[14px] p-5 mb-3.5"
@@ -1057,18 +1161,11 @@ export default function AnalyzePage() {
                       X (Twitter)
                     </button>
                   </div>
-                  <button
-                    className="w-full py-3 text-sm font-semibold rounded-lg border-none cursor-pointer opacity-50"
-                    style={{ background: "var(--bg-paper)", color: "var(--ink-light)", fontFamily: "inherit" }}
-                    disabled
-                  >
-                    이미지로 저장 (준비 중)
-                  </button>
                 </div>
               </div>
             </StaggerSection>
 
-            {/* ━━━ COMING SOON ━━━ */}
+            {/* Coming Soon */}
             <StaggerSection index={9}>
               <div
                 className="flex items-center gap-3 p-4 rounded-xl mb-4"
@@ -1091,7 +1188,7 @@ export default function AnalyzePage() {
               </div>
             </StaggerSection>
 
-            {/* ━━━ ACTIONS ━━━ */}
+            {/* Actions */}
             <StaggerSection index={10}>
               <div className="flex flex-col gap-2.5">
                 <button
