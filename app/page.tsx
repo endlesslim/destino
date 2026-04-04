@@ -1,6 +1,8 @@
 import Seal from "@/components/ui/Seal";
 import Divider from "@/components/ui/Divider";
 import WaitlistForm from "@/components/WaitlistForm";
+import WaitlistCounter from "@/components/WaitlistCounter";
+import ScrollToWaitlistButton from "@/components/ScrollToWaitlistButton";
 
 export default function Home() {
   return (
@@ -47,6 +49,10 @@ export default function Home() {
             모두 다른 언어로 당신을 설명하지만,<br />
             교차하는 지점은 하나입니다.
           </p>
+
+          <ScrollToWaitlistButton />
+
+          <WaitlistCounter />
         </section>
 
         <Divider />
@@ -100,6 +106,29 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        <Divider />
+
+        {/* 푸터 */}
+        <footer
+          className="text-center flex flex-col gap-2 py-4"
+          style={{ color: "var(--ink-light)" }}
+        >
+          <p
+            className="text-[11px] tracking-[0.1em] uppercase font-medium"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            DESTINO
+          </p>
+          <p className="text-[12px]" style={{ color: "var(--ink-faint)" }}>
+            &copy; 2026 DESTINO. All rights reserved.
+          </p>
+          <div className="flex justify-center gap-4 text-[12px]" style={{ color: "var(--ink-light)" }}>
+            <a href="/analyze" className="hover:underline">미니 분석 도구</a>
+            <span style={{ color: "var(--border)" }}>|</span>
+            <a href="mailto:hello@destino.me" className="hover:underline">문의</a>
+          </div>
+        </footer>
 
       </div>
     </main>

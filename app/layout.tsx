@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Serif_KR } from "next/font/google";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
 const notoSerifKR = Noto_Serif_KR({
@@ -9,13 +10,68 @@ const notoSerifKR = Noto_Serif_KR({
   display: "swap",
 });
 
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-XXXXXXXXXX";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#F5F0E8",
+};
+
 export const metadata: Metadata = {
-  title: "DESTINO — 6개 문명이 내린 같은 답",
-  description: "사주, 서양 점성술, MBTI, 관상, 수비학, 타로를 교차 분석해서 당신의 교차점을 찾아드립니다.",
+  title: {
+    default: "DESTINO — 6개 문명이 내린 같은 답",
+    template: "%s",
+  },
+  description:
+    "사주, 서양 점성술, MBTI, 관상, 수비학, 타로를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
+  keywords: [
+    "사주",
+    "점성술",
+    "MBTI",
+    "관상",
+    "수비학",
+    "타로",
+    "운명",
+    "크로스체크",
+    "DESTINO",
+    "운세",
+    "사주팔자",
+    "별자리",
+    "성격 분석",
+  ],
+  authors: [{ name: "DESTINO" }],
+  creator: "DESTINO",
+  metadataBase: new URL("https://destino.kr"),
+  alternates: {
+    canonical: "/",
+    languages: {
+      "ko-KR": "/",
+    },
+  },
   openGraph: {
-    title: "DESTINO",
-    description: "6개 문명이 내린 같은 답",
+    type: "website",
+    locale: "ko_KR",
+    url: "https://destino.kr",
+    title: "DESTINO — 6개 문명이 내린 같은 답",
+    description:
+      "사주, 점성술, MBTI, 관상, 수비학, 타로를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
     siteName: "DESTINO",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DESTINO — 6개 문명이 내린 같은 답",
+    description:
+      "사주, 점성술, MBTI, 관상, 수비학, 타로를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 };
 
@@ -26,7 +82,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`${notoSerifKR.variable} h-full`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <GoogleAnalytics measurementId={GA_MEASUREMENT_ID} />
+        {children}
+      </body>
     </html>
   );
 }
