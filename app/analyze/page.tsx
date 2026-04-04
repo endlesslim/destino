@@ -225,6 +225,130 @@ function SectionHeader({ color, title }: { color: string; title: string }) {
   );
 }
 
+// ━━━ 문명 헤더 (각 분석 체계의 권위감) ━━━
+function CivilizationHeader({
+  symbol,
+  title,
+  origin,
+  basis,
+  color,
+}: {
+  symbol: string;
+  title: string;
+  origin: string;
+  basis: string;
+  color: string;
+}) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-start gap-3.5">
+        <span
+          className="text-[32px] font-black leading-none shrink-0 mt-0.5"
+          style={{ fontFamily: "var(--font-display)", color }}
+        >
+          {symbol}
+        </span>
+        <div className="flex-1 min-w-0">
+          <h3
+            className="text-[17px] font-black leading-tight"
+            style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+          >
+            {title}
+          </h3>
+          <p
+            className="text-[12px] mt-1 leading-snug"
+            style={{ color: "var(--ink-light)" }}
+          >
+            {origin}
+          </p>
+        </div>
+      </div>
+      <div className="mt-3">
+        <span
+          className="inline-block text-[10px] tracking-[0.04em] font-semibold px-2.5 py-1 rounded"
+          style={{ background: `${color}10`, color, border: `1px solid ${color}20` }}
+        >
+          {basis}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ━━━ 수렴 시각화 (문명 간 분석 -> 교차점 전환) ━━━
+function ConvergenceMoment() {
+  return (
+    <ScrollReveal delay={400}>
+      <div
+        className="rounded-[14px] p-6 mb-3.5 text-center overflow-hidden relative"
+        style={{
+          background: "var(--bg-white)",
+          border: "1.5px solid var(--border)",
+        }}
+      >
+        {/* 4개 문명 라인이 수렴하는 시각화 */}
+        <div className="relative h-[80px] mb-5">
+          <svg
+            viewBox="0 0 300 80"
+            className="w-full h-full"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <line x1="20" y1="8" x2="150" y2="40" stroke="var(--saju)" strokeWidth="2" opacity="0.7">
+              <animate attributeName="x2" from="20" to="150" dur="1.2s" fill="freeze" />
+            </line>
+            <line x1="20" y1="28" x2="150" y2="40" stroke="var(--astro)" strokeWidth="2" opacity="0.7">
+              <animate attributeName="x2" from="20" to="150" dur="1.2s" fill="freeze" />
+            </line>
+            <line x1="20" y1="52" x2="150" y2="40" stroke="var(--numero)" strokeWidth="2" opacity="0.7">
+              <animate attributeName="x2" from="20" to="150" dur="1.2s" fill="freeze" />
+            </line>
+            <line x1="20" y1="72" x2="150" y2="40" stroke="var(--mbti)" strokeWidth="2" opacity="0.7">
+              <animate attributeName="x2" from="20" to="150" dur="1.2s" fill="freeze" />
+            </line>
+            <circle cx="150" cy="40" r="5" fill="var(--seal)" opacity="0">
+              <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="1s" fill="freeze" />
+              <animate attributeName="r" from="2" to="5" dur="0.5s" begin="1s" fill="freeze" />
+            </circle>
+            <line x1="150" y1="40" x2="280" y2="40" stroke="var(--seal)" strokeWidth="2.5" opacity="0">
+              <animate attributeName="opacity" from="0" to="0.8" dur="0.6s" begin="1.2s" fill="freeze" />
+              <animate attributeName="x2" from="150" to="280" dur="0.8s" begin="1.2s" fill="freeze" />
+            </line>
+            <text x="8" y="12" fontSize="8" fill="var(--saju)" fontWeight="bold">四柱</text>
+            <text x="8" y="32" fontSize="8" fill="var(--astro)" fontWeight="bold">星</text>
+            <text x="8" y="56" fontSize="8" fill="var(--numero)" fontWeight="bold">數</text>
+            <text x="8" y="76" fontSize="8" fill="var(--mbti)" fontWeight="bold">型</text>
+          </svg>
+        </div>
+
+        <p
+          className="text-[11px] tracking-[0.12em] uppercase font-semibold mb-2"
+          style={{ color: "var(--seal)" }}
+        >
+          CONVERGENCE
+        </p>
+        <h3
+          className="text-[18px] font-black leading-[1.4] mb-2"
+          style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+        >
+          수렴
+        </h3>
+        <p
+          className="text-[14px] leading-[1.8] mb-1"
+          style={{ fontFamily: "var(--font-display)", color: "var(--ink-muted)" }}
+        >
+          위 4개 문명의 분석이 아래의 교차점에서 만납니다
+        </p>
+        <p
+          className="text-[12px] leading-[1.7]"
+          style={{ color: "var(--ink-light)" }}
+        >
+          4개 문명, 수천 년의 독립적 관찰이 수렴한 결과
+        </p>
+      </div>
+    </ScrollReveal>
+  );
+}
+
 // ━━━ AI 해석 로딩 스켈레톤 ━━━
 function InterpretationSkeleton() {
   return (
@@ -331,7 +455,9 @@ function AnalyzePageInner() {
         if (yi && mi && di) {
           setLoading(true);
           setTimeout(() => {
-            const r = analyzeCrosspoint(yi, mi, di, n || undefined);
+            const h = searchParams.get("h");
+            const hi = h ? parseInt(h) : undefined;
+            const r = analyzeCrosspoint(yi, mi, di, n || undefined, hi !== undefined && hi >= 0 && hi <= 23 ? hi : undefined);
             setResult(r);
             setLoading(false);
             playStampSound();
@@ -393,7 +519,8 @@ function AnalyzePageInner() {
     } catch {}
 
     setTimeout(() => {
-      const r = analyzeCrosspoint(y, m, d, name || undefined);
+      const h = hour ? parseInt(hour) : undefined;
+      const r = analyzeCrosspoint(y, m, d, name || undefined, h !== undefined && h >= 0 && h <= 23 ? h : undefined);
       setResult(r);
       setLoading(false);
       playStampSound();
@@ -584,7 +711,7 @@ function AnalyzePageInner() {
                   disabled
                 />
                 <p className="text-[11px] mt-1" style={{ color: "var(--ink-light)" }}>
-                  시간 입력 시 더 정확한 일주 분석이 가능합니다
+                  시간 입력 시 시주(내면의 자아)까지 분석합니다
                 </p>
               </div>
             </div>
@@ -700,9 +827,14 @@ function AnalyzePageInner() {
                 className="rounded-[14px] p-6 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
               >
-                <div className="flex items-center gap-2 mb-5">
-                  <Dot color="#C53D43" size={10} />
-                  <span className="text-sm font-bold tracking-wider" style={{ color: "var(--seal)" }}>교차점</span>
+                <div className="flex flex-col gap-1 mb-5">
+                  <div className="flex items-center gap-2">
+                    <Dot color="#C53D43" size={10} />
+                    <span className="text-sm font-bold tracking-wider" style={{ color: "var(--seal)" }}>교차점</span>
+                  </div>
+                  <p className="text-[12px] leading-snug ml-[18px]" style={{ color: "var(--ink-light)" }}>
+                    4개 문명, 수천 년의 독립적 관찰이 수렴한 결과
+                  </p>
                 </div>
 
                 {/* Convergence Rate Counter */}
@@ -791,17 +923,29 @@ function AnalyzePageInner() {
               </div>
             </ScrollReveal>
 
-            {/* Archetype Name ONLY (no description in free preview) */}
+            {/* Archetype Name with Seal Stamp Visual */}
             <ScrollReveal delay={160}>
               <div
-                className="rounded-[14px] p-6 mb-3.5"
+                className="rounded-[14px] p-6 mb-3.5 relative overflow-hidden"
                 style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
               >
+                {/* Seal watermark */}
+                <div
+                  className="absolute -right-4 -top-4 w-[100px] h-[100px] flex items-center justify-center -rotate-[12deg] pointer-events-none"
+                  style={{ opacity: 0.06 }}
+                >
+                  <span
+                    className="text-[80px] font-black"
+                    style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
+                  >
+                    命
+                  </span>
+                </div>
                 <div className="text-[11px] font-semibold tracking-widest mb-2" style={{ color: "var(--ink-light)" }}>
                   교차점 유형
                 </div>
                 <h2
-                  className="text-[22px] font-black leading-snug"
+                  className="text-[22px] font-black leading-snug relative"
                   style={{ fontFamily: "var(--font-display)", color: "var(--seal-dark)" }}
                 >
                   {result.archetype}
@@ -832,26 +976,43 @@ function AnalyzePageInner() {
                       {result.archetype_desc}
                     </p>
 
-                    {/* cross_message: KeyInsight + Expandable */}
+                    {/* cross_message: Seal-stamped container */}
                     {result.cross_message && (() => {
                       const [first, rest] = splitFirstSentence(result.cross_message);
                       return (
-                        <div className="flex flex-col gap-[16px]">
-                          <KeyInsight text={first} source="교차점" />
-                          {rest && (
-                            <Expandable
-                              title="교차 메시지"
-                              preview={rest.slice(0, 80) + (rest.length > 80 ? "..." : "")}
-                              accentColor="var(--seal)"
+                        <div
+                          className="relative overflow-hidden rounded-lg p-4"
+                          style={{ background: "var(--seal-bg)", border: "1px solid rgba(197,61,67,0.12)" }}
+                        >
+                          {/* Seal watermark */}
+                          <div
+                            className="absolute right-2 bottom-1 pointer-events-none -rotate-[8deg]"
+                            style={{ opacity: 0.04 }}
+                          >
+                            <span
+                              className="text-[56px] font-black"
+                              style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
                             >
-                              <p
-                                className="text-[15px] leading-[2]"
-                                style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                              印
+                            </span>
+                          </div>
+                          <div className="relative flex flex-col gap-[16px]">
+                            <KeyInsight text={first} source="교차점" />
+                            {rest && (
+                              <Expandable
+                                title="교차 메시지"
+                                preview={rest.slice(0, 80) + (rest.length > 80 ? "..." : "")}
+                                accentColor="var(--seal)"
                               >
-                                {rest}
-                              </p>
-                            </Expandable>
-                          )}
+                                <p
+                                  className="text-[15px] leading-[2]"
+                                  style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                                >
+                                  {rest}
+                                </p>
+                              </Expandable>
+                            )}
+                          </div>
                         </div>
                       );
                     })()}
@@ -951,37 +1112,130 @@ function AnalyzePageInner() {
                 <ScrollReveal delay={160}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
-                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                    style={{
+                      background: "var(--bg-white)",
+                      borderLeft: "3px solid var(--saju)",
+                      borderTop: "1.5px solid var(--border)",
+                      borderRight: "1.5px solid var(--border)",
+                      borderBottom: "1.5px solid var(--border)",
+                      boxShadow: "inset 0 0 0 1000px rgba(45,90,39,0.03)",
+                    }}
                   >
-                    <SectionHeader color="var(--saju)" title="사주 상세분석" />
+                    <CivilizationHeader
+                      symbol="四柱"
+                      title="사주명리학"
+                      origin="기원전 1,000년 -- 동아시아"
+                      basis="天干地支 60甲子 체계 기반"
+                      color="var(--saju)"
+                    />
 
-                    {/* Pillar Cards */}
-                    <div className="flex gap-2.5 mb-3.5">
-                      <div className="flex-1 text-center p-3.5 rounded-[10px]" style={{ background: "var(--bg-paper)" }}>
-                        <div className="text-[11px] font-semibold mb-1.5" style={{ color: "var(--ink-light)" }}>연주</div>
-                        <div className="text-[28px] font-black" style={{ fontFamily: "var(--font-display)" }}>
-                          {result.saju.year.cheongan}{result.saju.year.jiji}
-                        </div>
-                        <div className="flex items-center justify-center gap-1 mt-1.5">
-                          <Dot color={OHANG_INFO[result.saju.year.ohang].color} />
-                          <span className="text-sm" style={{ color: "var(--ink-medium)" }}>
-                            {result.saju.year.ohang} {OHANG_INFO[result.saju.year.ohang].kr}
-                          </span>
-                        </div>
+                    {/* Pillar Cards - 만세력 스타일 */}
+                    <div
+                      className="rounded-lg mb-3.5 overflow-hidden"
+                      style={{ border: "1px solid var(--saju)", background: "var(--bg-paper)" }}
+                    >
+                      {/* 만세력 헤더 */}
+                      <div
+                        className="flex text-center text-[10px] font-bold tracking-wider py-1.5"
+                        style={{ background: "rgba(45,90,39,0.08)", color: "var(--saju)" }}
+                      >
+                        <div className="flex-1">年柱</div>
+                        <div className="flex-1" style={{ borderLeft: "1px solid rgba(45,90,39,0.15)", borderRight: "1px solid rgba(45,90,39,0.15)" }}>日柱</div>
+                        {result.saju.hour && <div className="flex-1">時柱</div>}
                       </div>
-                      <div className="flex-1 text-center p-3.5 rounded-[10px]" style={{ background: "var(--bg-paper)" }}>
-                        <div className="text-[11px] font-semibold mb-1.5" style={{ color: "var(--ink-light)" }}>일간</div>
-                        <div className="text-[28px] font-black" style={{ fontFamily: "var(--font-display)" }}>
-                          {result.saju.day.cheongan}
+                      {/* 천간 행 */}
+                      <div className="flex text-center" style={{ borderBottom: "1px solid var(--border)" }}>
+                        <div className="flex-1 py-3">
+                          <div
+                            className="text-[26px] font-black"
+                            style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.year.ohang].color }}
+                          >
+                            {result.saju.year.cheongan}
+                          </div>
+                          <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>천간</div>
                         </div>
-                        <div className="flex items-center justify-center gap-1 mt-1.5">
-                          <Dot color={OHANG_INFO[result.saju.day.ohang].color} />
-                          <span className="text-sm" style={{ color: "var(--ink-medium)" }}>
-                            {result.saju.personality.nature}
-                          </span>
+                        <div className="flex-1 py-3" style={{ borderLeft: "1px solid var(--border)", borderRight: result.saju.hour ? "1px solid var(--border)" : "none" }}>
+                          <div
+                            className="text-[26px] font-black"
+                            style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.day.ohang].color }}
+                          >
+                            {result.saju.day.cheongan}
+                          </div>
+                          <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>천간 (일간)</div>
                         </div>
+                        {result.saju.hour && (
+                          <div className="flex-1 py-3">
+                            <div
+                              className="text-[26px] font-black"
+                              style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.hour.ohang].color }}
+                            >
+                              {result.saju.hour.cheongan}
+                            </div>
+                            <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>천간</div>
+                          </div>
+                        )}
+                      </div>
+                      {/* 지지 행 */}
+                      <div className="flex text-center">
+                        <div className="flex-1 py-3">
+                          <div
+                            className="text-[26px] font-black"
+                            style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.year.ohang].color }}
+                          >
+                            {result.saju.year.jiji}
+                          </div>
+                          <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>지지</div>
+                        </div>
+                        <div className="flex-1 py-3" style={{ borderLeft: "1px solid var(--border)", borderRight: result.saju.hour ? "1px solid var(--border)" : "none" }}>
+                          <div className="flex items-center justify-center gap-1">
+                            <Dot color={OHANG_INFO[result.saju.day.ohang].color} />
+                            <span className="text-sm font-semibold" style={{ color: "var(--ink-medium)" }}>
+                              {result.saju.personality.nature}
+                            </span>
+                          </div>
+                          <div className="text-[10px] mt-1" style={{ color: "var(--ink-light)" }}>
+                            {result.saju.day.ohang} {OHANG_INFO[result.saju.day.ohang].kr}
+                          </div>
+                        </div>
+                        {result.saju.hour && (
+                          <div className="flex-1 py-3">
+                            <div
+                              className="text-[26px] font-black"
+                              style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.hour.ohang].color }}
+                            >
+                              {result.saju.hour.jiji}
+                            </div>
+                            <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>지지</div>
+                          </div>
+                        )}
+                      </div>
+                      {/* 오행 요약 */}
+                      <div
+                        className="flex justify-center gap-3 py-2 text-[11px]"
+                        style={{ background: "rgba(45,90,39,0.04)", borderTop: "1px solid var(--border)" }}
+                      >
+                        <span style={{ color: OHANG_INFO[result.saju.year.ohang].color }}>
+                          {result.saju.year.ohang} {OHANG_INFO[result.saju.year.ohang].kr}
+                        </span>
+                        <span style={{ color: "var(--ink-faint)" }}>|</span>
+                        <span style={{ color: OHANG_INFO[result.saju.day.ohang].color }}>
+                          {result.saju.day.ohang} {OHANG_INFO[result.saju.day.ohang].kr}
+                        </span>
                       </div>
                     </div>
+
+                    {/* 시주 내면의 자아 */}
+                    {result.saju.hourPersonality && (
+                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)", borderLeft: "2px solid var(--seal)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="var(--seal)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--seal)" }}>시주 (내면의 자아)</span>
+                        </div>
+                        <p className="text-[14px] leading-[1.9]" style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}>
+                          {result.saju.hourPersonality}
+                        </p>
+                      </div>
+                    )}
 
                     {/* Personality description */}
                     <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -1179,9 +1433,22 @@ function AnalyzePageInner() {
                 <ScrollReveal delay={240}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
-                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                    style={{
+                      background: "var(--bg-white)",
+                      borderLeft: "3px solid var(--astro)",
+                      borderTop: "1.5px solid var(--border)",
+                      borderRight: "1.5px solid var(--border)",
+                      borderBottom: "1.5px solid var(--border)",
+                      boxShadow: "inset 0 0 0 1000px rgba(30,58,95,0.03)",
+                    }}
                   >
-                    <SectionHeader color={result.western.sunSign.color} title="별자리 상세" />
+                    <CivilizationHeader
+                      symbol={result.western.sunSign.symbol}
+                      title="서양 점성술"
+                      origin="기원전 2,000년 -- 바빌로니아"
+                      basis="NASA JPL 천문 데이터 참조"
+                      color="var(--astro)"
+                    />
 
                     <div className="text-center py-2">
                       <div
@@ -1374,9 +1641,22 @@ function AnalyzePageInner() {
                 <ScrollReveal delay={320}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
-                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                    style={{
+                      background: "var(--bg-white)",
+                      borderLeft: "3px solid var(--numero)",
+                      borderTop: "1.5px solid var(--border)",
+                      borderRight: "1.5px solid var(--border)",
+                      borderBottom: "1.5px solid var(--border)",
+                      boxShadow: "inset 0 0 0 1000px rgba(107,58,42,0.03)",
+                    }}
                   >
-                    <SectionHeader color="var(--numero)" title="수비학 상세" />
+                    <CivilizationHeader
+                      symbol={String(result.numerology.lifePath)}
+                      title="수비학"
+                      origin="기원전 500년 -- 피타고라스"
+                      basis="수의 진동(Vibration) 이론 기반"
+                      color="var(--numero)"
+                    />
 
                     <div className="text-center py-2">
                       <div
@@ -1622,9 +1902,22 @@ function AnalyzePageInner() {
                 <ScrollReveal delay={360}>
                   <div
                     className="rounded-[14px] p-6 mb-3.5"
-                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                    style={{
+                      background: "var(--bg-white)",
+                      borderLeft: "3px solid var(--mbti)",
+                      borderTop: "1.5px solid var(--border)",
+                      borderRight: "1.5px solid var(--border)",
+                      borderBottom: "1.5px solid var(--border)",
+                      boxShadow: "inset 0 0 0 1000px rgba(91,62,138,0.03)",
+                    }}
                   >
-                    <SectionHeader color="var(--mbti)" title="MBTI 교차분석" />
+                    <CivilizationHeader
+                      symbol={result.mbti.primaryType}
+                      title="성격유형론"
+                      origin="1921년 -- 칼 융"
+                      basis="융의 심리 유형론(Psychological Types) 기반"
+                      color="var(--mbti)"
+                    />
 
                     <div className="text-center py-2">
                       {/* MBTI Type Badge */}
@@ -1766,6 +2059,9 @@ function AnalyzePageInner() {
                     </div>
                   </div>
                 </ScrollReveal>
+
+                {/* Convergence Moment: 문명간 수렴 시각화 */}
+                <ConvergenceMoment />
 
                 {/* B6: 성격 종합 */}
                 <ScrollReveal delay={440}>

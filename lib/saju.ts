@@ -341,17 +341,55 @@ export function getMonthCheongan(yearCheongan: Cheongan, lunarMonth: number): Ch
   return CHEONGAN[(startIdx + (lunarMonth - 1)) % 10];
 }
 
+// ━━━ 시주 (時柱) 계산 ━━━
+
+/** 시지 (時支) — 태어난 시간에 해당하는 지지 */
+export function getHourJiji(hour: number): Jiji {
+  // 23:00-01:00 → 子, 01:00-03:00 → 丑, ...
+  const hourBranches: Jiji[] = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+  // 23시는 子시 (다음날의 시작)
+  const idx = hour === 23 ? 0 : Math.floor((hour + 1) / 2);
+  return hourBranches[idx];
+}
+
+/** 시간 (時干) — 일간(日干)과 태어난 시간으로 결정 (오자연원법) */
+export function getHourCheongan(dayCheongan: Cheongan, hour: number): Cheongan {
+  const dcIdx = CHEONGAN.indexOf(dayCheongan);
+  // 甲己일 → 子시=甲(0), 乙庚일 → 子시=丙(2), 丙辛일 → 子시=戊(4), 丁壬일 → 子시=庚(6), 戊癸일 → 子시=壬(8)
+  const startMap: Record<number, number> = {
+    0: 0, 5: 0,  // 甲己 → 甲
+    1: 2, 6: 2,  // 乙庚 → 丙
+    2: 4, 7: 4,  // 丙辛 → 戊
+    3: 6, 8: 6,  // 丁壬 → 庚
+    4: 8, 9: 8,  // 戊癸 → 壬
+  };
+  const startIdx = startMap[dcIdx] ?? 0;
+  const hourJiji = getHourJiji(hour);
+  const jijiIdx = JIJI.indexOf(hourJiji);
+  return CHEONGAN[(startIdx + jijiIdx) % 10];
+}
+
+// 시주 내면 성격 설명 생성
+function generateHourPersonality(hourCheongan: Cheongan, hourJiji: Jiji, hourOhang: Ohang): string {
+  const info = CHEONGAN_INFO[hourCheongan];
+  const jijiInfo = JIJI_INFO[hourJiji];
+  const ohangInfo = OHANG_INFO[hourOhang];
+  return `시주는 내면의 자아를 나타냅니다. ${hourCheongan}${hourJiji}(${ohangInfo.kr})는 겉으로 드러나지 않는 당신의 깊은 내면에 ${info.nature}의 기운이 흐르고 있음을 뜻합니다. ${info.personality} 이는 가장 가까운 사람에게만 보이는 당신의 숨겨진 모습입니다.`;
+}
+
 // ━━━ 결과 타입 ━━━
 export interface SajuResult {
   year: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang };
   day: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang };
+  hour?: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang };
+  hourPersonality?: string;
   personality: typeof CHEONGAN_INFO[Cheongan];
   animal: typeof JIJI_INFO[Jiji];
   ohang_balance: Record<Ohang, number>;
 }
 
 /** 사주 종합 분석 */
-export function analyzeSaju(year: number, month: number, day: number): SajuResult {
+export function analyzeSaju(year: number, month: number, day: number, hour?: number): SajuResult {
   const yCg = getYearCheongan(year);
   const yJj = getYearJiji(year);
   const yOh = getYearOhang(year);
@@ -366,9 +404,28 @@ export function analyzeSaju(year: number, month: number, day: number): SajuResul
   balance[JIJI_INFO[yJj].ohang] += 1;
   balance[JIJI_INFO[dJj].ohang] += 1;
 
+  // 시주 (時柱) 계산 — hour가 제공된 경우
+  let hourPillar: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang } | undefined;
+  let hourPersonality: string | undefined;
+
+  if (hour !== undefined && hour >= 0 && hour <= 23) {
+    const hJj = getHourJiji(hour);
+    const hCg = getHourCheongan(dCg, hour);
+    const hOh = OHANG_LIST[Math.floor(CHEONGAN.indexOf(hCg) / 2)];
+    hourPillar = { cheongan: hCg, jiji: hJj, ohang: hOh };
+
+    // 시주 오행도 밸런스에 추가
+    balance[hOh] += 1;
+    balance[JIJI_INFO[hJj].ohang] += 1;
+
+    hourPersonality = generateHourPersonality(hCg, hJj, hOh);
+  }
+
   return {
     year: { cheongan: yCg, jiji: yJj, ohang: yOh },
     day: { cheongan: dCg, jiji: dJj, ohang: dOh },
+    hour: hourPillar,
+    hourPersonality,
     personality: CHEONGAN_INFO[dCg], // 일간 기준 성격
     animal: JIJI_INFO[yJj],
     ohang_balance: balance,

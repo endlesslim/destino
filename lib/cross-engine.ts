@@ -249,6 +249,22 @@ function extractTraits(saju: SajuResult, western: WesternResult, numerology: Num
     addTraits(mappedYearTraits, "사주(연간)");
   }
 
+  // 4.5. 사주 — 시주 오행 (시간이 있는 경우)
+  if (saju.hour) {
+    const hourOhang = saju.hour.ohang;
+    addTraits((OHANG_TRAITS[hourOhang] || []).slice(0, 2), "사주(시주)");
+
+    // 시주 천간 성격 특성
+    const hourCheongan = saju.hour.cheongan;
+    const hourInfo = CHEONGAN_INFO[hourCheongan];
+    if (hourInfo) {
+      const mappedHourTraits = hourInfo.trait
+        .map(t => CHEONGAN_TRAIT_MAP[t])
+        .filter((t): t is TraitAxis => !!t);
+      addTraits(mappedHourTraits.slice(0, 2), "사주(시주)");
+    }
+  }
+
   // 5. 서양 점성술 — 태양궁 원소
   const westernTraits = ELEMENT_TRAITS[western.element] || [];
   addTraits(westernTraits, "별자리");
@@ -678,10 +694,11 @@ function buildOhangVisual(saju: SajuResult): { ohang: Ohang; ratio: number; labe
 // ━━━ 메인 분석 함수 ━━━
 export function analyzeCrosspoint(
   year: number, month: number, day: number,
-  name?: string
+  name?: string,
+  hour?: number
 ): CrosspointResult {
   // 개별 체계 분석
-  const saju = analyzeSaju(year, month, day);
+  const saju = analyzeSaju(year, month, day, hour);
   const western = analyzeWestern(month, day);
   const numerology = analyzeNumerology(year, month, day, name);
   const mbti = analyzeMBTI(saju.day.cheongan, western.sunSign.name, western.element);
@@ -756,8 +773,10 @@ export function analyzeCrosspoint(
     element_harmony: elementHarmony,
     archetype: archetype.name,
     archetype_desc: archetype.desc,
-    system_count: 4,
-    cross_message: crossMessage,
+    system_count: saju.hour ? 4 : 4, // 4개 체계 (사주, 별자리, 수비학, MBTI)
+    cross_message: saju.hour
+      ? crossMessage + " (시주가 포함된 사주사기둥 분석으로 더욱 정밀한 결과입니다.)"
+      : crossMessage,
     ohang_visual: ohangVisual,
     career_crosspoint: careerCrosspoint,
     relationship_crosspoint: relationshipCrosspoint,
