@@ -16,6 +16,10 @@ import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
 import { playStampSound } from "@/lib/sound";
 import { saveAnalysis } from "@/lib/history";
 import FeedbackWidget from "@/components/FeedbackWidget";
+import Dot from "@/components/ui/Dot";
+import StaggerSection from "@/components/ui/StaggerSection";
+import SectionHeader from "@/components/ui/SectionHeader";
+import { useCountUp } from "@/hooks/useCountUp";
 
 // ━━━ 텍스트 유틸 ━━━
 function splitFirstSentence(text: string): [string, string] {
@@ -33,16 +37,6 @@ function splitFirstTwo(text: string): [string, string] {
   const m = text.match(/^(.+?[.!?。]\s*.+?[.!?。])\s*/);
   if (m) return [m[1], text.slice(m[0].length)];
   return splitFirstSentence(text);
-}
-
-// ━━━ 컬러 도트 ━━━
-function Dot({ color, size = 8 }: { color: string; size?: number }) {
-  return (
-    <span
-      className="inline-block rounded-full shrink-0"
-      style={{ width: size, height: size, background: color }}
-    />
-  );
 }
 
 // ━━━ 탭 아이콘 (SVG) ━━━
@@ -77,54 +71,6 @@ function TabIcon({ type, active }: { type: string; active: boolean }) {
     ),
   };
   return <>{icons[type]}</>;
-}
-
-// ━━━ 카운트 업 훅 ━━━
-function useCountUp(target: number, duration = 1800) {
-  const [value, setValue] = useState(0);
-  const started = useRef(false);
-
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    const startTime = performance.now();
-    function tick(now: number) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // easeOutExpo for premium feel
-      const eased = 1 - Math.pow(1 - progress, 4);
-      setValue(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }, [target, duration]);
-
-  return value;
-}
-
-// ━━━ 스태거 섹션 래퍼 ━━━
-function StaggerSection({
-  children,
-  index,
-  className = "",
-  style = {},
-}: {
-  children: React.ReactNode;
-  index: number;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <div
-      className={`animate-stagger-in ${className}`}
-      style={{
-        ...style,
-        animationDelay: `${index * 0.1}s`,
-      }}
-    >
-      {children}
-    </div>
-  );
 }
 
 // ━━━ 오행 바 차트 ━━━
@@ -213,18 +159,6 @@ function Chip({
     >
       {label}
     </span>
-  );
-}
-
-// ━━━ 섹션 헤더 ━━━
-function SectionHeader({ color, title }: { color: string; title: string }) {
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      <Dot color={color} size={8} />
-      <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
-        {title}
-      </span>
-    </div>
   );
 }
 
@@ -1135,7 +1069,7 @@ function AnalyzePageInner() {
                     })()}
 
                     {/* Career Crosspoint */}
-                    {(result as any)?.career_crosspoint && (
+                    {result?.career_crosspoint && (
                       <>
                         <Divider />
                         <div className="mt-5">
@@ -1147,17 +1081,17 @@ function AnalyzePageInner() {
                             className="text-base font-black mb-2"
                             style={{ fontFamily: "var(--font-display)", color: "var(--saju)" }}
                           >
-                            {(result as any).career_crosspoint?.title}
+                            {result.career_crosspoint?.title}
                           </h4>
                           <p
                             className="text-[15px] leading-[1.9] mb-4"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                           >
-                            {(result as any).career_crosspoint?.description}
+                            {result.career_crosspoint?.description}
                           </p>
-                          {(result as any).career_crosspoint?.ideal_fields && (
+                          {result.career_crosspoint?.ideal_fields && (
                             <div className="flex flex-wrap gap-2">
-                              {((result as any).career_crosspoint.ideal_fields as string[]).map((f: string) => (
+                              {result.career_crosspoint.ideal_fields.map((f: string) => (
                                 <Chip key={f} label={f} color="var(--saju)" />
                               ))}
                             </div>
@@ -1167,7 +1101,7 @@ function AnalyzePageInner() {
                     )}
 
                     {/* Relationship Crosspoint */}
-                    {(result as any)?.relationship_crosspoint && (
+                    {result?.relationship_crosspoint && (
                       <>
                         <Divider />
                         <div className="mt-5">
@@ -1179,17 +1113,17 @@ function AnalyzePageInner() {
                             className="text-base font-black mb-2"
                             style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
                           >
-                            {(result as any).relationship_crosspoint?.title}
+                            {result.relationship_crosspoint?.title}
                           </h4>
                           <p
                             className="text-[15px] leading-[1.9] mb-4"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                           >
-                            {(result as any).relationship_crosspoint?.description}
+                            {result.relationship_crosspoint?.description}
                           </p>
-                          {(result as any).relationship_crosspoint?.ideal_partner_traits && (
+                          {result.relationship_crosspoint?.ideal_partner_traits && (
                             <div className="flex flex-wrap gap-2">
-                              {((result as any).relationship_crosspoint.ideal_partner_traits as string[]).map((t: string) => (
+                              {result.relationship_crosspoint.ideal_partner_traits.map((t: string) => (
                                 <Chip key={t} label={t} color="var(--seal)" />
                               ))}
                             </div>
@@ -1376,8 +1310,8 @@ function AnalyzePageInner() {
                     </div>
 
                     {/* Detailed Personality: KeyInsight + Expandable */}
-                    {(result.saju.personality as any)?.detailed_personality && (() => {
-                      const text = (result.saju.personality as any).detailed_personality as string;
+                    {result.saju.personality?.detailed_personality && (() => {
+                      const text = result.saju.personality.detailed_personality;
                       const [first, rest] = splitFirstSentence(text);
                       return (
                         <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -1407,7 +1341,7 @@ function AnalyzePageInner() {
                     })()}
 
                     {/* Career: StatCards */}
-                    {(result.saju.personality as any)?.career && (
+                    {result.saju.personality?.career && result.saju.personality.career.length > 0 && (
                       <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
                         <div className="flex items-center gap-2 mb-3">
                           <Dot color="#8B6914" size={7} />
@@ -1427,22 +1361,23 @@ function AnalyzePageInner() {
                         </div>
                         <Expandable
                           title="직업/진로"
-                          preview={splitFirstSentence((result.saju.personality as any).career as string)[0]}
+                          preview={splitFirstSentence(result.saju.personality.career[0])[0]}
                           accentColor="#8B6914"
                         >
-                          <p
-                            className="text-[15px] leading-[2]"
+                          <ul className="text-[15px] leading-[2] list-none p-0 m-0"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                           >
-                            {(result.saju.personality as any).career}
-                          </p>
+                            {result.saju.personality.career.map((c: string) => (
+                              <li key={c} className="mb-1">{c}</li>
+                            ))}
+                          </ul>
                         </Expandable>
                       </div>
                     )}
 
                     {/* Relationship Style: Expandable */}
-                    {(result.saju.personality as any)?.relationship && (() => {
-                      const text = (result.saju.personality as any).relationship as string;
+                    {result.saju.personality?.relationship && (() => {
+                      const text = result.saju.personality.relationship;
                       const [first, rest] = splitFirstSentence(text);
                       return (
                         <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -1467,8 +1402,8 @@ function AnalyzePageInner() {
                     })()}
 
                     {/* Weakness / Growth Area: Expandable */}
-                    {(result.saju.personality as any)?.weakness && (() => {
-                      const text = (result.saju.personality as any).weakness as string;
+                    {result.saju.personality?.weakness && (() => {
+                      const text = result.saju.personality.weakness;
                       const [first] = splitFirstSentence(text);
                       return (
                         <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -1493,14 +1428,14 @@ function AnalyzePageInner() {
                     })()}
 
                     {/* Life Advice: KeyInsight */}
-                    {(result.saju.personality as any)?.advice && (
+                    {result.saju.personality?.advice && (
                       <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
                         <div className="flex items-center gap-2 mb-3">
                           <Dot color="var(--numero)" size={7} />
                           <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>인생 조언</span>
                         </div>
                         <KeyInsight
-                          text={(result.saju.personality as any).advice as string}
+                          text={result.saju.personality.advice}
                           source="사주"
                           color="var(--numero)"
                         />
@@ -1518,27 +1453,27 @@ function AnalyzePageInner() {
                           {result.saju.year.jiji}
                         </span>
                       </div>
-                      {(result.saju.animal as any)?.personality && (
+                      {result.saju.animal?.personality && (
                         <p
                           className="text-[15px] leading-[2] mb-3"
                           style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                         >
-                          {(result.saju.animal as any).personality}
+                          {result.saju.animal.personality}
                         </p>
                       )}
-                      {(result.saju.animal as any)?.compatible && (
+                      {result.saju.animal?.compatibility_best && (
                         <div className="mb-2">
                           <span className="text-xs font-semibold" style={{ color: "var(--saju)" }}>잘 맞는 띠: </span>
                           <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
-                            {((result.saju.animal as any).compatible as string[]).join(", ")}
+                            {result.saju.animal.compatibility_best.join(", ")}
                           </span>
                         </div>
                       )}
-                      {(result.saju.animal as any)?.incompatible && (
+                      {result.saju.animal?.compatibility_worst && (
                         <div>
                           <span className="text-xs font-semibold" style={{ color: "var(--seal)" }}>조심할 띠: </span>
                           <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
-                            {((result.saju.animal as any).incompatible as string[]).join(", ")}
+                            {result.saju.animal.compatibility_worst.join(", ")}
                           </span>
                         </div>
                       )}
@@ -1628,8 +1563,8 @@ function AnalyzePageInner() {
                       </div>
 
                       {/* Detailed Personality: Expandable with first 2 sentences visible */}
-                      {(result.western.sunSign as any)?.detailed_personality && (() => {
-                        const text = (result.western.sunSign as any).detailed_personality as string;
+                      {result.western.sunSign?.detailed_personality && (() => {
+                        const text = result.western.sunSign.detailed_personality;
                         const [first, rest] = splitFirstTwo(text);
                         return (
                           <div className="text-left mt-4 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
@@ -1654,8 +1589,8 @@ function AnalyzePageInner() {
                       })()}
 
                       {/* Love Style: KeyInsight */}
-                      {(result.western.sunSign as any)?.love_style && (() => {
-                        const text = (result.western.sunSign as any).love_style as string;
+                      {result.western.sunSign?.love_style && (() => {
+                        const text = result.western.sunSign.love_style;
                         const [first] = splitFirstSentence(text);
                         return (
                           <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
@@ -1669,14 +1604,14 @@ function AnalyzePageInner() {
                       })()}
 
                       {/* Career Strengths */}
-                      {(result.western.sunSign as any)?.career_strengths && (
+                      {result.western.sunSign?.career_strengths && (
                         <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--saju)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업 강점</span>
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {((result.western.sunSign as any).career_strengths as string[]).map((s: string) => (
+                            {result.western.sunSign.career_strengths.map((s: string) => (
                               <Chip key={s} label={s} color={result.western.sunSign.color} />
                             ))}
                           </div>
@@ -1684,8 +1619,8 @@ function AnalyzePageInner() {
                       )}
 
                       {/* Shadow Side / Challenges: Expandable */}
-                      {(result.western.sunSign as any)?.shadow_side && (() => {
-                        const text = (result.western.sunSign as any).shadow_side as string;
+                      {result.western.sunSign?.shadow_side && (() => {
+                        const text = result.western.sunSign.shadow_side;
                         const [first] = splitFirstSentence(text);
                         return (
                           <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
@@ -1710,25 +1645,25 @@ function AnalyzePageInner() {
                       })()}
 
                       {/* Best / Worst Compatibility */}
-                      {((result.western.sunSign as any)?.best_compatibility || (result.western.sunSign as any)?.worst_compatibility) && (
+                      {(result.western.sunSign?.compatibility_best || result.western.sunSign?.compatibility_worst) && (
                         <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--astro)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>별자리 궁합</span>
                           </div>
-                          {(result.western.sunSign as any)?.best_compatibility && (
+                          {result.western.sunSign?.compatibility_best && (
                             <div className="mb-2">
                               <span className="text-xs font-semibold" style={{ color: "var(--saju)" }}>최고 궁합: </span>
                               <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
-                                {((result.western.sunSign as any).best_compatibility as string[]).join(", ")}
+                                {result.western.sunSign.compatibility_best.join(", ")}
                               </span>
                             </div>
                           )}
-                          {(result.western.sunSign as any)?.worst_compatibility && (
+                          {result.western.sunSign?.compatibility_worst && (
                             <div>
                               <span className="text-xs font-semibold" style={{ color: "var(--seal)" }}>도전적 궁합: </span>
                               <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
-                                {((result.western.sunSign as any).worst_compatibility as string[]).join(", ")}
+                                {result.western.sunSign.compatibility_worst.join(", ")}
                               </span>
                             </div>
                           )}
@@ -1736,7 +1671,7 @@ function AnalyzePageInner() {
                       )}
 
                       {/* Life Lesson */}
-                      {(result.western.sunSign as any)?.life_lesson && (
+                      {result.western.sunSign?.life_lesson && (
                         <blockquote
                           className="text-left mt-4 text-[15px] leading-[2] italic"
                           style={{
@@ -1747,7 +1682,7 @@ function AnalyzePageInner() {
                             margin: 0,
                           }}
                         >
-                          {(result.western.sunSign as any).life_lesson}
+                          {result.western.sunSign.life_lesson}
                         </blockquote>
                       )}
                     </div>
@@ -1828,8 +1763,8 @@ function AnalyzePageInner() {
                       </div>
 
                       {/* Detailed Personality: Expandable */}
-                      {(result.numerology.lifePathInfo as any)?.detailed_personality && (() => {
-                        const text = (result.numerology.lifePathInfo as any).detailed_personality as string;
+                      {result.numerology.lifePathInfo?.detailed_personality && (() => {
+                        const text = result.numerology.lifePathInfo.detailed_personality;
                         const [first] = splitFirstSentence(text);
                         return (
                           <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
@@ -1854,14 +1789,14 @@ function AnalyzePageInner() {
                       })()}
 
                       {/* Life Purpose: KeyInsight */}
-                      {(result.numerology.lifePathInfo as any)?.life_purpose && (
+                      {result.numerology.lifePathInfo?.life_purpose && (
                         <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--astro)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>인생 목적</span>
                           </div>
                           <KeyInsight
-                            text={(result.numerology.lifePathInfo as any).life_purpose as string}
+                            text={result.numerology.lifePathInfo.life_purpose}
                             source="수비학"
                             color="var(--astro)"
                           />
@@ -1869,7 +1804,7 @@ function AnalyzePageInner() {
                       )}
 
                       {/* Career Paths: StatCards + Chips */}
-                      {(result.numerology.lifePathInfo as any)?.career_paths && (
+                      {result.numerology.lifePathInfo?.career_paths && (
                         <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--saju)" size={7} />
@@ -1882,13 +1817,13 @@ function AnalyzePageInner() {
                               color="var(--numero)"
                             />
                             <StatCard
-                              number={String(((result.numerology.lifePathInfo as any).career_paths as string[]).length)}
+                              number={String(result.numerology.lifePathInfo.career_paths.length)}
                               label="경로수"
                               color="var(--saju)"
                             />
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {((result.numerology.lifePathInfo as any).career_paths as string[]).map((c: string) => (
+                            {result.numerology.lifePathInfo.career_paths.map((c: string) => (
                               <Chip key={c} label={c} color="var(--numero)" />
                             ))}
                           </div>
@@ -1896,7 +1831,7 @@ function AnalyzePageInner() {
                       )}
 
                       {/* Relationship Style */}
-                      {(result.numerology.lifePathInfo as any)?.relationship_style && (
+                      {result.numerology.lifePathInfo?.relationship_style && (
                         <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--seal)" size={7} />
@@ -1906,14 +1841,14 @@ function AnalyzePageInner() {
                             className="text-[15px] leading-[2]"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                           >
-                            {(result.numerology.lifePathInfo as any).relationship_style}
+                            {result.numerology.lifePathInfo.relationship_style}
                           </p>
                         </div>
                       )}
 
                       {/* Challenge: Expandable */}
-                      {(result.numerology.lifePathInfo as any)?.challenge && (() => {
-                        const text = (result.numerology.lifePathInfo as any).challenge as string;
+                      {result.numerology.lifePathInfo?.challenge && (() => {
+                        const text = result.numerology.lifePathInfo.challenge;
                         const [first] = splitFirstSentence(text);
                         return (
                           <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -2304,7 +2239,7 @@ function AnalyzePageInner() {
                       </div>
 
                       {/* 인생 조언 */}
-                      {(result as any)?.life_advice && Array.isArray((result as any).life_advice) && (
+                      {result?.life_advice && Array.isArray(result.life_advice) && (
                         <>
                           <Divider />
                           <div className="mt-4">
@@ -2315,7 +2250,7 @@ function AnalyzePageInner() {
                               </span>
                             </div>
                             <div className="flex flex-col gap-3">
-                              {((result as any).life_advice as string[]).map((advice: string, i: number) => (
+                              {result.life_advice.map((advice: string, i: number) => (
                                 <div
                                   key={i}
                                   className="p-4 rounded-xl"

@@ -322,7 +322,8 @@ export function estimateDayJiji(year: number, month: number, day: number): Jiji 
   const base = new Date(1900, 0, 1);
   const target = new Date(year, month - 1, day);
   const diffDays = Math.floor((target.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
-  const jjIdx = ((diffDays % 12) + 12) % 12;
+  // 1900-01-01은 甲戌일 (지지 인덱스 10), +10 오프셋 보정
+  const jjIdx = (((diffDays + 10) % 12) + 12) % 12;
   return JIJI[jjIdx];
 }
 

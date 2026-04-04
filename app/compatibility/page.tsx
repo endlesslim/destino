@@ -10,77 +10,10 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { analyzeCompatibility, type CompatibilityResult } from "@/lib/compatibility";
 import { OHANG_INFO, type Ohang } from "@/lib/saju";
 import { playStampSound } from "@/lib/sound";
-
-// ━━━ 컬러 도트 ━━━
-function Dot({ color, size = 8 }: { color: string; size?: number }) {
-  return (
-    <span
-      className="inline-block rounded-full shrink-0"
-      style={{ width: size, height: size, background: color }}
-    />
-  );
-}
-
-// ━━━ 카운트 업 훅 ━━━
-function useCountUp(target: number, duration = 1800) {
-  const [value, setValue] = useState(0);
-  const started = useRef(false);
-
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    const startTime = performance.now();
-    function tick(now: number) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 4);
-      setValue(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }, [target, duration]);
-
-  return value;
-}
-
-// ━━━ 스태거 섹션 래퍼 ━━━
-function StaggerSection({
-  children,
-  index,
-  className = "",
-}: {
-  children: React.ReactNode;
-  index: number;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`animate-stagger-in ${className}`}
-      style={{ animationDelay: `${index * 0.1}s` }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// ━━━ 섹션 헤더 ━━━
-function SectionHeader({ color, title, subtitle }: { color: string; title: string; subtitle?: string }) {
-  return (
-    <div className="mb-4">
-      <div className="flex items-center gap-2">
-        <Dot color={color} size={8} />
-        <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
-          {title}
-        </span>
-      </div>
-      {subtitle && (
-        <p className="text-xs mt-1 ml-4" style={{ color: "var(--ink-light)" }}>
-          {subtitle}
-        </p>
-      )}
-    </div>
-  );
-}
+import Dot from "@/components/ui/Dot";
+import StaggerSection from "@/components/ui/StaggerSection";
+import SectionHeader from "@/components/ui/SectionHeader";
+import { useCountUp } from "@/hooks/useCountUp";
 
 // ━━━ 칩 컴포넌트 ━━━
 function Chip({
