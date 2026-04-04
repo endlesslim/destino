@@ -259,7 +259,7 @@ function AIInterpretation({ result }: { result: CrosspointResult }) {
         </p>
       )}
       {interpretation && (
-        <p className="text-sm leading-[1.9]" style={{ color: "var(--ink-medium)" }}>
+        <p className="text-[15px] leading-[1.9]" style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}>
           {interpretation}
         </p>
       )}
@@ -714,8 +714,8 @@ function AnalyzePageInner() {
 
                 {/* Harmony Description */}
                 <div
-                  className="mt-4 p-3.5 rounded-lg text-sm leading-relaxed"
-                  style={{ background: "var(--bg-paper)", color: "var(--ink-muted)" }}
+                  className="mt-4 p-3.5 rounded-lg text-[15px] leading-[1.9]"
+                  style={{ fontFamily: "var(--font-display)", background: "var(--bg-paper)", color: "var(--ink-muted)" }}
                 >
                   {result.element_harmony.description}
                 </div>
@@ -744,7 +744,7 @@ function AnalyzePageInner() {
                 SECTION B: PREMIUM REPORT (PaymentGate)
                ═══════════════════════════════════════════ */}
             {/* SECTION B: FULL REPORT */}
-              <div className="flex flex-col gap-0">
+              <div className="flex flex-col gap-1">
 
                 {/* B1: 아키타입 상세 */}
                 <StaggerSection index={0}>
@@ -759,14 +759,14 @@ function AnalyzePageInner() {
                     >
                       {result.archetype}
                     </h3>
-                    <p className="text-sm leading-[1.9] mb-4" style={{ color: "var(--ink-medium)" }}>
+                    <p className="text-[15px] leading-[1.9] mb-4" style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}>
                       {result.archetype_desc}
                     </p>
 
                     {/* cross_message blockquote */}
                     {result.cross_message && (
                       <blockquote
-                        className="text-sm leading-[2] italic"
+                        className="text-[15px] leading-[2] italic"
                         style={{
                           fontFamily: "var(--font-display)",
                           color: "var(--ink-medium)",
@@ -777,6 +777,70 @@ function AnalyzePageInner() {
                       >
                         {result.cross_message}
                       </blockquote>
+                    )}
+
+                    {/* Career Crosspoint */}
+                    {(result as any)?.career_crosspoint && (
+                      <>
+                        <Divider />
+                        <div className="mt-5">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Dot color="var(--saju)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업/진로 교차점</span>
+                          </div>
+                          <h4
+                            className="text-base font-black mb-2"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--saju)" }}
+                          >
+                            {(result as any).career_crosspoint?.title}
+                          </h4>
+                          <p
+                            className="text-[15px] leading-[1.9] mb-4"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result as any).career_crosspoint?.description}
+                          </p>
+                          {(result as any).career_crosspoint?.ideal_fields && (
+                            <div className="flex flex-wrap gap-2">
+                              {((result as any).career_crosspoint.ideal_fields as string[]).map((f: string) => (
+                                <Chip key={f} label={f} color="var(--saju)" />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Relationship Crosspoint */}
+                    {(result as any)?.relationship_crosspoint && (
+                      <>
+                        <Divider />
+                        <div className="mt-5">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Dot color="var(--seal)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>연애/관계 교차점</span>
+                          </div>
+                          <h4
+                            className="text-base font-black mb-2"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
+                          >
+                            {(result as any).relationship_crosspoint?.title}
+                          </h4>
+                          <p
+                            className="text-[15px] leading-[1.9] mb-4"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result as any).relationship_crosspoint?.description}
+                          </p>
+                          {(result as any).relationship_crosspoint?.ideal_partner_traits && (
+                            <div className="flex flex-wrap gap-2">
+                              {((result as any).relationship_crosspoint.ideal_partner_traits as string[]).map((t: string) => (
+                                <Chip key={t} label={t} color="var(--seal)" />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </>
                     )}
                   </div>
                 </StaggerSection>
@@ -847,7 +911,7 @@ function AnalyzePageInner() {
                       <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
                         일간의 성격
                       </div>
-                      <p className="text-sm leading-[1.9] mb-3" style={{ color: "var(--ink-medium)" }}>
+                      <p className="text-[15px] leading-[1.9] mb-3" style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}>
                         {result.saju.personality.personality}
                       </p>
                       <div
@@ -863,12 +927,121 @@ function AnalyzePageInner() {
                       </div>
                     </div>
 
-                    {/* Animal Sign */}
-                    <div className="text-center p-3 rounded-lg" style={{ background: "var(--bg-paper)" }}>
-                      <span className="text-[15px] font-bold">{result.saju.animal.animal_kr}띠</span>
-                      <span className="text-sm ml-2" style={{ color: "var(--ink-light)" }}>
-                        {result.saju.year.jiji}
-                      </span>
+                    {/* Detailed Personality */}
+                    {(result.saju.personality as any)?.detailed_personality && (
+                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="var(--saju)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                        </div>
+                        <p
+                          className="text-[15px] leading-[2]"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {(result.saju.personality as any).detailed_personality}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Career */}
+                    {(result.saju.personality as any)?.career && (
+                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="#8B6914" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업/진로</span>
+                        </div>
+                        <p
+                          className="text-[15px] leading-[2]"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {(result.saju.personality as any).career}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Relationship Style */}
+                    {(result.saju.personality as any)?.relationship && (
+                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="var(--seal)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>연애/관계 스타일</span>
+                        </div>
+                        <p
+                          className="text-[15px] leading-[2]"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {(result.saju.personality as any).relationship}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Weakness / Growth Area */}
+                    {(result.saju.personality as any)?.weakness && (
+                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="var(--ink-muted)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>약점/성장 영역</span>
+                        </div>
+                        <p
+                          className="text-[15px] leading-[2]"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {(result.saju.personality as any).weakness}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Life Advice */}
+                    {(result.saju.personality as any)?.advice && (
+                      <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Dot color="var(--numero)" size={7} />
+                          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>인생 조언</span>
+                        </div>
+                        <p
+                          className="text-[15px] leading-[2]"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {(result.saju.personality as any).advice}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Animal Sign — Expanded */}
+                    <div className="p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Dot color="#8B6914" size={7} />
+                        <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+                          {result.saju.animal.animal_kr}띠
+                        </span>
+                        <span className="text-xs ml-1" style={{ color: "var(--ink-light)" }}>
+                          {result.saju.year.jiji}
+                        </span>
+                      </div>
+                      {(result.saju.animal as any)?.personality && (
+                        <p
+                          className="text-[15px] leading-[2] mb-3"
+                          style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                        >
+                          {(result.saju.animal as any).personality}
+                        </p>
+                      )}
+                      {(result.saju.animal as any)?.compatible && (
+                        <div className="mb-2">
+                          <span className="text-xs font-semibold" style={{ color: "var(--saju)" }}>잘 맞는 띠: </span>
+                          <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
+                            {((result.saju.animal as any).compatible as string[]).join(", ")}
+                          </span>
+                        </div>
+                      )}
+                      {(result.saju.animal as any)?.incompatible && (
+                        <div>
+                          <span className="text-xs font-semibold" style={{ color: "var(--seal)" }}>조심할 띠: </span>
+                          <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
+                            {((result.saju.animal as any).incompatible as string[]).join(", ")}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </StaggerSection>
@@ -894,7 +1067,7 @@ function AnalyzePageInner() {
                       <div className="text-xs mb-3" style={{ color: "var(--ink-light)" }}>
                         {result.western.sunSign.date_range}
                       </div>
-                      <div className="text-sm mb-4 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                      <div className="text-[15px] mb-4 leading-[1.9]" style={{ fontFamily: "var(--font-display)", color: "var(--ink-muted)" }}>
                         {result.western.sunSign.personality}
                       </div>
 
@@ -923,7 +1096,7 @@ function AnalyzePageInner() {
 
                       {/* Ruler & Modality Explanation */}
                       <div
-                        className="text-left p-3.5 rounded-lg text-sm leading-[1.8]"
+                        className="text-left p-3.5 rounded-lg text-[15px] leading-[1.8]"
                         style={{ background: "var(--bg-paper)", color: "var(--ink-muted)" }}
                       >
                         <span className="font-bold" style={{ color: "var(--ink-medium)" }}>
@@ -940,6 +1113,111 @@ function AnalyzePageInner() {
                           수호성: {result.western.sunSign.ruler_kr} ({result.western.sunSign.ruler}) / {result.western.sunSign.house}하우스
                         </span>
                       </div>
+
+                      {/* Detailed Personality */}
+                      {(result.western.sunSign as any)?.detailed_personality && (
+                        <div className="text-left mt-4 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Dot color={result.western.sunSign.color} size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                          </div>
+                          <p
+                            className="text-[15px] leading-[2]"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result.western.sunSign as any).detailed_personality}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Love Style */}
+                      {(result.western.sunSign as any)?.love_style && (
+                        <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Dot color="var(--seal)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>연애 스타일</span>
+                          </div>
+                          <p
+                            className="text-[15px] leading-[2]"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result.western.sunSign as any).love_style}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Career Strengths */}
+                      {(result.western.sunSign as any)?.career_strengths && (
+                        <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Dot color="var(--saju)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업 강점</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {((result.western.sunSign as any).career_strengths as string[]).map((s: string) => (
+                              <Chip key={s} label={s} color={result.western.sunSign.color} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Shadow Side / Challenges */}
+                      {(result.western.sunSign as any)?.shadow_side && (
+                        <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Dot color="var(--ink-muted)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>그림자 / 도전</span>
+                          </div>
+                          <p
+                            className="text-[15px] leading-[2]"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result.western.sunSign as any).shadow_side}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Best / Worst Compatibility */}
+                      {((result.western.sunSign as any)?.best_compatibility || (result.western.sunSign as any)?.worst_compatibility) && (
+                        <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Dot color="var(--astro)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>별자리 궁합</span>
+                          </div>
+                          {(result.western.sunSign as any)?.best_compatibility && (
+                            <div className="mb-2">
+                              <span className="text-xs font-semibold" style={{ color: "var(--saju)" }}>최고 궁합: </span>
+                              <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
+                                {((result.western.sunSign as any).best_compatibility as string[]).join(", ")}
+                              </span>
+                            </div>
+                          )}
+                          {(result.western.sunSign as any)?.worst_compatibility && (
+                            <div>
+                              <span className="text-xs font-semibold" style={{ color: "var(--seal)" }}>도전적 궁합: </span>
+                              <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
+                                {((result.western.sunSign as any).worst_compatibility as string[]).join(", ")}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Life Lesson */}
+                      {(result.western.sunSign as any)?.life_lesson && (
+                        <blockquote
+                          className="text-left mt-4 text-[15px] leading-[2] italic"
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            color: "var(--ink-medium)",
+                            borderLeft: `3px solid ${result.western.sunSign.color}`,
+                            paddingLeft: "16px",
+                            margin: 0,
+                          }}
+                        >
+                          {(result.western.sunSign as any).life_lesson}
+                        </blockquote>
+                      )}
                     </div>
                   </div>
                 </StaggerSection>
@@ -976,7 +1254,7 @@ function AnalyzePageInner() {
                           마스터 넘버
                         </span>
                       )}
-                      <div className="text-sm mb-4 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                      <div className="text-[15px] mb-4 leading-[1.9]" style={{ fontFamily: "var(--font-display)", color: "var(--ink-muted)" }}>
                         {result.numerology.lifePathInfo.personality}
                       </div>
 
@@ -1004,6 +1282,134 @@ function AnalyzePageInner() {
                         </div>
                       </div>
 
+                      {/* Detailed Personality */}
+                      {(result.numerology.lifePathInfo as any)?.detailed_personality && (
+                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Dot color="var(--numero)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>성격 심층 분석</span>
+                          </div>
+                          <p
+                            className="text-[15px] leading-[2]"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result.numerology.lifePathInfo as any).detailed_personality}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Life Purpose */}
+                      {(result.numerology.lifePathInfo as any)?.life_purpose && (
+                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Dot color="var(--astro)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>인생 목적</span>
+                          </div>
+                          <p
+                            className="text-[15px] leading-[2]"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result.numerology.lifePathInfo as any).life_purpose}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Career Paths */}
+                      {(result.numerology.lifePathInfo as any)?.career_paths && (
+                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Dot color="var(--saju)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>추천 직업 분야</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {((result.numerology.lifePathInfo as any).career_paths as string[]).map((c: string) => (
+                              <Chip key={c} label={c} color="var(--numero)" />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Relationship Style */}
+                      {(result.numerology.lifePathInfo as any)?.relationship_style && (
+                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Dot color="var(--seal)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>관계 스타일</span>
+                          </div>
+                          <p
+                            className="text-[15px] leading-[2]"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result.numerology.lifePathInfo as any).relationship_style}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Challenge */}
+                      {(result.numerology.lifePathInfo as any)?.challenge && (
+                        <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Dot color="var(--ink-muted)" size={7} />
+                            <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>도전 과제</span>
+                          </div>
+                          <p
+                            className="text-[15px] leading-[2]"
+                            style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                          >
+                            {(result.numerology.lifePathInfo as any).challenge}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Personal Year Number */}
+                      {(() => {
+                        const m = parseInt(month);
+                        const d = parseInt(day);
+                        if (!m || !d) return null;
+                        const currentYear = new Date().getFullYear();
+                        let pySum = String(currentYear).split("").reduce((a, b) => a + Number(b), 0)
+                          + String(m).split("").reduce((a, b) => a + Number(b), 0)
+                          + String(d).split("").reduce((a, b) => a + Number(b), 0);
+                        while (pySum > 9 && pySum !== 11 && pySum !== 22 && pySum !== 33) {
+                          pySum = String(pySum).split("").reduce((a, b) => a + Number(b), 0);
+                        }
+                        return (
+                          <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--seal-bg)" }}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Dot color="var(--seal)" size={7} />
+                              <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+                                {currentYear}년 개인년수
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span
+                                className="text-2xl font-black"
+                                style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
+                              >
+                                {pySum}
+                              </span>
+                              <p
+                                className="text-[15px] leading-[1.8]"
+                                style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                              >
+                                {pySum === 1 ? "새로운 시작과 독립의 해. 씨앗을 뿌리는 시기입니다."
+                                  : pySum === 2 ? "협력과 인내의 해. 관계에 집중하는 시기입니다."
+                                  : pySum === 3 ? "창의적 표현의 해. 자기표현이 빛나는 시기입니다."
+                                  : pySum === 4 ? "기반을 다지는 해. 꾸준함이 보상받는 시기입니다."
+                                  : pySum === 5 ? "변화와 자유의 해. 모험을 떠나는 시기입니다."
+                                  : pySum === 6 ? "책임과 사랑의 해. 가정과 조화에 집중하는 시기입니다."
+                                  : pySum === 7 ? "내면 탐구의 해. 영적 성장이 깊어지는 시기입니다."
+                                  : pySum === 8 ? "성취와 풍요의 해. 물질적 성공이 가까운 시기입니다."
+                                  : pySum === 9 ? "완성과 마무리의 해. 한 사이클을 정리하는 시기입니다."
+                                  : pySum === 11 ? "영적 각성의 해. 직관이 극대화되는 마스터 넘버 시기입니다."
+                                  : pySum === 22 ? "위대한 건설의 해. 큰 비전을 현실로 만드는 마스터 넘버 시기입니다."
+                                  : "영적 스승의 해. 깊은 치유와 봉사의 마스터 넘버 시기입니다."}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
                       {/* Destiny Number (if name was provided) */}
                       {result.numerology.destinyNumber && result.numerology.destinyInfo && (
                         <div
@@ -1024,7 +1430,7 @@ function AnalyzePageInner() {
                           <div className="text-sm font-bold mb-1" style={{ color: "var(--ink)" }}>
                             {result.numerology.destinyInfo.name}
                           </div>
-                          <div className="text-sm leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                          <div className="text-[15px] leading-[1.9]" style={{ fontFamily: "var(--font-display)", color: "var(--ink-muted)" }}>
                             {result.numerology.destinyInfo.personality}
                           </div>
                         </div>
@@ -1155,6 +1561,45 @@ function AnalyzePageInner() {
                             </div>
                           ))}
                       </div>
+
+                      {/* 인생 조언 */}
+                      {(result as any)?.life_advice && Array.isArray((result as any).life_advice) && (
+                        <>
+                          <Divider />
+                          <div className="mt-4">
+                            <div className="flex items-center gap-2 mb-4">
+                              <Dot color="var(--seal)" size={8} />
+                              <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+                                교차점이 말하는 인생 조언
+                              </span>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                              {((result as any).life_advice as string[]).map((advice: string, i: number) => (
+                                <div
+                                  key={i}
+                                  className="p-4 rounded-xl"
+                                  style={{ background: "var(--bg-paper)", border: "1px solid var(--border)" }}
+                                >
+                                  <div className="flex gap-3">
+                                    <span
+                                      className="text-lg font-black shrink-0 w-7 text-center"
+                                      style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
+                                    >
+                                      {i + 1}
+                                    </span>
+                                    <p
+                                      className="text-[15px] leading-[2]"
+                                      style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
+                                    >
+                                      {advice}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </StaggerSection>
                 )}
