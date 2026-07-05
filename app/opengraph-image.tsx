@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "DESTINO — 6개 문명이 내린 같은 답";
+export const alt = "DESTINO — 사주도 별자리도 같은 답";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -67,7 +67,7 @@ export default function OGImage() {
             marginBottom: 40,
           }}
         >
-          6개 문명이 내린 같은 답
+          사주도 별자리도 같은 답
         </div>
 
         {/* Bottom systems */}

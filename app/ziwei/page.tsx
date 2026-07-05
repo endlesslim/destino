@@ -260,7 +260,7 @@ export default function ZiweiPage() {
                 className="block w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg no-underline btn-stamp"
                 style={{ background: "var(--seal)", color: "#fff", fontFamily: "var(--font-display)", boxShadow: "0 4px 16px var(--shadow-btn)" }}
               >
-                6개 문명 교차 분석도 해보기
+                전체 교차 분석도 해보기
               </Link>
             </ScrollReveal>
           </div>

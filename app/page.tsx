@@ -189,9 +189,9 @@ export default function Home() {
             className="text-[46px] font-black leading-[1.15] tracking-[-0.02em]"
             style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
           >
-            6개 문명이
+            사주도 별자리도
             <br />
-            내린 <span style={{ color: "var(--seal)" }}>같은 답</span>
+            <span style={{ color: "var(--seal)" }}>같은 답</span>이라면
           </h1>
 
           <p
@@ -626,7 +626,7 @@ export default function Home() {
               className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
               style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
             >
-              6개 문명의 지혜
+              여섯 가지 운명 풀이
             </h2>
           </ScrollReveal>
 

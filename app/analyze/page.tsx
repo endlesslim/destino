@@ -1032,10 +1032,10 @@ function AnalyzePageInner() {
                 style={{ background: "var(--bg-warm)", border: "1.5px solid var(--border)" }}
               >
                 <p className="text-[11px] font-semibold tracking-widest mb-1" style={{ color: "var(--ink-light)" }}>
-                  6개 문명 중 4개 완료
+                  여섯 풀이 중 넷 완료
                 </p>
                 <p className="text-[14px] font-bold mb-3" style={{ color: "var(--ink)" }}>
-                  남은 2개 문명의 시선도 확인해보세요
+                  남은 두 가지 시선도 확인해보세요
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <Link

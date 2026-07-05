@@ -258,7 +258,7 @@ export default function AboutPage() {
               className="text-[22px] font-black leading-[1.4] tracking-[-0.01em]"
               style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
             >
-              6개 문명의 지혜
+              여섯 가지 운명 풀이
             </h2>
             <p
               className="text-[15px] leading-[1.9]"

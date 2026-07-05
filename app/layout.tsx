@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "DESTINO — 6개 문명이 내린 같은 답",
+    default: "DESTINO — 사주도 별자리도 같은 답",
     template: "%s",
   },
   description:
@@ -55,14 +55,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: "https://destino.kr",
-    title: "DESTINO — 6개 문명이 내린 같은 답",
+    title: "DESTINO — 사주도 별자리도 같은 답",
     description:
       "사주, 자미두수, 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
     siteName: "DESTINO",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DESTINO — 6개 문명이 내린 같은 답",
+    title: "DESTINO — 사주도 별자리도 같은 답",
     description:
       "사주, 자미두수, 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
   },
