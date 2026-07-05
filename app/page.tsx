@@ -16,13 +16,13 @@ const howItWorksSteps = [
   },
   {
     number: "2",
-    title: "4개 체계 동시 분석",
+    title: "사주·별자리·수비학·MBTI에 동시에 묻기",
     description: "사주 · 별자리 · 수비학 · MBTI",
   },
   {
     number: "3",
     title: "교차점 발견",
-    description: "여러 문명이 같은 답을 내린 지점",
+    description: "사주와 별자리가 같은 답을 낸 지점",
   },
   {
     number: "4",
@@ -35,12 +35,12 @@ const reportCards = [
   {
     color: "var(--seal)",
     title: "교차점 수렴률",
-    description: "당신의 동서양 일치도",
+    description: "사주와 별자리의 답이 얼마나 겹치는지",
   },
   {
     color: "var(--astro)",
     title: "아키타입",
-    description: "3개 문명이 본 당신의 본질",
+    description: "사주·별자리·수비학이 겹쳐 그린 당신의 본질",
   },
   {
     color: "var(--saju)",
@@ -60,7 +60,7 @@ const reportCards = [
   {
     color: "var(--tarot)",
     title: "인생 조언",
-    description: "4개 체계가 전하는 메시지",
+    description: "사주·별자리·수비학·MBTI가 함께 전하는 메시지",
   },
 ];
 
@@ -139,7 +139,7 @@ const services = [
 
 const whyCards = [
   {
-    title: "하나의 체계가 아닌, 교차 검증",
+    title: "사주 하나가 아닌, 교차 검증",
     description:
       "다른 앱은 사주 OR 별자리. DESTINO는 동시에.",
   },
@@ -199,8 +199,8 @@ export default function Home() {
             style={{ color: "var(--ink-medium)" }}
           >
             사주명리학 3,000년, 서양 점성술 4,000년, 수비학 2,500년.
-            서로 다른 문명에서 독립적으로 발전한 운명 분석 체계들이
-            당신에 대해 같은 결론을 내리는 지점이 있습니다.
+            서로 만난 적 없는 이 풀이들이
+            당신에 대해 같은 답을 내리는 지점이 있습니다.
           </p>
 
           <div className="flex flex-col gap-3 w-full mt-2">
@@ -257,7 +257,7 @@ export default function Home() {
               className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
               style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
             >
-              서로 다른 문명이
+              사주와 별자리가
               <br />
               같은 답을 내리는 지점
             </h2>
@@ -620,7 +620,7 @@ export default function Home() {
               style={{ color: "var(--ink-light)" }}
             >
               <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "var(--seal)" }} />
-              분석 체계
+              여섯 가지 풀이
             </p>
             <h2
               className="text-[22px] font-black leading-[1.4] tracking-[-0.01em] mb-8"
@@ -737,7 +737,7 @@ export default function Home() {
             <Link href="/tarot" className="py-3 hover:underline">
               타로
             </Link>
-            <a href="mailto:hello@destino.me" className="py-3 hover:underline">
+            <a href="mailto:hello@destino.kr" className="py-3 hover:underline">
               문의
             </a>
           </div>

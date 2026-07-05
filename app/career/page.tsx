@@ -122,7 +122,7 @@ function InputSection({
             className="rounded-md px-3 py-3 text-[15px] text-center outline-none focus:ring-1"
             style={{ ...inputStyle, ["--tw-ring-color" as string]: "var(--saju)" }}
             min={1920}
-            max={2025}
+            max={new Date().getFullYear()}
           />
           <input
             type="number"
@@ -206,7 +206,7 @@ function ResultDisplay({ result }: { result: CareerAnalysis }) {
           className="text-[13px] mb-4"
           style={{ color: "var(--ink-muted)" }}
         >
-          4개 체계가 교차 분석한 최적의 직업
+          사주·별자리·수비학·MBTI의 답이 겹친 직업 다섯
         </p>
       </ScrollReveal>
 
@@ -494,7 +494,7 @@ export default function CareerPage() {
     const m = parseInt(birthMonth);
     const d = parseInt(birthDay);
 
-    if (!y || !m || !d || y < 1920 || y > 2025 || m < 1 || m > 12 || d < 1 || d > 31) return;
+    if (!y || !m || !d || y < 1920 || y > new Date().getFullYear() || m < 1 || m > 12 || d < 1 || d > 31) return;
 
     localStorage.setItem("destino_daily_birth", JSON.stringify({ year: y, month: m, day: d }));
     setHasSaved(true);

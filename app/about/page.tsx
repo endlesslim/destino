@@ -89,8 +89,7 @@ const systems = [
     history:
       "15세기 이탈리아에서 카드 게임으로 시작된 타로는 18세기 프랑스에서 점술 도구로 재탄생했습니다. 메이저 아르카나 22장은 '바보(The Fool)'에서 '세계(The World)'까지 인간 성장의 보편적 여정을 상징합니다.",
     usage:
-      "생년월일에서 탄생 카드를 산출하고, 22가지 원형에서 인생 테마와 성장 과제를 추출합니다. (곧 출시)",
-    comingSoon: true,
+      "생년월일에서 탄생 카드를 산출하고, 22가지 원형에서 인생 테마와 성장 과제를 추출합니다.",
   },
 ];
 
@@ -144,7 +143,7 @@ export default function AboutPage() {
             className="text-[15px] leading-[1.8] mt-3"
             style={{ color: "var(--ink-muted)" }}
           >
-            과거와 현대를 관통하는 운명 분석의 교차점
+            같은 질문을 여섯 번 묻고, 겹치는 답만 남깁니다
           </p>
         </section>
 
@@ -273,11 +272,10 @@ export default function AboutPage() {
           {systems.map((sys, i) => (
             <ScrollReveal key={sys.key} delay={i * 60}>
               <div
-                className={`rounded-xl p-5 relative ${sys.comingSoon ? "" : "hover-lift"}`}
+                className="rounded-xl p-5 relative hover-lift"
                 style={{
                   background: "var(--bg-white)",
                   border: "1px solid var(--border)",
-                  opacity: sys.comingSoon ? 0.6 : 1,
                 }}
               >
                 {/* 헤더 */}
@@ -300,14 +298,6 @@ export default function AboutPage() {
                       >
                         {sys.label}
                       </h3>
-                      {sys.comingSoon && (
-                        <span
-                          className="text-[9px] tracking-[0.05em] font-medium px-1.5 py-0.5 rounded"
-                          style={{ background: "var(--bg-warm)", color: "var(--ink-light)" }}
-                        >
-                          곧 출시
-                        </span>
-                      )}
                     </div>
                     <p className="text-[12px] mt-0.5" style={{ color: sys.color }}>
                       {sys.origin} &middot; {sys.years}

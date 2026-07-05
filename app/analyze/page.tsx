@@ -341,13 +341,13 @@ function ConvergenceMoment() {
           className="text-[14px] leading-[1.8] mb-1"
           style={{ fontFamily: "var(--font-display)", color: "var(--ink-muted)" }}
         >
-          위 4개 문명의 분석이 아래의 교차점에서 만납니다
+          위 네 가지 풀이 — 사주·별자리·수비학·MBTI — 가 아래 교차점에서 만납니다
         </p>
         <p
           className="text-[12px] leading-[1.7]"
           style={{ color: "var(--ink-light)" }}
         >
-          4개 문명, 수천 년의 독립적 관찰이 수렴한 결과
+          사주·별자리·수비학·MBTI가 각자 내린 답이 겹친 결과
         </p>
       </div>
     </ScrollReveal>
@@ -534,15 +534,15 @@ function AnalyzePageInner() {
 
     const maxYear = new Date().getFullYear();
     if (!y || y < 1924 || y > maxYear) {
-      setValidationError(`1924~${maxYear}년 사이를 입력해주세요`);
+      setValidationError(`태어난 해는 1924~${maxYear}년 사이로 입력해주세요`);
       return;
     }
     if (!m || m < 1 || m > 12) {
-      setValidationError("1~12월 사이를 입력해주세요");
+      setValidationError("월은 1~12 사이로 입력해주세요");
       return;
     }
     if (!d || d < 1 || d > 31) {
-      setValidationError("1~31일 사이를 입력해주세요");
+      setValidationError("일은 1~31 사이로 입력해주세요");
       return;
     }
 
@@ -598,7 +598,7 @@ function AnalyzePageInner() {
   }, [year, month, day]);
 
   const shareToTwitter = () => {
-    const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
+    const text = `사주도 별자리도 수비학도 같은 답 — 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
     const url = `${window.location.origin}/analyze`;
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
@@ -607,7 +607,7 @@ function AnalyzePageInner() {
   };
 
   const shareToThreads = () => {
-    const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}% ${window.location.origin}/analyze`;
+    const text = `사주도 별자리도 수비학도 같은 답 — 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}% ${window.location.origin}/analyze`;
     window.open(
       `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -681,7 +681,7 @@ function AnalyzePageInner() {
                   onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
                 />
                 <p className="text-[11px] mt-1" style={{ color: "var(--ink-light)" }}>
-                  영문 이름 입력 시 운명수(Destiny Number)도 함께 분석합니다
+                  이름을 영문(예: Hong Gildong)으로 입력하면 운명수(Destiny Number)도 함께 분석합니다
                 </p>
               </div>
 
@@ -819,8 +819,8 @@ function AnalyzePageInner() {
               {([
                 ["#2D5A27", "사주"],
                 ["#1E3A5F", "별자리"],
-                ["#5B3E8A", "수비학"],
-                ["#8B6914", "띠"],
+                ["#6B3A2A", "수비학"],
+                ["#5B3E8A", "MBTI"],
               ] as const).map(([c, v]) => (
                 <span key={v} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-muted)" }}>
                   <Dot color={c} />{v}
@@ -909,7 +909,7 @@ function AnalyzePageInner() {
                     <span className="text-sm font-bold tracking-wider" style={{ color: "var(--seal)" }}>교차점</span>
                   </div>
                   <p className="text-[12px] leading-snug ml-[18px]" style={{ color: "var(--ink-light)" }}>
-                    4개 문명, 수천 년의 독립적 관찰이 수렴한 결과
+                    사주·별자리·수비학·MBTI가 각자 내린 답이 겹친 결과
                   </p>
                 </div>
 
@@ -1106,7 +1106,7 @@ function AnalyzePageInner() {
                 >
                   당신의 유형, &lsquo;{result.archetype}&rsquo; —
                   <br />
-                  어떤 일에서 빛나고 누구를 만나야 하는지는
+                  어떤 일에서 빛나고 어떤 사람과 잘 맞는지는
                   <br />
                   <span style={{ color: "var(--seal)" }}>아래에 봉인되어 있습니다</span>
                 </p>
@@ -1259,7 +1259,7 @@ function AnalyzePageInner() {
                     <CivilizationHeader
                       symbol="四柱"
                       title="사주명리학"
-                      origin="기원전 1,000년 -- 동아시아"
+                      origin="기원전 1,000년 — 동아시아"
                       basis="天干地支 60甲子 체계 기반"
                       color="var(--saju)"
                     />
@@ -1580,7 +1580,7 @@ function AnalyzePageInner() {
                     <CivilizationHeader
                       symbol={result.western.sunSign.symbol}
                       title="서양 점성술"
-                      origin="기원전 2,000년 -- 바빌로니아"
+                      origin="기원전 2,000년 — 바빌로니아"
                       basis="NASA JPL 천문 데이터 참조"
                       color="var(--astro)"
                     />
@@ -1833,7 +1833,7 @@ function AnalyzePageInner() {
                     <CivilizationHeader
                       symbol={String(result.numerology.lifePath)}
                       title="수비학"
-                      origin="기원전 500년 -- 피타고라스"
+                      origin="기원전 500년 — 피타고라스"
                       basis="수의 진동(Vibration) 이론 기반"
                       color="var(--numero)"
                     />
@@ -2093,8 +2093,8 @@ function AnalyzePageInner() {
                   >
                     <CivilizationHeader
                       symbol={result.mbti.primaryType}
-                      title="성격유형론"
-                      origin="1921년 -- 칼 융"
+                      title="MBTI"
+                      origin="1921년 — 칼 융"
                       basis="융의 심리 유형론(Psychological Types) 기반"
                       color="var(--mbti)"
                     />
@@ -2132,7 +2132,7 @@ function AnalyzePageInner() {
                       <p className="text-[11px] mb-3" style={{ color: "var(--ink-light)" }}>
                         {result.mbti.source === "user"
                           ? "직접 입력하신 유형 기준 분석입니다"
-                          : "사주 일간 기반 추정 유형입니다 — 실제 검사 결과와 다를 수 있어요. 입력창에서 실제 유형을 선택하면 그 유형으로 분석합니다"}
+                          : "사주 일간 기반 추정 유형입니다 — 실제 검사 결과와 다를 수 있습니다. 입력창에서 실제 유형을 선택하면 그 유형으로 분석합니다"}
                       </p>
 
                       {/* Description */}

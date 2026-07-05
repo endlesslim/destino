@@ -385,7 +385,7 @@ function CompatibilityPageInner() {
                 궁합 분석
               </h1>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                두 사람의 생년월일을 입력하면<br />동서양 4개 체계가 궁합을 분석합니다
+                두 사람의 생년월일을 입력하면<br />사주·별자리·수비학·MBTI로 궁합을 교차 확인합니다
 
               </p>
             </div>
@@ -1383,7 +1383,7 @@ function CompatibilityPageInner() {
                 <SectionHeader
                   color="var(--seal)"
                   title="관계 조언"
-                  subtitle="동서양 4체계가 전하는 메시지"
+                  subtitle="사주·별자리·수비학·MBTI가 전하는 메시지"
                   icon={<TwinMoonsIcon color="var(--seal)" size={14} />}
                 />
 

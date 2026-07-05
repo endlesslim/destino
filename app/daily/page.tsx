@@ -214,7 +214,7 @@ export default function DailyPage() {
     const m = parseInt(birthMonth);
     const d = parseInt(birthDay);
 
-    if (!y || !m || !d || y < 1920 || y > 2025 || m < 1 || m > 12 || d < 1 || d > 31) {
+    if (!y || !m || !d || y < 1920 || y > new Date().getFullYear() || m < 1 || m > 12 || d < 1 || d > 31) {
       return;
     }
 
@@ -313,7 +313,7 @@ function InputSection({
           className="text-[28px] font-black leading-[1.3] tracking-[-0.01em]"
           style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
         >
-          매일 운세를<br />받아보세요
+          오늘의 운세를<br />확인해보세요
         </h1>
         <p className="text-[15px] leading-[1.8]" style={{ color: "var(--ink-muted)" }}>
           생년월일을 입력하면, 사주 오행과 오늘의 기운을<br />
@@ -337,7 +337,7 @@ function InputSection({
             className="rounded-md px-3 py-3 text-[15px] text-center outline-none focus:ring-1"
             style={{ ...inputStyle, ["--tw-ring-color" as string]: "var(--seal)" }}
             min={1920}
-            max={2025}
+            max={new Date().getFullYear()}
           />
           <input
             type="number"

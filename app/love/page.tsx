@@ -159,7 +159,7 @@ function InputSection({
             className="rounded-md px-3 py-3 text-[15px] text-center outline-none focus:ring-1"
             style={{ ...inputStyle, ["--tw-ring-color" as string]: "var(--seal)" }}
             min={1920}
-            max={2025}
+            max={new Date().getFullYear()}
           />
           <input
             type="number"
@@ -524,7 +524,7 @@ export default function LovePage() {
     const m = parseInt(birthMonth);
     const d = parseInt(birthDay);
 
-    if (!y || !m || !d || y < 1920 || y > 2025 || m < 1 || m > 12 || d < 1 || d > 31) return;
+    if (!y || !m || !d || y < 1920 || y > new Date().getFullYear() || m < 1 || m > 12 || d < 1 || d > 31) return;
 
     localStorage.setItem("destino_daily_birth", JSON.stringify({ year: y, month: m, day: d }));
     setHasSaved(true);

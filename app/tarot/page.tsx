@@ -436,7 +436,7 @@ function ReadingDisplay({ reading, birth }: { reading: TarotReading; birth?: { y
 
       {/* Year Card */}
       <CardSection
-        sectionLabel="2026 YEAR CARD"
+        sectionLabel={`${new Date().getFullYear()} YEAR CARD`}
         sectionSub="올해 당신에게 영향을 미치는 에너지입니다. 한 해의 주제와 과제를 담고 있습니다."
         card={reading.yearCard}
         cardSize="sm"

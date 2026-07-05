@@ -18,16 +18,16 @@ interface Service {
 }
 
 const coreServices: Service[] = [
-  { name: "교차 분석", desc: "동서양 4개 문명 교차 분석 리포트", href: "/analyze", price: "₩29,900", color: "var(--seal)", type: "default" },
-  { name: "궁합 분석", desc: "두 사람의 교차점 비교", href: "/compatibility", price: "₩9,900", color: "var(--astro)", type: "compatibility" },
-  { name: "결혼 궁합", desc: "결혼 5대 차원 심화 분석", href: "/marriage", price: "₩29,900", color: "var(--seal)", type: "marriage" },
+  { name: "교차 분석", desc: "사주·별자리·수비학·MBTI 교차 분석 리포트", href: "/analyze", price: "₩16,500", color: "var(--seal)", type: "default" },
+  { name: "궁합 분석", desc: "두 사람의 교차점 비교", href: "/compatibility", price: "무료", color: "var(--astro)", type: "compatibility" },
+  { name: "결혼 궁합", desc: "결혼 5대 차원 심화 분석", href: "/marriage", price: "무료", color: "var(--seal)", type: "marriage" },
 ];
 
 const deepServices: Service[] = [
-  { name: "커리어 심화", desc: "TOP 5 추천 직업 + 연대별 조언", href: "/career", price: "₩9,900", color: "var(--saju)", type: "career" },
-  { name: "연애 심화", desc: "이상형 + 연애 패턴 + 인연 시기", href: "/love", price: "₩9,900", color: "var(--seal)", type: "love" },
-  { name: "가족 분석", desc: "가족 구성원 관계 분석", href: "/family", price: "₩19,900", color: "var(--face)", type: "face" },
-  { name: "이름 풀이", desc: "한글 이름 획수 + 오행 분석", href: "/name-analysis", price: "₩9,900", color: "var(--numero)", type: "default" },
+  { name: "커리어 심화", desc: "TOP 5 추천 직업 + 연대별 조언", href: "/career", price: "무료", color: "var(--saju)", type: "career" },
+  { name: "연애 심화", desc: "이상형 + 연애 패턴 + 인연 시기", href: "/love", price: "무료", color: "var(--seal)", type: "love" },
+  { name: "가족 분석", desc: "가족 구성원 관계 분석", href: "/family", price: "무료", color: "var(--face)", type: "face" },
+  { name: "이름 풀이", desc: "한글 이름 획수 + 오행 분석", href: "/name-analysis", price: "무료", color: "var(--numero)", type: "default" },
 ];
 
 const freeServices: Service[] = [

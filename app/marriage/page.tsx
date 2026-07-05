@@ -274,7 +274,7 @@ function MarriagePageInner() {
     ctx.fillRect(440, 1780, 200, 3);
     ctx.font = "16px sans-serif";
     ctx.fillStyle = "#8B7E74";
-    ctx.fillText("destino.vercel.app", 540, 1830);
+    ctx.fillText("destino.kr", 540, 1830);
 
     canvas.toBlob((blob) => {
       if (!blob) return;
@@ -324,7 +324,7 @@ function MarriagePageInner() {
               결혼 궁합 심화 분석
             </h1>
             <p className="text-[14px] leading-[1.7]" style={{ color: "var(--ink-muted)" }}>
-              동서양 운명학이 바라본 두 사람의 결혼 가능성
+              사주·별자리·수비학·MBTI에게 다시 물은 두 사람의 결혼 궁합
             </p>
           </div>
         </ScrollReveal>

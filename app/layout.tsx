@@ -57,14 +57,14 @@ export const metadata: Metadata = {
     url: "https://destino.kr",
     title: "DESTINO — 사주도 별자리도 같은 답",
     description:
-      "사주, 자미두수, 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
+      "사주, 자미두수, 서양 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
     siteName: "DESTINO",
   },
   twitter: {
     card: "summary_large_image",
     title: "DESTINO — 사주도 별자리도 같은 답",
     description:
-      "사주, 자미두수, 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
+      "사주, 자미두수, 서양 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
   },
   robots: {
     index: true,

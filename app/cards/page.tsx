@@ -5,7 +5,7 @@ import Divider from "@/components/ui/Divider";
 import { CARDS } from "@/lib/cards-data";
 
 export const metadata: Metadata = {
-  title: "문명 크로스체크 카드 — DESTINO",
+  title: "크로스체크 카드 | DESTINO",
   description: "총 20편 — 동서양 교차 분석 Threads 카드 시리즈",
 };
 
@@ -40,7 +40,7 @@ export default function CardsGalleryPage() {
               letterSpacing: "-0.01em",
             }}
           >
-            문명 크로스체크 카드
+            크로스체크 카드
           </h1>
         </div>
 
@@ -52,7 +52,7 @@ export default function CardsGalleryPage() {
             lineHeight: 1.7,
           }}
         >
-          총 20편 — 동서양 문명이 내린 같은 답을 교차 분석합니다
+          총 20편 — 사주와 별자리가 같은 답을 낸 지점만 골랐습니다
         </p>
 
         <Divider />

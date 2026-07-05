@@ -487,7 +487,7 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
               letterSpacing: "0.01em",
             }}
           >
-            사주 · 별자리 · 수비학 교차 분석 + AI 해석
+            사주 · 별자리 · 수비학 · MBTI 교차 분석 + AI 해석
           </p>
         )}
       </button>

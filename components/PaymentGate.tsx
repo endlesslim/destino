@@ -360,7 +360,7 @@ export default function PaymentGate({ result, archetype, children }: PaymentGate
             {!PAYMENT_ENABLED && (
               <>
                 <br />
-                입금 확인 후 카카오톡으로 열람 코드를 보내드려요
+                입금 확인 후 카카오톡으로 열람 코드를 보내드립니다
               </>
             )}
           </p>
