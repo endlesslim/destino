@@ -63,3 +63,12 @@ export function generateBirthHash(year: number, month: number, day: number): str
   }
   return Math.abs(hash).toString(36);
 }
+
+/**
+ * 실결제(PortOne) 활성화 여부 — NEXT_PUBLIC_PORTONE_STORE_ID가 설정된 경우에만 true.
+ * false면 페이월이 수동 판매 모드(열람 코드 입력 + 문의)로 전환된다.
+ */
+export const PAYMENT_ENABLED = !!process.env.NEXT_PUBLIC_PORTONE_STORE_ID;
+
+/** 수동 판매 문의 링크 (카카오 오픈채팅 등). 미설정 시 문의 버튼 숨김 */
+export const CONTACT_URL = process.env.NEXT_PUBLIC_CONTACT_URL || "";

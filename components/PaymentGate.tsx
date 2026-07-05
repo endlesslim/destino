@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback, type ReactNode } from "react";
 import PaymentButton from "./PaymentButton";
-import { generateBirthHash, type PaymentCheckResponse } from "@/lib/payment";
+import { generateBirthHash, PAYMENT_ENABLED, type PaymentCheckResponse } from "@/lib/payment";
 import { track } from "@/lib/track";
 
 const MY_REF_KEY = "destino_my_refcode";
@@ -354,6 +354,12 @@ export default function PaymentGate({ result, children }: PaymentGateProps) {
           </p>
           <p style={{ fontSize: "12px", color: "var(--ink-light)", marginBottom: "12px" }}>
             사주카페 1회 상담 ₩100,000+ · 같은 깊이를 이 가격에
+            {!PAYMENT_ENABLED && (
+              <>
+                <br />
+                입금 확인 후 카카오톡으로 열람 코드를 보내드려요
+              </>
+            )}
           </p>
           <div>
             <span style={{ fontSize: "14px", color: "var(--ink-faint)", textDecoration: "line-through", marginRight: 8 }}>
@@ -391,7 +397,7 @@ export default function PaymentGate({ result, children }: PaymentGateProps) {
             "연애·관계 교차점 — 이상형과 관계 패턴",
             "사주 명식 + 오행 균형 리포트",
             "인생 조언 & AI 맞춤 해석",
-            "결제 후 24시간 무제한 열람",
+            PAYMENT_ENABLED ? "결제 후 24시간 무제한 열람" : "코드 입력 후 24시간 무제한 열람",
           ].map((item) => (
             <li key={item}>
               <span style={{ color: "var(--seal)", marginRight: 6 }}>✓</span>

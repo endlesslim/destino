@@ -6,6 +6,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import {
   PAYMENT_CONFIG,
+  PAYMENT_ENABLED,
+  CONTACT_URL,
   generatePaymentId,
   type PaymentVerifyResponse,
 } from "@/lib/payment";
@@ -329,6 +331,80 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
     paying: "결제 진행 중...",
     verifying: "결제 확인 중...",
   };
+
+  // ── 수동 판매 모드 — PortOne 미설정 시 결제 버튼 대신 열람 코드 입력을 전면에 ──
+  if (!PAYMENT_ENABLED) {
+    return (
+      <div className="flex flex-col items-center gap-3" style={{ width: "100%", maxWidth: "380px" }}>
+        <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--ink)", textAlign: "center" }}>
+          열람 코드를 받으셨나요?
+        </p>
+        <div style={{ display: "flex", gap: "6px", width: "100%" }}>
+          <input
+            value={couponInput}
+            onChange={(e) => setCouponInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+            placeholder="예: OPEN-3F7A2C"
+            style={{
+              flex: 1,
+              padding: "14px 16px",
+              fontSize: "16px",
+              border: "2px solid var(--seal)",
+              borderRadius: "12px",
+              background: "var(--bg-white)",
+              color: "var(--ink)",
+              textAlign: "center",
+              letterSpacing: "0.05em",
+            }}
+          />
+          <button
+            onClick={applyCoupon}
+            className="btn-stamp"
+            style={{
+              padding: "14px 26px",
+              fontSize: "16px",
+              fontWeight: 800,
+              border: "none",
+              borderRadius: "12px",
+              background: "var(--seal)",
+              color: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            열람
+          </button>
+        </div>
+        {couponMessage && (
+          <p style={{ fontSize: "13px", color: "var(--seal)", textAlign: "center" }}>{couponMessage}</p>
+        )}
+        {CONTACT_URL ? (
+          <a
+            href={CONTACT_URL}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              width: "100%",
+              textAlign: "center",
+              padding: "13px 0",
+              fontSize: "14px",
+              fontWeight: 700,
+              borderRadius: "12px",
+              border: "1.5px solid var(--ink)",
+              color: "var(--ink)",
+              textDecoration: "none",
+              background: "transparent",
+            }}
+          >
+            코드가 없다면 구매 문의하기
+          </a>
+        ) : (
+          <p style={{ fontSize: "12px", color: "var(--ink-light)", textAlign: "center" }}>
+            코드는 구매 시 카카오톡으로 보내드립니다
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center gap-3">
