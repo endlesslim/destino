@@ -372,9 +372,12 @@ function AIInterpretation({ result }: { result: CrosspointResult }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const fetched = useRef(false);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (fetched.current) return;
+    // 페이월 블러 미리보기 안에서는 AI 호출 생략 — 잠금 해제 후에만 과금 발생
+    if (rootRef.current?.closest('[data-gated="true"]')) return;
     fetched.current = true;
 
     async function fetchInterpretation() {
@@ -399,6 +402,7 @@ function AIInterpretation({ result }: { result: CrosspointResult }) {
 
   return (
     <div
+      ref={rootRef}
       className="rounded-[14px] p-6 mb-3.5"
       style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
     >

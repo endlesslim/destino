@@ -292,6 +292,7 @@ export default function PaymentGate({ result, children }: PaymentGateProps) {
         }}
       >
         <div
+          data-gated="true"
           style={{
             filter: "blur(7px)",
             userSelect: "none",
