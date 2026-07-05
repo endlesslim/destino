@@ -64,19 +64,18 @@ const systems = [
       "16가지 유형의 인지 기능 스택을 분석하여 의사결정 패턴, 소통 방식, 스트레스 반응을 성격 축에 매핑합니다.",
   },
   {
-    key: "face",
-    label: "관상",
-    origin: "동양 오관 이론 (~1,500년 전)",
-    years: "1,500년",
-    color: "var(--face)",
-    bgColor: "color-mix(in srgb, var(--face) 15%, transparent)",
-    icon: "面",
-    principle: "얼굴의 오관(五官)에서 오행의 기운을 읽습니다.",
+    key: "ziwei",
+    label: "자미두수",
+    origin: "중국 송대 (~1,000년 전)",
+    years: "1,000년",
+    color: "var(--saju)",
+    bgColor: "color-mix(in srgb, var(--saju) 15%, transparent)",
+    icon: "紫",
+    principle: "출생 시점의 명궁에 배치되는 14주성으로 운명의 지도를 그립니다.",
     history:
-      "《마의상법》에 체계화된 동양 관상학은 이목구비의 형태와 비율에서 성격과 운명의 단서를 찾습니다. 현대에는 AI 기반 얼굴 분석 기술과 결합하여 객관적 측정이 가능해졌습니다.",
+      "송대 도사 진희이가 창시했다고 전해지는 자미두수는 자미성을 비롯한 별들을 12궁에 배치해 명반(命盤)을 만드는 동양 점성술입니다. 사주와 함께 동양 명리학의 양대 축으로 꼽힙니다.",
     usage:
-      "오관의 형태에서 오행 성분을 추출하고, 사주의 오행 균형과 교차 검증합니다. (곧 출시)",
-    comingSoon: true,
+      "음력 생년월일시로 명궁과 오행국을 정하고 14주성의 배치를 계산하여, 사주의 오행 구조와 교차 검증합니다.",
   },
   {
     key: "tarot",
@@ -100,7 +99,7 @@ const timelineItems = [
   { label: "서양 점성술", years: "4,000년", color: "var(--astro)", width: "100%" },
   { label: "사주명리학", years: "3,000년", color: "var(--saju)", width: "75%" },
   { label: "수비학", years: "2,500년", color: "var(--numero)", width: "62%" },
-  { label: "관상", years: "1,500년", color: "var(--face)", width: "37%" },
+  { label: "자미두수", years: "1,000년", color: "var(--saju)", width: "25%" },
   { label: "타로", years: "600년", color: "var(--tarot)", width: "15%" },
   { label: "MBTI", years: "100년+", color: "var(--mbti)", width: "3%" },
 ];

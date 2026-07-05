@@ -13,6 +13,7 @@ export default function Nav() {
         {/* Left: Seal + DESTINO */}
         <Link
           href="/"
+          prefetch={false}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <Seal size="sm" char="命" />

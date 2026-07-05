@@ -94,11 +94,11 @@ const services = [
     icon: "tarot",
   },
   {
-    title: "관상 분석",
-    description: "얼굴에서 읽는 오행",
-    href: "/face",
-    color: "var(--face)",
-    icon: "face",
+    title: "자미두수",
+    description: "명궁과 14주성이 그리는 명반",
+    href: "/ziwei",
+    color: "var(--saju)",
+    icon: "saju",
   },
   {
     title: "커리어 심화",
@@ -158,7 +158,7 @@ const systems = [
   { label: "서양 점성술", sub: "태양궁·상승궁·달궁", color: "var(--astro)", icon: "astro" },
   { label: "수비학", sub: "생명경로수·표현수", color: "var(--numero)", icon: "numero" },
   { label: "MBTI", sub: "16가지 성격 유형", color: "var(--mbti)", icon: "mbti" },
-  { label: "관상", sub: "오관·오행 체형", color: "var(--face)", icon: "face" },
+  { label: "자미두수", sub: "명궁·14주성 명반", color: "var(--saju)", icon: "saju" },
   { label: "타로", sub: "메이저 아르카나", color: "var(--tarot)", icon: "tarot" },
 ];
 
@@ -186,29 +186,27 @@ export default function Home() {
           </p>
 
           <h1
-            className="text-[36px] font-black leading-[1.2] tracking-[-0.02em]"
+            className="text-[46px] font-black leading-[1.15] tracking-[-0.02em]"
             style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
           >
             6개 문명이
             <br />
-            내린 같은 답
+            내린 <span style={{ color: "var(--seal)" }}>같은 답</span>
           </h1>
 
           <p
-            className="text-[15px] leading-[1.9]"
+            className="text-[15px] leading-[1.9] text-pretty max-w-[340px]"
             style={{ color: "var(--ink-medium)" }}
           >
             사주명리학 3,000년, 서양 점성술 4,000년, 수비학 2,500년.
-            <br />
             서로 다른 문명에서 독립적으로 발전한 운명 분석 체계들이
-            <br />
             당신에 대해 같은 결론을 내리는 지점이 있습니다.
           </p>
 
           <div className="flex flex-col gap-3 w-full mt-2">
             <Link
               href="/analyze"
-              className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-all hover:opacity-90 active:opacity-80"
+              className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg btn-stamp"
               style={{
                 background: "var(--seal)",
                 color: "#fff",

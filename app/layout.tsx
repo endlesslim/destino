@@ -26,12 +26,12 @@ export const metadata: Metadata = {
     template: "%s",
   },
   description:
-    "사주, 서양 점성술, MBTI, 관상, 수비학, 타로를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
+    "사주, 자미두수, 서양 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
   keywords: [
     "사주",
     "점성술",
     "MBTI",
-    "관상",
+    "자미두수",
     "수비학",
     "타로",
     "운명",
@@ -57,14 +57,14 @@ export const metadata: Metadata = {
     url: "https://destino.kr",
     title: "DESTINO — 6개 문명이 내린 같은 답",
     description:
-      "사주, 점성술, MBTI, 관상, 수비학, 타로를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
+      "사주, 자미두수, 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
     siteName: "DESTINO",
   },
   twitter: {
     card: "summary_large_image",
     title: "DESTINO — 6개 문명이 내린 같은 답",
     description:
-      "사주, 점성술, MBTI, 관상, 수비학, 타로를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
+      "사주, 자미두수, 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
   },
   robots: {
     index: true,
@@ -82,8 +82,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${notoSerifKR.variable} h-full`}>
-      <body suppressHydrationWarning className="min-h-full flex flex-col pb-16 md:pb-0">
+    <html lang="ko" className={`${notoSerifKR.variable} h-full`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col pb-16 md:pb-0" suppressHydrationWarning>
         <GoogleAnalytics measurementId={GA_MEASUREMENT_ID} />
         {children}
         <BottomTab />

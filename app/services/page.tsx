@@ -33,7 +33,7 @@ const deepServices: Service[] = [
 const freeServices: Service[] = [
   { name: "오늘의 운세", desc: "매일 달라지는 오행의 기운", href: "/daily", price: "무료", color: "var(--astro)", type: "daily" },
   { name: "타로 리딩", desc: "탄생 카드 + 올해의 카드", href: "/tarot", price: "무료", color: "var(--tarot)", type: "tarot" },
-  { name: "관상 분석", desc: "얼굴에서 읽는 오행", href: "/face", price: "무료", color: "var(--face)", type: "face" },
+  { name: "자미두수", desc: "명궁과 14주성이 그리는 명반", href: "/ziwei", price: "무료", color: "var(--saju)", type: "default" },
 ];
 
 const sections = [

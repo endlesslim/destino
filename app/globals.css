@@ -34,7 +34,7 @@
   --mbti: #5B3E8A;
   --face: #8B6914;
   --numero: #6B3A2A;
-  --tarot: #1A4A4A;
+  --tarot: #0F5B54; /* 진한 청록 — 채도를 올려 다른 체계 컬러와 시각적 무게를 맞춤 (기존 #1A4A4A는 회청록이라 물 빠져 보였음) */
 
   /* 경고 컬러 */
   --caution-bg: #FFFBEB;
@@ -56,10 +56,23 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-feature-settings: 'liga' 1;
+  /* 한글 단어 단위 줄바꿈 — 단어 중간에서 끊기지 않게 */
+  word-break: keep-all;
+  overflow-wrap: break-word; /* 긴 URL·코드가 넘칠 때만 예외적으로 분리 */
 }
 
 h1, h2, h3 {
   text-wrap: balance;
+  word-break: keep-all;
+}
+
+/* 제목·핵심 키워드: 단어가 잘린 채 줄이 나뉘지 않게 */
+h4, h5, h6, button, .font-black, .font-extrabold, [class*="font-display"] {
+  word-break: keep-all;
+}
+
+p {
+  text-wrap: pretty; /* 고아 단어(한 글자만 다음 줄로 밀리는 것) 방지 */
 }
 
 @keyframes fadeUp {
@@ -155,9 +168,9 @@ h1, h2, h3 {
 
 /* ━━━ Seal Stamp Effect ━━━ */
 @keyframes stampIn {
-  0% { opacity: 0; transform: scale(1.5) rotate(-8deg); }
-  60% { opacity: 1; transform: scale(0.95) rotate(-2deg); }
-  100% { opacity: 1; transform: scale(1) rotate(-3deg); }
+  0% { opacity: 0; transform: scale(1.5) rotate(-6deg); }
+  60% { opacity: 1; transform: scale(0.95) rotate(-1deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-0.5deg); }
 }
 
 /* ━━━ Subtle Shimmer ━━━ */
@@ -245,4 +258,18 @@ input::placeholder, textarea::placeholder {
   button { display: none !important; }
   a { text-decoration: none !important; }
   .print-break { page-break-before: always; }
+}
+
+/* 도장 누르는 CTA 프레스 인터랙션 — 인장 브랜드 시그니처 */
+.btn-stamp {
+  transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-stamp:hover {
+  background: var(--seal-light) !important;
+  transform: translateY(-1px);
+}
+.btn-stamp:active {
+  transform: scale(0.96);
+  background: var(--seal-dark) !important;
+  box-shadow: none !important;
 }

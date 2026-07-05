@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const TAB_ITEMS = [
   {
@@ -117,10 +117,24 @@ function HistoryIcon({ color }: { color: string }) {
 
 export default function BottomTab() {
   const pathname = usePathname();
+  const router = useRouter();
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
   const isLanding = pathname === "/";
+
+  /* ── 탭 라우트 프리페치: 마운트 시 1회만 ───────────────────
+   *  Link의 기본 뷰포트 프리페치는 캐시 만료(정적 5분)마다 재요청을
+   *  반복한다. 탭바는 항상 뷰포트에 있어 /daily 등으로 ?_rsc 요청이
+   *  무한 누적되므로, Link에는 prefetch={false}를 주고 여기서 한 번만
+   *  프리페치한다.
+   * ────────────────────────────────────────────────────────── */
+  useEffect(() => {
+    for (const { href } of TAB_ITEMS) {
+      router.prefetch(href);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* ── Scroll-direction hide/show (like iOS Safari tab bar) ─── */
   useEffect(() => {
@@ -172,6 +186,7 @@ export default function BottomTab() {
             <Link
               key={href}
               href={href}
+              prefetch={false}
               className="flex flex-col items-center justify-center gap-0.5 flex-1 py-2.5 min-h-[48px] transition-colors"
               aria-current={active ? "page" : undefined}
             >

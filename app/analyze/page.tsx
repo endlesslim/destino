@@ -13,53 +13,15 @@ import StatCard from "@/components/StatCard";
 
 import { analyzeCrosspoint, type CrosspointResult } from "@/lib/cross-engine";
 import { OHANG_INFO, OHANG_LIST, type Ohang } from "@/lib/saju";
-import { generateMonthlyForecast, type MonthlyForecast } from "@/lib/monthly-forecast";
+import { track } from "@/lib/track";
 import { playStampSound } from "@/lib/sound";
 import { saveAnalysis } from "@/lib/history";
 import FeedbackWidget from "@/components/FeedbackWidget";
-import Footer from "@/components/Footer";
-import Dot from "@/components/ui/Dot";
-import StaggerSection from "@/components/ui/StaggerSection";
-import SectionHeader from "@/components/ui/SectionHeader";
-import { SajuIcon, AstroIcon, NumeroIcon, MBTIIcon, FaceIcon, TarotIcon, SystemIcon, StarIcon } from "@/components/ui/SystemIcons";
-import { useCountUp } from "@/hooks/useCountUp";
-
-// ━━━ Canvas 유틸 (인스타 카드용) ━━━
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = text.split("");
-  const lines: string[] = [];
-  let line = "";
-  for (const char of words) {
-    const test = line + char;
-    if (ctx.measureText(test).width > maxWidth && line) {
-      lines.push(line);
-      line = char;
-    } else {
-      line = test;
-    }
-  }
-  if (line) lines.push(line);
-  return lines.slice(0, 3); // 최대 3줄
-}
-
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-  ctx.fill();
-}
+import PaymentGate from "@/components/PaymentGate";
 
 // ━━━ 텍스트 유틸 ━━━
 function splitFirstSentence(text: string): [string, string] {
-  if (!text || typeof text !== "string") return ["", ""];
+  if (!text || typeof text !== "string") return [String(text || ""), ""];
   const m = text.match(/^(.+?[.!?。])\s*/);
   if (m) return [m[1], text.slice(m[0].length)];
   const mid = Math.min(60, Math.floor(text.length / 2));
@@ -69,42 +31,102 @@ function splitFirstSentence(text: string): [string, string] {
 }
 
 function splitFirstTwo(text: string): [string, string] {
-  if (!text || typeof text !== "string") return ["", ""];
+  if (!text || typeof text !== "string") return [String(text || ""), ""];
   const m = text.match(/^(.+?[.!?。]\s*.+?[.!?。])\s*/);
   if (m) return [m[1], text.slice(m[0].length)];
   return splitFirstSentence(text);
 }
 
+// ━━━ 컬러 도트 ━━━
+function Dot({ color, size = 8 }: { color: string; size?: number }) {
+  return (
+    <span
+      className="inline-block rounded-full shrink-0"
+      style={{ width: size, height: size, background: color }}
+    />
+  );
+}
+
 // ━━━ 탭 아이콘 (SVG) ━━━
 function TabIcon({ type, active }: { type: string; active: boolean }) {
-  const color = active ? "var(--seal)" : "var(--ink-light)";
+  const color = active ? "#C53D43" : "#8B7E74";
   const s = 16;
   const icons: Record<string, React.ReactNode> = {
     saju: (
       <svg width={s} height={s} viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="6" stroke={color} strokeWidth="1.2" />
-        <line x1="8" y1="2" x2="8" y2="14" stroke={color} strokeWidth="0.8" />
+        <rect x="2" y="2" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" />
+        <rect x="9" y="2" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" />
+        <rect x="2" y="9" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" />
+        <rect x="9" y="9" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" />
       </svg>
     ),
     star: (
       <svg width={s} height={s} viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="2" fill={color} />
-        <circle cx="8" cy="8" r="6" stroke={color} strokeWidth="1.2" />
+        <circle cx="8" cy="8" r="5.5" stroke={color} strokeWidth="1.5" />
+        <circle cx="8" cy="8" r="1.5" fill={color} />
       </svg>
     ),
     num: (
       <svg width={s} height={s} viewBox="0 0 16 16" fill="none">
-        <path d="M5 3v10M11 3v10" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+        <path d="M5 3v10M11 3v10M2 6h12M2 10h12" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
     person: (
       <svg width={s} height={s} viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="5.5" r="3" stroke={color} strokeWidth="1.2" />
-        <path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+        <circle cx="8" cy="5" r="3" stroke={color} strokeWidth="1.5" />
+        <path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
   };
   return <>{icons[type]}</>;
+}
+
+// ━━━ 카운트 업 훅 ━━━
+function useCountUp(target: number, duration = 1800) {
+  const [value, setValue] = useState(0);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    const startTime = performance.now();
+    function tick(now: number) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo for premium feel
+      const eased = 1 - Math.pow(1 - progress, 4);
+      setValue(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }, [target, duration]);
+
+  return value;
+}
+
+// ━━━ 스태거 섹션 래퍼 ━━━
+function StaggerSection({
+  children,
+  index,
+  className = "",
+  style = {},
+}: {
+  children: React.ReactNode;
+  index: number;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <div
+      className={`animate-stagger-in ${className}`}
+      style={{
+        ...style,
+        animationDelay: `${index * 0.1}s`,
+      }}
+    >
+      {children}
+    </div>
+  );
 }
 
 // ━━━ 오행 바 차트 ━━━
@@ -112,7 +134,7 @@ const OHANG_BAR_COLORS: Record<Ohang, string> = {
   "木": "var(--saju)",
   "火": "var(--seal)",
   "土": "var(--face)",
-  "金": "var(--ink-muted)",
+  "金": "#6B6B6B",
   "水": "var(--astro)",
 };
 
@@ -196,6 +218,18 @@ function Chip({
   );
 }
 
+// ━━━ 섹션 헤더 ━━━
+function SectionHeader({ color, title }: { color: string; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <Dot color={color} size={8} />
+      <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+        {title}
+      </span>
+    </div>
+  );
+}
+
 // ━━━ 문명 헤더 (각 분석 체계의 권위감) ━━━
 function CivilizationHeader({
   symbol,
@@ -237,7 +271,7 @@ function CivilizationHeader({
       <div className="mt-3">
         <span
           className="inline-block text-[10px] tracking-[0.04em] font-semibold px-2.5 py-1 rounded"
-          style={{ background: `color-mix(in srgb, ${color} 12%, transparent)`, color, border: `1px solid color-mix(in srgb, ${color} 20%, transparent)` }}
+          style={{ background: `${color}10`, color, border: `1px solid ${color}20` }}
         >
           {basis}
         </span>
@@ -368,7 +402,7 @@ function AIInterpretation({ result }: { result: CrosspointResult }) {
       className="rounded-[14px] p-6 mb-3.5"
       style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
     >
-      <SectionHeader color="var(--seal)" title="AI 맞춤 해석" icon={<StarIcon color="var(--seal)" size={14} />} />
+      <SectionHeader color="var(--seal)" title="AI 맞춤 해석" />
       {loading && <InterpretationSkeleton />}
       {error && (
         <p className="text-sm leading-[1.8]" style={{ color: "var(--ink-muted)" }}>
@@ -399,6 +433,8 @@ function AnalyzePageInner() {
   const [day, setDay] = useState("");
   const [hour, setHour] = useState("");
   const [name, setName] = useState("");
+  const [userMbti, setUserMbti] = useState("");
+  const [refBannerVisible, setRefBannerVisible] = useState(false);
   const [result, setResult] = useState<CrosspointResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
@@ -407,16 +443,33 @@ function AnalyzePageInner() {
   const topRef = useRef<HTMLDivElement>(null);
   const valid = year.length === 4 && month !== "" && day !== "";
 
-  const loadingSteps = [
-    "동아시아 사주명리학 분석 중",
-    "바빌로니아 점성술 확인 중",
-    "피타고라스 수비학 계산 중",
-    "칼 융 성격유형 매칭 중",
-    "4개 문명의 교차점 발견 중",
-  ];
+  const loadingSteps = ["사주 분석 중", "별자리 확인 중", "수비학 계산 중", "MBTI 매칭 중", "교차점 발견 중"];
+
+  // 퍼널: 방문 트래킹 + 추천 링크(?ref=) 캡처
+  useEffect(() => {
+    track("visit_analyze");
+    const ref = searchParams.get("ref");
+    if (ref && /^DST-[A-Za-z0-9]{4,8}$/.test(ref)) {
+      try {
+        localStorage.setItem("destino_ref_by", ref.toUpperCase());
+        setRefBannerVisible(true);
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 퍼널: 결과 확인 트래킹
+  useEffect(() => {
+    if (result) track("result_view");
+  }, [result]);
 
   // Read share URL params on mount
   useEffect(() => {
+    // 수동 판매 열람 링크(?token=): 토큰을 저장해 PaymentGate가 잠금 해제하도록
+    const linkToken = searchParams.get("token");
+    if (linkToken) {
+      try { localStorage.setItem("destino_link_token", linkToken); } catch {}
+    }
     const y = searchParams.get("y");
     const m = searchParams.get("m");
     const d = searchParams.get("d");
@@ -434,10 +487,10 @@ function AnalyzePageInner() {
           setTimeout(() => {
             const h = searchParams.get("h");
             const hi = h ? parseInt(h) : undefined;
-            const r = analyzeCrosspoint(yi, mi, di, n || undefined, hi !== undefined && hi >= 0 && hi <= 23 ? hi : undefined);
+            const urlMbti = searchParams.get("mbti") || undefined;
+            const r = analyzeCrosspoint(yi, mi, di, n || undefined, hi !== undefined && hi >= 0 && hi <= 23 ? hi : undefined, urlMbti);
             setResult(r);
             setLoading(false);
-            requestAnimationFrame(() => { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; });
             playStampSound();
             try {
               saveAnalysis({
@@ -475,9 +528,9 @@ function AnalyzePageInner() {
     const m = parseInt(month);
     const d = parseInt(day);
 
-    const currentYear = new Date().getFullYear();
-    if (!y || y < 1924 || y > currentYear) {
-      setValidationError(`1924~${currentYear}년 사이를 입력해주세요`);
+    const maxYear = new Date().getFullYear();
+    if (!y || y < 1924 || y > maxYear) {
+      setValidationError(`1924~${maxYear}년 사이를 입력해주세요`);
       return;
     }
     if (!m || m < 1 || m > 12) {
@@ -491,6 +544,7 @@ function AnalyzePageInner() {
 
     setValidationError(null);
     setLoading(true);
+    track("analyze_submit");
 
     // 내 정보를 localStorage에 저장 (궁합 페이지에서 자동 불러오기용)
     try {
@@ -499,10 +553,9 @@ function AnalyzePageInner() {
 
     setTimeout(() => {
       const h = hour ? parseInt(hour) : undefined;
-      const r = analyzeCrosspoint(y, m, d, name || undefined, h !== undefined && h >= 0 && h <= 23 ? h : undefined);
+      const r = analyzeCrosspoint(y, m, d, name || undefined, h !== undefined && h >= 0 && h <= 23 ? h : undefined, userMbti || undefined);
       setResult(r);
       setLoading(false);
-      requestAnimationFrame(() => { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; });
       playStampSound();
       // Save to history
       try {
@@ -540,199 +593,21 @@ function AnalyzePageInner() {
     });
   }, [year, month, day]);
 
+  const shareToTwitter = () => {
+    const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
+    const url = `${window.location.origin}/analyze`;
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+      "_blank"
+    );
+  };
+
   const shareToThreads = () => {
     const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}% ${window.location.origin}/analyze`;
     window.open(
       `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`,
       "_blank"
     );
-  };
-
-  const shareToKakao = async () => {
-    const title = "DESTINO 운명 분석";
-    const text = `동서양 4개 체계가 분석한 나의 교차점: ${result?.archetype}. 수렴률 ${result?.convergence_rate}%`;
-    const url = `${window.location.origin}/analyze?y=${year}&m=${month}&d=${day}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text, url });
-      } catch {
-        // User cancelled
-      }
-    } else {
-      navigator.clipboard.writeText(`${title}\n${text}\n${url}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const [instaSaved, setInstaSaved] = useState(false);
-
-  const downloadResultCard = () => {
-    if (!result) return;
-    const canvas = document.createElement("canvas");
-    canvas.width = 1080;
-    canvas.height = 1920;
-    const ctx = canvas.getContext("2d")!;
-
-    // Canvas 2D API는 CSS 변수를 사용할 수 없어 하드코딩된 색상 사용
-    const C = {
-      paper: "#F5F0E8", ink: "#1C1917", seal: "#C53D43",
-      muted: "#6B5E53", light: "#8B7E74", faint: "#B8AFA4",
-      border: "#D4C9BC", white: "#FFFDF7", warm: "#EDE8DE",
-      saju: "#2D5A27", astro: "#1E3A5F", numero: "#6B3A2A", mbti: "#5B3E8A",
-    };
-
-    // 배경
-    ctx.fillStyle = C.paper;
-    ctx.fillRect(0, 0, 1080, 1920);
-
-    // 상단 장식선
-    ctx.fillStyle = C.seal;
-    ctx.fillRect(440, 80, 200, 3);
-
-    // 브랜드
-    ctx.fillStyle = C.ink;
-    ctx.font = "bold 42px serif";
-    ctx.textAlign = "center";
-    ctx.fillText("DESTINO", 540, 150);
-
-    // 부제
-    ctx.fillStyle = C.light;
-    ctx.font = "22px sans-serif";
-    ctx.fillText("동서양 운명 교차 분석", 540, 195);
-
-    // 이름 (있으면 표시)
-    if (name) {
-      ctx.fillStyle = C.ink;
-      ctx.font = "bold 36px serif";
-      ctx.fillText(name, 540, 280);
-    }
-
-    // 생년월일
-    ctx.fillStyle = C.muted;
-    ctx.font = "24px sans-serif";
-    ctx.fillText(`${year}.${month}.${day}${hour ? ` ${hour}시` : ""}`, 540, name ? 325 : 280);
-
-    // 구분선
-    const baseY = name ? 370 : 330;
-    ctx.fillStyle = C.border;
-    ctx.fillRect(340, baseY, 400, 1);
-
-    // 수렴률
-    ctx.fillStyle = C.ink;
-    ctx.font = "bold 140px serif";
-    ctx.fillText(`${result.convergence_rate}%`, 540, baseY + 170);
-    ctx.fillStyle = C.seal;
-    ctx.font = "bold 32px serif";
-    ctx.fillText(result.element_harmony.relation === "공명" ? "완벽한 공명" : result.element_harmony.relation === "상생" ? "상생의 조화" : "변화의 긴장", 540, baseY + 220);
-
-    // 아키타입
-    ctx.fillStyle = C.ink;
-    ctx.font = "bold 48px serif";
-    ctx.fillText(result.archetype, 540, baseY + 320);
-
-    // 아키타입 설명 (첫 문장)
-    ctx.fillStyle = C.muted;
-    ctx.font = "22px sans-serif";
-    const descFirst = result.archetype_desc.split(".")[0] + ".";
-    const descLines = wrapText(ctx, descFirst, 800);
-    descLines.forEach((line, i) => {
-      ctx.fillText(line, 540, baseY + 370 + i * 32);
-    });
-
-    // 4개 체계 요약 박스
-    const boxY = baseY + 470;
-    const boxW = 460;
-    const boxH = 100;
-    const gap = 20;
-
-    // 사주
-    ctx.fillStyle = C.warm;
-    roundRect(ctx, 70, boxY, boxW, boxH, 12);
-    ctx.fillStyle = C.saju;
-    ctx.font = "bold 14px sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("● 사주명리학", 90, boxY + 30);
-    ctx.fillStyle = C.ink;
-    ctx.font = "bold 32px serif";
-    ctx.fillText(`${result.saju.day.cheongan} (${result.saju.personality.nature})`, 90, boxY + 72);
-
-    // 별자리
-    ctx.fillStyle = C.warm;
-    roundRect(ctx, 70 + boxW + gap, boxY, boxW, boxH, 12);
-    ctx.fillStyle = C.astro;
-    ctx.font = "bold 14px sans-serif";
-    ctx.fillText("● 서양 점성술", 90 + boxW + gap, boxY + 30);
-    ctx.fillStyle = C.ink;
-    ctx.font = "bold 32px serif";
-    ctx.fillText(`${result.western.sunSign.name} (${result.western.sunSign.element_kr})`, 90 + boxW + gap, boxY + 72);
-
-    // 수비학
-    ctx.fillStyle = C.warm;
-    roundRect(ctx, 70, boxY + boxH + gap, boxW, boxH, 12);
-    ctx.fillStyle = C.numero;
-    ctx.font = "bold 14px sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("● 수비학", 90, boxY + boxH + gap + 30);
-    ctx.fillStyle = C.ink;
-    ctx.font = "bold 32px serif";
-    ctx.fillText(`경로수 ${result.numerology.lifePath} (${result.numerology.lifePathInfo.name})`, 90, boxY + boxH + gap + 72);
-
-    // MBTI
-    ctx.fillStyle = C.warm;
-    roundRect(ctx, 70 + boxW + gap, boxY + boxH + gap, boxW, boxH, 12);
-    ctx.fillStyle = C.mbti;
-    ctx.font = "bold 14px sans-serif";
-    ctx.fillText("● MBTI", 90 + boxW + gap, boxY + boxH + gap + 30);
-    ctx.fillStyle = C.ink;
-    ctx.font = "bold 32px serif";
-    ctx.fillText(`${result.mbti.primaryType}`, 90 + boxW + gap, boxY + boxH + gap + 72);
-
-    // 동서양 교차
-    ctx.textAlign = "center";
-    const crossY = boxY + boxH * 2 + gap * 2 + 60;
-    ctx.fillStyle = C.faint;
-    ctx.font = "20px sans-serif";
-    ctx.fillText("동양", 340, crossY);
-    ctx.fillText("서양", 740, crossY);
-    ctx.fillStyle = C.ink;
-    ctx.font = "bold 48px serif";
-    ctx.fillText(result.saju.day.ohang, 340, crossY + 60);
-    ctx.fillText(result.western.sunSign.element, 740, crossY + 60);
-    ctx.fillStyle = C.seal;
-    ctx.font = "28px sans-serif";
-    ctx.fillText("↔", 540, crossY + 55);
-    ctx.fillStyle = C.muted;
-    ctx.font = "20px sans-serif";
-    ctx.fillText(OHANG_INFO[result.saju.day.ohang].kr, 340, crossY + 95);
-    ctx.fillText(result.western.sunSign.element_kr, 740, crossY + 95);
-
-    // 띠
-    ctx.fillStyle = C.light;
-    ctx.font = "22px sans-serif";
-    ctx.fillText(`${result.saju.animal.animal_kr}띠 · ${result.saju.year.cheongan}${result.saju.year.jiji}년생`, 540, crossY + 155);
-
-    // 하단 구분선
-    ctx.fillStyle = C.border;
-    ctx.fillRect(340, 1720, 400, 1);
-
-    // 브랜드 푸터
-    ctx.fillStyle = C.light;
-    ctx.font = "24px sans-serif";
-    ctx.fillText("destino.kr", 540, 1770);
-
-    // 하단 장식선
-    ctx.fillStyle = C.seal;
-    ctx.fillRect(440, 1810, 200, 3);
-
-    // Download
-    const link = document.createElement("a");
-    link.download = "destino-result.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-
-    setInstaSaved(true);
-    setTimeout(() => setInstaSaved(false), 3000);
   };
 
   const inputClass =
@@ -759,34 +634,19 @@ function AnalyzePageInner() {
                 운명의 교차점
               </h1>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                생년월일 하나로, 4개 문명이 동시에 분석합니다
+                생년월일을 입력하면<br />동서양 4개 체계가 동시에 분석합니다
               </p>
             </div>
 
-            {/* 4개 문명 소개 */}
-            <div className="grid grid-cols-2 gap-2 mb-4 animate-fade-up" style={{ animationDelay: "0.03s" }}>
-              {[
-                { name: "사주명리학", origin: "동아시아 3,000년", color: "var(--saju)" },
-                { name: "서양 점성술", origin: "바빌로니아 4,000년", color: "var(--astro)" },
-                { name: "수비학", origin: "그리스 2,500년", color: "var(--numero)" },
-                { name: "MBTI", origin: "칼 융 심리학", color: "var(--mbti)" },
-              ].map((civ) => (
-                <div
-                  key={civ.name}
-                  className="flex items-center gap-2 p-2.5 rounded-lg"
-                  style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
-                >
-                  <span
-                    className="inline-block w-2 h-2 rounded-full shrink-0"
-                    style={{ background: civ.color }}
-                  />
-                  <div>
-                    <div className="text-[13px] font-bold" style={{ color: "var(--ink)" }}>{civ.name}</div>
-                    <div className="text-[11px]" style={{ color: "var(--ink-light)" }}>{civ.origin}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {/* 추천 유입 즉시 고지 배너 */}
+            {refBannerVisible && (
+              <div
+                className="rounded-lg px-4 py-3 mb-3.5 text-center text-[13px] font-bold animate-fade-up"
+                style={{ background: "var(--seal-bg)", border: "1.5px solid var(--seal)", color: "var(--seal)" }}
+              >
+                🎁 친구 추천 50% 할인이 적용되었습니다 — 결제 시 자동 반영
+              </div>
+            )}
 
             <div
               className="rounded-[14px] p-5 mb-3.5 animate-fade-up"
@@ -896,16 +756,45 @@ function AnalyzePageInner() {
                   시간 입력 시 시주(내면의 자아)까지 분석합니다
                 </p>
               </div>
+
+              {/* MBTI (선택) */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold mb-1.5" style={{ color: "var(--ink-medium)" }}>
+                  MBTI
+                  <span
+                    className="text-[10px] font-normal px-1.5 py-0.5 rounded"
+                    style={{ background: "var(--bg-paper)", color: "var(--ink-light)" }}
+                  >
+                    선택
+                  </span>
+                </label>
+                <select
+                  className={inputClass}
+                  style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: userMbti ? "var(--ink)" : "var(--ink-faint)" }}
+                  value={userMbti}
+                  onChange={(e) => setUserMbti(e.target.value)}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
+                  onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+                >
+                  <option value="">모름 — 사주 기반으로 추정</option>
+                  {["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"].map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+                <p className="text-[11px] mt-1" style={{ color: "var(--ink-light)" }}>
+                  실제 유형을 알고 계시면 선택하세요. 더 정확한 교차 분석이 가능합니다
+                </p>
+              </div>
             </div>
 
             <button
               onClick={analyze}
               disabled={!valid}
-              className="w-full py-4.5 text-base font-extrabold rounded-xl border-none cursor-pointer transition-all animate-fade-up"
+              className={`w-full py-4.5 text-base font-extrabold rounded-xl border-none cursor-pointer transition-all animate-fade-up ${valid ? "btn-stamp" : ""}`}
               style={{
                 background: valid ? "var(--seal)" : "var(--ink-ghost)",
                 color: valid ? "#fff" : "var(--ink-faint)",
-                boxShadow: valid ? "0 4px 16px var(--shadow-btn)" : "none",
+                boxShadow: valid ? "0 4px 16px rgba(197,61,67,0.25)" : "none",
                 animationDelay: "0.1s",
               }}
             >
@@ -924,13 +813,13 @@ function AnalyzePageInner() {
 
             <div className="flex justify-center gap-3 mt-4 animate-fade-up" style={{ animationDelay: "0.15s" }}>
               {([
-                ["saju", "var(--saju)", "사주"],
-                ["astro", "var(--astro)", "별자리"],
-                ["mbti", "var(--mbti)", "수비학"],
-                ["face", "var(--face)", "띠"],
-              ] as const).map(([type, c, v]) => (
+                ["#2D5A27", "사주"],
+                ["#1E3A5F", "별자리"],
+                ["#5B3E8A", "수비학"],
+                ["#8B6914", "띠"],
+              ] as const).map(([c, v]) => (
                 <span key={v} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-muted)" }}>
-                  <SystemIcon type={type} color={c} size={12} />{v}
+                  <Dot color={c} />{v}
                 </span>
               ))}
             </div>
@@ -938,6 +827,7 @@ function AnalyzePageInner() {
             <div className="flex justify-center mt-5 animate-fade-up" style={{ animationDelay: "0.2s" }}>
               <Link
                 href="/about"
+                prefetch={false}
                 className="text-[13px] font-medium transition-opacity hover:opacity-70"
                 style={{ color: "var(--ink-light)", textDecoration: "underline", textUnderlineOffset: "3px" }}
               >
@@ -1011,7 +901,7 @@ function AnalyzePageInner() {
               >
                 <div className="flex flex-col gap-1 mb-5">
                   <div className="flex items-center gap-2">
-                    <StarIcon color="var(--seal)" size={14} />
+                    <Dot color="#C53D43" size={10} />
                     <span className="text-sm font-bold tracking-wider" style={{ color: "var(--seal)" }}>교차점</span>
                   </div>
                   <p className="text-[12px] leading-snug ml-[18px]" style={{ color: "var(--ink-light)" }}>
@@ -1105,16 +995,16 @@ function AnalyzePageInner() {
               </div>
             </ScrollReveal>
 
-            {/* Archetype Name with Seal Stamp Visual */}
+            {/* Archetype Name — 도장 찍히는 의식 (감정적 절정) */}
             <ScrollReveal delay={160}>
               <div
-                className="rounded-[14px] p-6 mb-3.5 relative overflow-hidden"
-                style={{ background: "var(--seal-bg)", border: "1.5px solid var(--seal-light)" }}
+                className="rounded-[14px] p-6 mb-3.5 relative overflow-hidden animate-stamp-in"
+                style={{ background: "var(--seal-bg)", border: "2px solid var(--seal)" }}
               >
                 {/* Seal watermark */}
                 <div
                   className="absolute -right-4 -top-4 w-[100px] h-[100px] flex items-center justify-center -rotate-[12deg] pointer-events-none"
-                  style={{ opacity: 0.06 }}
+                  style={{ opacity: 0.08 }}
                 >
                   <span
                     className="text-[80px] font-black"
@@ -1127,7 +1017,7 @@ function AnalyzePageInner() {
                   교차점 유형
                 </div>
                 <h2
-                  className="text-[22px] font-black leading-snug relative"
+                  className="text-[36px] font-black leading-snug relative"
                   style={{ fontFamily: "var(--font-display)", color: "var(--seal-dark)" }}
                 >
                   {result.archetype}
@@ -1135,10 +1025,43 @@ function AnalyzePageInner() {
               </div>
             </ScrollReveal>
 
+            {/* 나머지 2개 문명으로 이어지는 크로스링크 — "6개 문명" 브랜드 약속 완성 */}
+            <ScrollReveal delay={0}>
+              <div
+                className="rounded-[14px] p-5 mb-3.5"
+                style={{ background: "var(--bg-warm)", border: "1.5px solid var(--border)" }}
+              >
+                <p className="text-[11px] font-semibold tracking-widest mb-1" style={{ color: "var(--ink-light)" }}>
+                  6개 문명 중 4개 완료
+                </p>
+                <p className="text-[14px] font-bold mb-3" style={{ color: "var(--ink)" }}>
+                  남은 2개 문명의 시선도 확인해보세요
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/ziwei"
+                    className="rounded-lg px-3 py-3 text-center no-underline transition-transform hover:scale-[1.02]"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <span className="block text-[15px] font-black" style={{ color: "var(--ink)", fontFamily: "var(--font-display)" }}>紫 자미두수</span>
+                    <span className="block text-[11px] mt-0.5" style={{ color: "var(--ink-muted)" }}>명궁에 새겨진 별의 지도</span>
+                  </Link>
+                  <Link
+                    href="/tarot"
+                    className="rounded-lg px-3 py-3 text-center no-underline transition-transform hover:scale-[1.02]"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+                  >
+                    <span className="block text-[15px] font-black" style={{ color: "var(--ink)", fontFamily: "var(--font-display)" }}>塔 타로</span>
+                    <span className="block text-[11px] mt-0.5" style={{ color: "var(--ink-muted)" }}>오늘의 질문에 답하다</span>
+                  </Link>
+                </div>
+              </div>
+            </ScrollReveal>
+
             {/* ═══════════════════════════════════════════
                 SECTION B: PREMIUM REPORT (PaymentGate)
                ═══════════════════════════════════════════ */}
-            {/* SECTION B: FULL REPORT */}
+            <PaymentGate result={JSON.stringify(result)}>
               <div className="flex flex-col gap-1">
 
                 {/* B1: 아키타입 상세 */}
@@ -1147,7 +1070,7 @@ function AnalyzePageInner() {
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
                   >
-                    <SectionHeader color="var(--seal)" title="아키타입 상세" icon={<StarIcon color="var(--seal)" size={14} />} />
+                    <SectionHeader color="var(--seal)" title="아키타입 상세" />
                     <h3
                       className="text-lg font-black mb-2"
                       style={{ fontFamily: "var(--font-display)", color: "var(--seal-dark)" }}
@@ -1164,7 +1087,7 @@ function AnalyzePageInner() {
                       return (
                         <div
                           className="relative overflow-hidden rounded-lg p-4"
-                          style={{ background: "var(--seal-bg)", border: "1px solid color-mix(in srgb, var(--seal) 15%, transparent)" }}
+                          style={{ background: "var(--seal-bg)", border: "1px solid rgba(197,61,67,0.12)" }}
                         >
                           {/* Seal watermark */}
                           <div
@@ -1200,7 +1123,7 @@ function AnalyzePageInner() {
                     })()}
 
                     {/* Career Crosspoint */}
-                    {result?.career_crosspoint && (
+                    {(result as any)?.career_crosspoint && (
                       <>
                         <Divider />
                         <div className="mt-5">
@@ -1212,17 +1135,17 @@ function AnalyzePageInner() {
                             className="text-base font-black mb-2"
                             style={{ fontFamily: "var(--font-display)", color: "var(--saju)" }}
                           >
-                            {result.career_crosspoint?.title}
+                            {(result as any).career_crosspoint?.title}
                           </h4>
                           <p
                             className="text-[15px] leading-[1.9] mb-4"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                           >
-                            {result.career_crosspoint?.description}
+                            {(result as any).career_crosspoint?.description}
                           </p>
-                          {result.career_crosspoint?.ideal_fields && (
+                          {(result as any).career_crosspoint?.ideal_fields && (
                             <div className="flex flex-wrap gap-2">
-                              {result.career_crosspoint.ideal_fields.map((f: string) => (
+                              {((result as any).career_crosspoint.ideal_fields as string[]).map((f: string) => (
                                 <Chip key={f} label={f} color="var(--saju)" />
                               ))}
                             </div>
@@ -1232,7 +1155,7 @@ function AnalyzePageInner() {
                     )}
 
                     {/* Relationship Crosspoint */}
-                    {result?.relationship_crosspoint && (
+                    {(result as any)?.relationship_crosspoint && (
                       <>
                         <Divider />
                         <div className="mt-5">
@@ -1244,17 +1167,17 @@ function AnalyzePageInner() {
                             className="text-base font-black mb-2"
                             style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
                           >
-                            {result.relationship_crosspoint?.title}
+                            {(result as any).relationship_crosspoint?.title}
                           </h4>
                           <p
                             className="text-[15px] leading-[1.9] mb-4"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                           >
-                            {result.relationship_crosspoint?.description}
+                            {(result as any).relationship_crosspoint?.description}
                           </p>
-                          {result.relationship_crosspoint?.ideal_partner_traits && (
+                          {(result as any).relationship_crosspoint?.ideal_partner_traits && (
                             <div className="flex flex-wrap gap-2">
-                              {result.relationship_crosspoint.ideal_partner_traits.map((t: string) => (
+                              {((result as any).relationship_crosspoint.ideal_partner_traits as string[]).map((t: string) => (
                                 <Chip key={t} label={t} color="var(--seal)" />
                               ))}
                             </div>
@@ -1271,7 +1194,7 @@ function AnalyzePageInner() {
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
                   >
-                    <SectionHeader color="var(--saju)" title="오행 밸런스" icon={<SajuIcon color="var(--saju)" size={14} />} />
+                    <SectionHeader color="var(--saju)" title="오행 밸런스" />
                     <div className="flex justify-center gap-3 mb-4">
                       {(["木", "火", "土", "金", "水"] as const).map((oh) => (
                         <span
@@ -1300,7 +1223,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--saju) 12%, transparent)",
+                      boxShadow: "inset 0 0 0 1000px rgba(45,90,39,0.03)",
                     }}
                   >
                     <CivilizationHeader
@@ -1319,11 +1242,10 @@ function AnalyzePageInner() {
                       {/* 만세력 헤더 */}
                       <div
                         className="flex text-center text-[10px] font-bold tracking-wider py-1.5"
-                        style={{ background: "color-mix(in srgb, var(--saju) 10%, transparent)", color: "var(--saju)" }}
+                        style={{ background: "rgba(45,90,39,0.08)", color: "var(--saju)" }}
                       >
                         <div className="flex-1">年柱</div>
-                        <div className="flex-1" style={{ borderLeft: "1px solid color-mix(in srgb, var(--saju) 18%, transparent)" }}>月柱</div>
-                        <div className="flex-1" style={{ borderLeft: "1px solid color-mix(in srgb, var(--saju) 18%, transparent)", borderRight: "1px solid color-mix(in srgb, var(--saju) 18%, transparent)" }}>日柱</div>
+                        <div className="flex-1" style={{ borderLeft: "1px solid rgba(45,90,39,0.15)", borderRight: "1px solid rgba(45,90,39,0.15)" }}>日柱</div>
                         {result.saju.hour && <div className="flex-1">時柱</div>}
                       </div>
                       {/* 천간 행 */}
@@ -1334,15 +1256,6 @@ function AnalyzePageInner() {
                             style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.year.ohang].color }}
                           >
                             {result.saju.year.cheongan}
-                          </div>
-                          <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>천간</div>
-                        </div>
-                        <div className="flex-1 py-3" style={{ borderLeft: "1px solid var(--border)" }}>
-                          <div
-                            className="text-[26px] font-black"
-                            style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.month.ohang].color }}
-                          >
-                            {result.saju.month.cheongan}
                           </div>
                           <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>천간</div>
                         </div>
@@ -1378,15 +1291,6 @@ function AnalyzePageInner() {
                           </div>
                           <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>지지</div>
                         </div>
-                        <div className="flex-1 py-3" style={{ borderLeft: "1px solid var(--border)" }}>
-                          <div
-                            className="text-[26px] font-black"
-                            style={{ fontFamily: "var(--font-display)", color: OHANG_INFO[result.saju.month.ohang].color }}
-                          >
-                            {result.saju.month.jiji}
-                          </div>
-                          <div className="text-[10px] mt-0.5" style={{ color: "var(--ink-light)" }}>지지</div>
-                        </div>
                         <div className="flex-1 py-3" style={{ borderLeft: "1px solid var(--border)", borderRight: result.saju.hour ? "1px solid var(--border)" : "none" }}>
                           <div className="flex items-center justify-center gap-1">
                             <Dot color={OHANG_INFO[result.saju.day.ohang].color} />
@@ -1413,14 +1317,10 @@ function AnalyzePageInner() {
                       {/* 오행 요약 */}
                       <div
                         className="flex justify-center gap-3 py-2 text-[11px]"
-                        style={{ background: "color-mix(in srgb, var(--saju) 12%, transparent)", borderTop: "1px solid var(--border)" }}
+                        style={{ background: "rgba(45,90,39,0.04)", borderTop: "1px solid var(--border)" }}
                       >
                         <span style={{ color: OHANG_INFO[result.saju.year.ohang].color }}>
                           {result.saju.year.ohang} {OHANG_INFO[result.saju.year.ohang].kr}
-                        </span>
-                        <span style={{ color: "var(--ink-faint)" }}>|</span>
-                        <span style={{ color: OHANG_INFO[result.saju.month.ohang].color }}>
-                          {result.saju.month.ohang} {OHANG_INFO[result.saju.month.ohang].kr}
                         </span>
                         <span style={{ color: "var(--ink-faint)" }}>|</span>
                         <span style={{ color: OHANG_INFO[result.saju.day.ohang].color }}>
@@ -1464,8 +1364,8 @@ function AnalyzePageInner() {
                     </div>
 
                     {/* Detailed Personality: KeyInsight + Expandable */}
-                    {result.saju.personality?.detailed_personality && (() => {
-                      const text = result.saju.personality.detailed_personality;
+                    {(result.saju.personality as any)?.detailed_personality && (() => {
+                      const text = (result.saju.personality as any).detailed_personality as string;
                       const [first, rest] = splitFirstSentence(text);
                       return (
                         <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -1495,10 +1395,10 @@ function AnalyzePageInner() {
                     })()}
 
                     {/* Career: StatCards */}
-                    {result.saju.personality?.career && result.saju.personality.career.length > 0 && (
+                    {(result.saju.personality as any)?.career && (
                       <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
                         <div className="flex items-center gap-2 mb-3">
-                          <Dot color="var(--face)" size={7} />
+                          <Dot color="#8B6914" size={7} />
                           <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업/진로</span>
                         </div>
                         <div className="flex gap-2 mb-[16px]">
@@ -1515,23 +1415,22 @@ function AnalyzePageInner() {
                         </div>
                         <Expandable
                           title="직업/진로"
-                          preview={splitFirstSentence(result.saju.personality.career[0])[0]}
-                          accentColor="var(--face)"
+                          preview={splitFirstSentence((result.saju.personality as any).career as string)[0]}
+                          accentColor="#8B6914"
                         >
-                          <ul className="text-[15px] leading-[2] list-none p-0 m-0"
+                          <p
+                            className="text-[15px] leading-[2]"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                           >
-                            {result.saju.personality.career.map((c: string) => (
-                              <li key={c} className="mb-1">{c}</li>
-                            ))}
-                          </ul>
+                            {(result.saju.personality as any).career}
+                          </p>
                         </Expandable>
                       </div>
                     )}
 
                     {/* Relationship Style: Expandable */}
-                    {result.saju.personality?.relationship && (() => {
-                      const text = result.saju.personality.relationship;
+                    {(result.saju.personality as any)?.relationship && (() => {
+                      const text = (result.saju.personality as any).relationship as string;
                       const [first, rest] = splitFirstSentence(text);
                       return (
                         <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -1556,8 +1455,8 @@ function AnalyzePageInner() {
                     })()}
 
                     {/* Weakness / Growth Area: Expandable */}
-                    {result.saju.personality?.weakness && (() => {
-                      const text = result.saju.personality.weakness;
+                    {(result.saju.personality as any)?.weakness && (() => {
+                      const text = (result.saju.personality as any).weakness as string;
                       const [first] = splitFirstSentence(text);
                       return (
                         <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -1582,14 +1481,14 @@ function AnalyzePageInner() {
                     })()}
 
                     {/* Life Advice: KeyInsight */}
-                    {result.saju.personality?.advice && (
+                    {(result.saju.personality as any)?.advice && (
                       <div className="p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
                         <div className="flex items-center gap-2 mb-3">
                           <Dot color="var(--numero)" size={7} />
                           <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>인생 조언</span>
                         </div>
                         <KeyInsight
-                          text={result.saju.personality.advice}
+                          text={(result.saju.personality as any).advice as string}
                           source="사주"
                           color="var(--numero)"
                         />
@@ -1599,7 +1498,7 @@ function AnalyzePageInner() {
                     {/* Animal Sign — Expanded */}
                     <div className="p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
                       <div className="flex items-center gap-2 mb-3">
-                        <Dot color="var(--face)" size={7} />
+                        <Dot color="#8B6914" size={7} />
                         <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
                           {result.saju.animal.animal_kr}띠
                         </span>
@@ -1607,27 +1506,27 @@ function AnalyzePageInner() {
                           {result.saju.year.jiji}
                         </span>
                       </div>
-                      {result.saju.animal?.personality && (
+                      {(result.saju.animal as any)?.personality && (
                         <p
                           className="text-[15px] leading-[2] mb-3"
                           style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                         >
-                          {result.saju.animal.personality}
+                          {(result.saju.animal as any).personality}
                         </p>
                       )}
-                      {result.saju.animal?.compatibility_best && (
+                      {(result.saju.animal as any)?.compatible && (
                         <div className="mb-2">
                           <span className="text-xs font-semibold" style={{ color: "var(--saju)" }}>잘 맞는 띠: </span>
                           <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
-                            {result.saju.animal.compatibility_best.join(", ")}
+                            {((result.saju.animal as any).compatible as string[]).join(", ")}
                           </span>
                         </div>
                       )}
-                      {result.saju.animal?.compatibility_worst && (
+                      {(result.saju.animal as any)?.incompatible && (
                         <div>
                           <span className="text-xs font-semibold" style={{ color: "var(--seal)" }}>조심할 띠: </span>
                           <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
-                            {result.saju.animal.compatibility_worst.join(", ")}
+                            {((result.saju.animal as any).incompatible as string[]).join(", ")}
                           </span>
                         </div>
                       )}
@@ -1645,7 +1544,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--astro) 12%, transparent)",
+                      boxShadow: "inset 0 0 0 1000px rgba(30,58,95,0.03)",
                     }}
                   >
                     <CivilizationHeader
@@ -1696,6 +1595,51 @@ function AnalyzePageInner() {
                         ))}
                       </div>
 
+                      {/* Big 3 — 달별자리 · 상승궁 */}
+                      <div className="text-left mb-4">
+                        <div className="text-[11px] font-semibold tracking-widest mb-2" style={{ color: "var(--ink-light)" }}>
+                          BIG 3 — 태양 · 달 · 상승
+                        </div>
+                        <div
+                          className="p-3.5 rounded-lg mb-2"
+                          style={{ background: "var(--bg-paper)", borderLeft: "3px solid var(--astro)" }}
+                        >
+                          <div className="flex items-baseline gap-2 mb-1">
+                            <span className="text-sm font-black" style={{ color: "var(--ink)" }}>
+                              ☽ {result.western.moonInfo.name}
+                            </span>
+                            <span className="text-[11px]" style={{ color: "var(--ink-light)" }}>
+                              감정과 내면{result.western.moonHourAssumed ? " · 정오 기준" : ""}
+                            </span>
+                          </div>
+                          <p className="text-[14px] leading-[1.8]" style={{ color: "var(--ink-muted)" }}>
+                            {result.western.moonInfo.emotion_style}
+                          </p>
+                        </div>
+                        {result.western.risingSign && result.western.risingInfo ? (
+                          <div
+                            className="p-3.5 rounded-lg"
+                            style={{ background: "var(--bg-paper)", borderLeft: "3px solid var(--astro)" }}
+                          >
+                            <div className="flex items-baseline gap-2 mb-1">
+                              <span className="text-sm font-black" style={{ color: "var(--ink)" }}>
+                                ↗ {result.western.risingInfo.name}
+                              </span>
+                              <span className="text-[11px]" style={{ color: "var(--ink-light)" }}>
+                                첫인상과 페르소나 · 서울 기준
+                              </span>
+                            </div>
+                            <p className="text-[14px] leading-[1.8]" style={{ color: "var(--ink-muted)" }}>
+                              {result.western.risingInfo.first_impression}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-[11px] px-1" style={{ color: "var(--ink-faint)" }}>
+                            태어난 시간을 입력하면 상승궁(첫인상·페르소나)까지 분석합니다
+                          </p>
+                        )}
+                      </div>
+
                       {/* Ruler & Modality Explanation */}
                       <div
                         className="text-left p-3.5 rounded-lg text-[15px] leading-[1.8]"
@@ -1717,8 +1661,8 @@ function AnalyzePageInner() {
                       </div>
 
                       {/* Detailed Personality: Expandable with first 2 sentences visible */}
-                      {result.western.sunSign?.detailed_personality && (() => {
-                        const text = result.western.sunSign.detailed_personality;
+                      {(result.western.sunSign as any)?.detailed_personality && (() => {
+                        const text = (result.western.sunSign as any).detailed_personality as string;
                         const [first, rest] = splitFirstTwo(text);
                         return (
                           <div className="text-left mt-4 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
@@ -1743,8 +1687,8 @@ function AnalyzePageInner() {
                       })()}
 
                       {/* Love Style: KeyInsight */}
-                      {result.western.sunSign?.love_style && (() => {
-                        const text = result.western.sunSign.love_style;
+                      {(result.western.sunSign as any)?.love_style && (() => {
+                        const text = (result.western.sunSign as any).love_style as string;
                         const [first] = splitFirstSentence(text);
                         return (
                           <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
@@ -1758,14 +1702,14 @@ function AnalyzePageInner() {
                       })()}
 
                       {/* Career Strengths */}
-                      {result.western.sunSign?.career_strengths && (
+                      {(result.western.sunSign as any)?.career_strengths && (
                         <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--saju)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>직업 강점</span>
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {result.western.sunSign.career_strengths.map((s: string) => (
+                            {((result.western.sunSign as any).career_strengths as string[]).map((s: string) => (
                               <Chip key={s} label={s} color={result.western.sunSign.color} />
                             ))}
                           </div>
@@ -1773,8 +1717,8 @@ function AnalyzePageInner() {
                       )}
 
                       {/* Shadow Side / Challenges: Expandable */}
-                      {result.western.sunSign?.shadow_side && (() => {
-                        const text = result.western.sunSign.shadow_side;
+                      {(result.western.sunSign as any)?.shadow_side && (() => {
+                        const text = (result.western.sunSign as any).shadow_side as string;
                         const [first] = splitFirstSentence(text);
                         return (
                           <div className="text-left mt-[24px] p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
@@ -1799,25 +1743,25 @@ function AnalyzePageInner() {
                       })()}
 
                       {/* Best / Worst Compatibility */}
-                      {(result.western.sunSign?.compatibility_best || result.western.sunSign?.compatibility_worst) && (
+                      {((result.western.sunSign as any)?.best_compatibility || (result.western.sunSign as any)?.worst_compatibility) && (
                         <div className="text-left mt-3.5 p-4 rounded-lg" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--astro)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>별자리 궁합</span>
                           </div>
-                          {result.western.sunSign?.compatibility_best && (
+                          {(result.western.sunSign as any)?.best_compatibility && (
                             <div className="mb-2">
                               <span className="text-xs font-semibold" style={{ color: "var(--saju)" }}>최고 궁합: </span>
                               <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
-                                {result.western.sunSign.compatibility_best.join(", ")}
+                                {((result.western.sunSign as any).best_compatibility as string[]).join(", ")}
                               </span>
                             </div>
                           )}
-                          {result.western.sunSign?.compatibility_worst && (
+                          {(result.western.sunSign as any)?.worst_compatibility && (
                             <div>
                               <span className="text-xs font-semibold" style={{ color: "var(--seal)" }}>도전적 궁합: </span>
                               <span className="text-xs" style={{ color: "var(--ink-medium)" }}>
-                                {result.western.sunSign.compatibility_worst.join(", ")}
+                                {((result.western.sunSign as any).worst_compatibility as string[]).join(", ")}
                               </span>
                             </div>
                           )}
@@ -1825,7 +1769,7 @@ function AnalyzePageInner() {
                       )}
 
                       {/* Life Lesson */}
-                      {result.western.sunSign?.life_lesson && (
+                      {(result.western.sunSign as any)?.life_lesson && (
                         <blockquote
                           className="text-left mt-4 text-[15px] leading-[2] italic"
                           style={{
@@ -1836,7 +1780,7 @@ function AnalyzePageInner() {
                             margin: 0,
                           }}
                         >
-                          {result.western.sunSign.life_lesson}
+                          {(result.western.sunSign as any).life_lesson}
                         </blockquote>
                       )}
                     </div>
@@ -1853,7 +1797,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--numero) 12%, transparent)",
+                      boxShadow: "inset 0 0 0 1000px rgba(107,58,42,0.03)",
                     }}
                   >
                     <CivilizationHeader
@@ -1867,7 +1811,7 @@ function AnalyzePageInner() {
                     <div className="text-center py-2">
                       <div
                         className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3"
-                        style={{ background: "color-mix(in srgb, var(--numero) 12%, transparent)" }}
+                        style={{ background: "var(--numero)" + "15" }}
                       >
                         <span
                           className="text-2xl font-black"
@@ -1917,8 +1861,8 @@ function AnalyzePageInner() {
                       </div>
 
                       {/* Detailed Personality: Expandable */}
-                      {result.numerology.lifePathInfo?.detailed_personality && (() => {
-                        const text = result.numerology.lifePathInfo.detailed_personality;
+                      {(result.numerology.lifePathInfo as any)?.detailed_personality && (() => {
+                        const text = (result.numerology.lifePathInfo as any).detailed_personality as string;
                         const [first] = splitFirstSentence(text);
                         return (
                           <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
@@ -1943,14 +1887,14 @@ function AnalyzePageInner() {
                       })()}
 
                       {/* Life Purpose: KeyInsight */}
-                      {result.numerology.lifePathInfo?.life_purpose && (
+                      {(result.numerology.lifePathInfo as any)?.life_purpose && (
                         <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--astro)" size={7} />
                             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>인생 목적</span>
                           </div>
                           <KeyInsight
-                            text={result.numerology.lifePathInfo.life_purpose}
+                            text={(result.numerology.lifePathInfo as any).life_purpose as string}
                             source="수비학"
                             color="var(--astro)"
                           />
@@ -1958,7 +1902,7 @@ function AnalyzePageInner() {
                       )}
 
                       {/* Career Paths: StatCards + Chips */}
-                      {result.numerology.lifePathInfo?.career_paths && (
+                      {(result.numerology.lifePathInfo as any)?.career_paths && (
                         <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--saju)" size={7} />
@@ -1971,13 +1915,13 @@ function AnalyzePageInner() {
                               color="var(--numero)"
                             />
                             <StatCard
-                              number={String(result.numerology.lifePathInfo.career_paths.length)}
+                              number={String(((result.numerology.lifePathInfo as any).career_paths as string[]).length)}
                               label="경로수"
                               color="var(--saju)"
                             />
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {result.numerology.lifePathInfo.career_paths.map((c: string) => (
+                            {((result.numerology.lifePathInfo as any).career_paths as string[]).map((c: string) => (
                               <Chip key={c} label={c} color="var(--numero)" />
                             ))}
                           </div>
@@ -1985,7 +1929,7 @@ function AnalyzePageInner() {
                       )}
 
                       {/* Relationship Style */}
-                      {result.numerology.lifePathInfo?.relationship_style && (
+                      {(result.numerology.lifePathInfo as any)?.relationship_style && (
                         <div className="text-left p-4 rounded-lg mb-[24px]" style={{ background: "var(--bg-paper)" }}>
                           <div className="flex items-center gap-2 mb-3">
                             <Dot color="var(--seal)" size={7} />
@@ -1995,14 +1939,14 @@ function AnalyzePageInner() {
                             className="text-[15px] leading-[2]"
                             style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}
                           >
-                            {result.numerology.lifePathInfo.relationship_style}
+                            {(result.numerology.lifePathInfo as any).relationship_style}
                           </p>
                         </div>
                       )}
 
                       {/* Challenge: Expandable */}
-                      {result.numerology.lifePathInfo?.challenge && (() => {
-                        const text = result.numerology.lifePathInfo.challenge;
+                      {(result.numerology.lifePathInfo as any)?.challenge && (() => {
+                        const text = (result.numerology.lifePathInfo as any).challenge as string;
                         const [first] = splitFirstSentence(text);
                         return (
                           <div className="text-left p-4 rounded-lg mb-3.5" style={{ background: "var(--bg-paper)" }}>
@@ -2114,7 +2058,7 @@ function AnalyzePageInner() {
                       borderTop: "1.5px solid var(--border)",
                       borderRight: "1.5px solid var(--border)",
                       borderBottom: "1.5px solid var(--border)",
-                      boxShadow: "inset 0 0 0 1000px color-mix(in srgb, var(--mbti) 12%, transparent)",
+                      boxShadow: "inset 0 0 0 1000px rgba(91,62,138,0.03)",
                     }}
                   >
                     <CivilizationHeader
@@ -2129,7 +2073,7 @@ function AnalyzePageInner() {
                       {/* MBTI Type Badge */}
                       <div
                         className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-3"
-                        style={{ background: "color-mix(in srgb, var(--mbti) 12%, transparent)" }}
+                        style={{ background: "var(--mbti)" + "15" }}
                       >
                         <span
                           className="text-2xl font-black tracking-wide"
@@ -2139,11 +2083,11 @@ function AnalyzePageInner() {
                         </span>
                       </div>
 
-                      {/* Secondary Type */}
-                      <div className="flex items-center justify-center gap-2 mb-3">
+                      {/* Secondary Type + 출처 라벨 */}
+                      <div className="flex items-center justify-center gap-2 mb-2">
                         <span
                           className="inline-block px-3 py-1 rounded-full text-sm font-bold"
-                          style={{ background: "color-mix(in srgb, var(--mbti) 12%, transparent)", color: "var(--mbti)" }}
+                          style={{ background: "var(--mbti)" + "12", color: "var(--mbti)" }}
                         >
                           {result.mbti.primaryType}
                         </span>
@@ -2155,6 +2099,11 @@ function AnalyzePageInner() {
                           {result.mbti.secondaryType}
                         </span>
                       </div>
+                      <p className="text-[11px] mb-3" style={{ color: "var(--ink-light)" }}>
+                        {result.mbti.source === "user"
+                          ? "직접 입력하신 유형 기준 분석입니다"
+                          : "사주 일간 기반 추정 유형입니다 — 실제 검사 결과와 다를 수 있어요. 입력창에서 실제 유형을 선택하면 그 유형으로 분석합니다"}
+                      </p>
 
                       {/* Description */}
                       <p
@@ -2275,7 +2224,7 @@ function AnalyzePageInner() {
                     className="rounded-[14px] p-6 mb-3.5"
                     style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
                   >
-                    <SectionHeader color="var(--ink)" title="성격 종합" icon={<StarIcon color="var(--ink)" size={14} />} />
+                    <SectionHeader color="var(--ink)" title="성격 종합" />
 
                     {/* Nature Header */}
                     <div className="flex items-center gap-3 mb-4">
@@ -2353,7 +2302,7 @@ function AnalyzePageInner() {
                       style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
                     >
                       <div className="flex items-center gap-2 mb-3">
-                        <Dot color="var(--seal)" size={8} />
+                        <Dot color="#C53D43" size={8} />
                         <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>교차점 일치 특성</span>
                         <span className="text-xs ml-auto" style={{ color: "var(--ink-light)" }}>
                           {result.matches.length}개 발견
@@ -2393,7 +2342,7 @@ function AnalyzePageInner() {
                       </div>
 
                       {/* 인생 조언 */}
-                      {result?.life_advice && Array.isArray(result.life_advice) && (
+                      {(result as any)?.life_advice && Array.isArray((result as any).life_advice) && (
                         <>
                           <Divider />
                           <div className="mt-4">
@@ -2404,7 +2353,7 @@ function AnalyzePageInner() {
                               </span>
                             </div>
                             <div className="flex flex-col gap-3">
-                              {result.life_advice.map((advice: string, i: number) => (
+                              {((result as any).life_advice as string[]).map((advice: string, i: number) => (
                                 <div
                                   key={i}
                                   className="p-4 rounded-xl"
@@ -2440,11 +2389,7 @@ function AnalyzePageInner() {
                 </ScrollReveal>
 
               </div>
-
-            {/* ═══════════════════════════════════════════
-                SECTION B9: 월별 운세
-               ═══════════════════════════════════════════ */}
-            <MonthlyForecastSection year={parseInt(year)} month={parseInt(month)} day={parseInt(day)} />
+            </PaymentGate>
 
             {/* ═══════════════════════════════════════════
                 SECTION C: BOTTOM (always visible)
@@ -2461,28 +2406,25 @@ function AnalyzePageInner() {
               />
             </ScrollReveal>
 
-            {/* AI Chat Consultation */}
-            <ScrollReveal delay={630}>
-              <div className="mb-3.5">
-              </div>
-            </ScrollReveal>
-
             {/* Share */}
             <ScrollReveal delay={640}>
               <div
                 className="rounded-[14px] p-5 mb-3.5"
                 style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
               >
-                <div className="text-sm font-bold mb-3" style={{ color: "var(--ink)" }}>
+                <div className="text-sm font-bold mb-1" style={{ color: "var(--ink)" }}>
                   결과 공유하기
                 </div>
+                <p className="text-[12px] mb-3" style={{ color: "var(--ink-light)" }}>
+                  당신의 교차점을 친구에게 보여주세요
+                </p>
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={handleShare}
-                    className="w-full py-3 text-sm font-bold rounded-lg border-none cursor-pointer transition-all"
+                    className="w-full py-3 text-sm font-bold rounded-lg border-none cursor-pointer transition-all btn-stamp"
                     style={{
-                      background: copied ? "var(--saju)" : "var(--bg-paper)",
-                      color: copied ? "#fff" : "var(--ink)",
+                      background: copied ? "var(--saju)" : "var(--seal)",
+                      color: "#fff",
                       fontFamily: "inherit",
                     }}
                   >
@@ -2497,29 +2439,24 @@ function AnalyzePageInner() {
                       Threads
                     </button>
                     <button
-                      onClick={shareToKakao}
+                      onClick={shareToTwitter}
                       className="flex-1 py-3 text-sm font-semibold rounded-lg border-none cursor-pointer transition-opacity hover:opacity-80"
-                      style={{ background: "var(--bg-warm)", color: "var(--ink)", fontFamily: "inherit", border: "1px solid var(--border)" }}
+                      style={{ background: "var(--bg-paper)", color: "var(--ink-medium)", fontFamily: "inherit" }}
                     >
-                      카카오톡 공유
+                      X (Twitter)
                     </button>
                   </div>
                   <button
-                    onClick={downloadResultCard}
-                    className="no-print w-full py-3 text-sm font-semibold rounded-lg cursor-pointer transition-opacity hover:opacity-80 flex items-center justify-center gap-1.5"
+                    onClick={() => window.print()}
+                    className="no-print w-full py-3 text-sm font-semibold rounded-lg cursor-pointer transition-opacity hover:opacity-80"
                     style={{
-                      background: instaSaved ? "var(--saju)" : "transparent",
-                      color: instaSaved ? "#fff" : "var(--ink-muted)",
-                      border: instaSaved ? "1.5px solid transparent" : "1.5px solid var(--border)",
+                      background: "transparent",
+                      color: "var(--ink-muted)",
+                      border: "1.5px solid var(--border)",
                       fontFamily: "inherit",
                     }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                      <circle cx="12" cy="12" r="5" />
-                      <circle cx="17.5" cy="6.5" r="1.5" />
-                    </svg>
-                    {instaSaved ? "이미지가 저장되었습니다. 인스타 스토리에 업로드하세요" : "인스타 스토리용 저장"}
+                    PDF로 저장
                   </button>
                 </div>
               </div>
@@ -2530,7 +2467,7 @@ function AnalyzePageInner() {
               <Link
                 href="/compatibility"
                 className="flex items-center gap-3 p-4 rounded-xl mb-3 no-underline transition-opacity hover:opacity-85"
-                style={{ background: "var(--seal-bg)", border: "1.5px solid var(--seal-light)" }}
+                style={{ background: "var(--seal-bg)", border: "1.5px solid #E8C5C7" }}
               >
                 <div
                   className="flex items-center justify-center w-9 h-9 rounded-[3px] shrink-0 -rotate-[3deg]"
@@ -2561,9 +2498,9 @@ function AnalyzePageInner() {
               >
                 <div
                   className="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
-                  style={{ background: "color-mix(in srgb, var(--tarot) 10%, transparent)" }}
+                  style={{ background: "rgba(15,91,84,0.10)" }}
                 >
-                  <TarotIcon color="var(--tarot)" size={16} />
+                  <Dot color="var(--tarot)" size={10} />
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>
@@ -2579,67 +2516,13 @@ function AnalyzePageInner() {
               </Link>
             </ScrollReveal>
 
-            {/* Career Deep Analysis link */}
-            <ScrollReveal delay={860}>
-              <Link
-                href="/career"
-                className="flex items-center gap-3 p-4 rounded-xl mb-3 no-underline transition-opacity hover:opacity-85"
-                style={{ background: "var(--bg-warm)", border: "1.5px solid var(--saju)" }}
-              >
-                <div
-                  className="flex items-center justify-center w-9 h-9 rounded-[3px] shrink-0 -rotate-[3deg]"
-                  style={{ border: "2px solid var(--saju)", color: "var(--saju)", fontFamily: "var(--font-display)" }}
-                >
-                  <span className="text-sm font-black">職</span>
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>
-                    커리어 심화 분석
-                  </div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
-                    TOP 5 추천 직업과 업무 성향 분석
-                  </div>
-                </div>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
-                  <path d="M6 4l4 4-4 4" stroke="var(--saju)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Link>
-            </ScrollReveal>
-
-            {/* Love Deep Analysis link */}
-            <ScrollReveal delay={920}>
-              <Link
-                href="/love"
-                className="flex items-center gap-3 p-4 rounded-xl mb-4 no-underline transition-opacity hover:opacity-85"
-                style={{ background: "var(--bg-warm)", border: "1.5px solid var(--seal)" }}
-              >
-                <div
-                  className="flex items-center justify-center w-9 h-9 rounded-[3px] shrink-0 -rotate-[3deg]"
-                  style={{ border: "2px solid var(--seal)", color: "var(--seal)", fontFamily: "var(--font-display)" }}
-                >
-                  <span className="text-sm font-black">緣</span>
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-bold" style={{ color: "var(--ink-medium)" }}>
-                    연애 심화 분석
-                  </div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-light)" }}>
-                    이상형, 연애 패턴, 올해 연애운
-                  </div>
-                </div>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
-                  <path d="M6 4l4 4-4 4" stroke="var(--seal)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Link>
-            </ScrollReveal>
-
             {/* Actions */}
-            <ScrollReveal delay={980}>
+            <ScrollReveal delay={880}>
               <div className="flex flex-col gap-2.5">
                 <button
                   onClick={reset}
                   className="w-full py-4 text-[15px] font-bold rounded-xl border-none cursor-pointer transition-opacity hover:opacity-85"
-                  style={{ background: "var(--seal)", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 16px var(--shadow-btn)" }}
+                  style={{ background: "var(--ink)", color: "var(--bg-paper)", fontFamily: "inherit" }}
                 >
                   다시 분석하기
                 </button>
@@ -2653,192 +2536,30 @@ function AnalyzePageInner() {
               </div>
             </ScrollReveal>
 
+            {/* Bottom Spacer */}
             <div className="h-10" />
           </>
         )}
-
-        <Footer />
       </div>
     </main>
-  );
-}
-
-// ━━━ 월별 운세 섹션 ━━━
-function MonthlyForecastSection({ year, month, day }: { year: number; month: number; day: number }) {
-  const forecast = generateMonthlyForecast(year, month, day, 2026);
-  const [expandedMonth, setExpandedMonth] = useState<number | null>(null);
-
-  return (
-    <ScrollReveal delay={650}>
-      <div className="mb-3.5">
-        <SectionHeader color="var(--astro)" title="2026년 월별 운세" icon={<AstroIcon color="var(--astro)" size={14} />} />
-
-        {/* Year Summary */}
-        <div
-          className="rounded-[14px] p-5 mb-4"
-          style={{
-            background: "var(--bg-white)",
-            border: "1.5px solid var(--border)",
-            borderLeft: "3px solid var(--seal)",
-          }}
-        >
-          <p
-            className="text-[14px] leading-[1.9] italic"
-            style={{ color: "var(--ink-muted)", fontFamily: "var(--font-display)" }}
-          >
-            &ldquo;{forecast.yearSummary}&rdquo;
-          </p>
-        </div>
-
-        {/* Best & Caution badges */}
-        <div className="flex gap-2 mb-4">
-          <div
-            className="flex-1 rounded-lg px-3 py-2.5 text-center"
-            style={{ background: "var(--seal-bg)", border: "1px solid var(--seal)" }}
-          >
-            <div className="text-[10px] font-semibold tracking-wider mb-0.5" style={{ color: "var(--seal)" }}>
-              BEST MONTH
-            </div>
-            <div className="text-lg font-black" style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}>
-              {forecast.bestMonth}월
-            </div>
-          </div>
-          <div
-            className="flex-1 rounded-lg px-3 py-2.5 text-center"
-            style={{ background: "var(--caution-bg)", border: "1px solid var(--caution-border)" }}
-          >
-            <div className="text-[10px] font-semibold tracking-wider mb-0.5" style={{ color: "var(--caution-title)" }}>
-              CAUTION
-            </div>
-            <div className="text-lg font-black" style={{ fontFamily: "var(--font-display)", color: "var(--caution-title)" }}>
-              {forecast.cautionMonth}월
-            </div>
-          </div>
-        </div>
-
-        {/* 12 month cards — 2 column grid */}
-        <div className="grid grid-cols-2 gap-2.5">
-          {forecast.months.map((m) => {
-            const isBest = m.month === forecast.bestMonth;
-            const isCaution = m.month === forecast.cautionMonth;
-            const isExpanded = expandedMonth === m.month;
-            const borderColor = isBest ? "var(--seal)" : isCaution ? "var(--caution-border)" : "var(--border)";
-            const bgColor = isBest ? "var(--seal-bg)" : isCaution ? "var(--caution-bg)" : "var(--bg-white)";
-
-            return (
-              <button
-                key={m.month}
-                onClick={() => setExpandedMonth(isExpanded ? null : m.month)}
-                className="rounded-[12px] p-3.5 text-left transition-all cursor-pointer"
-                style={{
-                  background: bgColor,
-                  border: `1.5px solid ${borderColor}`,
-                  gridColumn: isExpanded ? "1 / -1" : undefined,
-                }}
-              >
-                {/* Header row */}
-                <div className="flex items-center justify-between mb-2">
-                  <span
-                    className="text-[15px] font-black"
-                    style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
-                  >
-                    {m.label}
-                  </span>
-                  <span
-                    className="text-[11px] font-bold px-2 py-0.5 rounded-full"
-                    style={{
-                      background: isBest ? "var(--seal)" : isCaution ? "var(--caution-border)" : "var(--ink-muted)",
-                      color: "#fff",
-                    }}
-                  >
-                    {m.keyword}
-                  </span>
-                </div>
-
-                {/* Score bar */}
-                <div className="mb-2">
-                  <div
-                    className="h-[6px] rounded-full overflow-hidden"
-                    style={{ background: "var(--border)" }}
-                  >
-                    <div
-                      className="h-full rounded-full transition-all duration-700"
-                      style={{
-                        width: `${m.score * 10}%`,
-                        background: isBest ? "var(--seal)" : isCaution ? "var(--caution-border)" : "var(--ink-muted)",
-                      }}
-                    />
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-[10px]" style={{ color: "var(--ink-light)" }}>
-                      {m.score}/10
-                    </span>
-                    <span className="text-[10px]" style={{ color: "var(--ink-light)" }}>
-                      행운의 날: {m.luckyDay}일
-                    </span>
-                  </div>
-                </div>
-
-                {/* Category mini-bars (always visible) */}
-                <div className="flex gap-1.5 mb-1.5">
-                  {(["career", "love", "health", "wealth"] as const).map((cat) => {
-                    const labels = { career: "직업", love: "연애", health: "건강", wealth: "재물" };
-                    const colors = { career: "var(--saju)", love: "var(--seal)", health: "var(--astro)", wealth: "var(--face)" };
-                    return (
-                      <div key={cat} className="flex-1">
-                        <div className="text-[9px] font-medium mb-0.5" style={{ color: "var(--ink-light)" }}>
-                          {labels[cat]}
-                        </div>
-                        <div className="flex gap-[2px]">
-                          {[1, 2, 3, 4, 5].map((n) => (
-                            <div
-                              key={n}
-                              className="h-[3px] flex-1 rounded-full"
-                              style={{
-                                background: n <= m.category[cat] ? colors[cat] : "var(--border)",
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Expanded content */}
-                {isExpanded && (
-                  <div className="mt-3 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
-                    <p className="text-[13px] leading-[1.8] mb-2" style={{ color: "var(--ink-muted)" }}>
-                      {m.description}
-                    </p>
-                    <p className="text-[12px] leading-[1.6] font-semibold" style={{ color: "var(--ink-medium)" }}>
-                      {m.advice}
-                    </p>
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </ScrollReveal>
   );
 }
 
 // ━━━ 수렴률 카운터 ━━━
 function ConvergenceCounter({ rate }: { rate: number }) {
   const displayValue = useCountUp(rate, 2000);
+  const done = displayValue >= rate;
   return (
-    <div>
+    <div className={done ? "animate-stamp-in" : undefined}>
       <span
-        className="text-[56px] font-black leading-none tracking-tight"
-        style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+        className="text-[68px] font-black leading-none tracking-tight"
+        style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
       >
         {displayValue}
       </span>
       <span
         className="text-2xl font-bold"
-        style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+        style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
       >
         %
       </span>
