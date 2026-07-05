@@ -3,12 +3,16 @@
 // components/PaymentButton.tsx
 // PortOne (토스페이먼츠) 결제 버튼 — 전체 분석 리포트 구매
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   PAYMENT_CONFIG,
   generatePaymentId,
   type PaymentVerifyResponse,
 } from "@/lib/payment";
+import { track } from "@/lib/track";
+
+/** 추천 유입 코드 localStorage 키 (?ref= 링크로 방문 시 저장됨) */
+const REF_BY_KEY = "destino_ref_by";
 
 // PortOne SDK 타입 (브라우저 전역)
 declare global {
@@ -25,7 +29,7 @@ declare global {
 }
 
 interface PaymentButtonProps {
-  onPaymentComplete: (accessToken: string) => void;
+  onPaymentComplete: (accessToken: string, referralCode?: string | null) => void;
 }
 
 /** 다이아몬드 아이콘 SVG (이모지 대신 인라인 SVG 사용) */
@@ -122,6 +126,87 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
   const [errorMessage, setErrorMessage] = useState("");
   const sdkLoadedRef = useRef(false);
 
+  // ── 할인 (추천 유입 / 쿠폰) ──
+  const [discountPct, setDiscountPct] = useState(0);
+  const [discountLabel, setDiscountLabel] = useState("");
+  const [appliedCode, setAppliedCode] = useState<{ coupon?: string; ref?: string }>({});
+  const [showCouponInput, setShowCouponInput] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponMessage, setCouponMessage] = useState("");
+
+  const finalPrice = Math.round((PAYMENT_CONFIG.price * (100 - discountPct)) / 100);
+
+  // 추천 링크(?ref=)로 유입된 경우 자동 50% 할인 적용
+  useEffect(() => {
+    try {
+      const refBy = localStorage.getItem(REF_BY_KEY);
+      if (!refBy) return;
+      fetch("/api/coupon/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: refBy }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.valid && data.kind === "referral") {
+            setDiscountPct(data.discountPct);
+            setDiscountLabel("친구 추천 할인");
+            setAppliedCode({ ref: refBy });
+          }
+        })
+        .catch(() => {});
+    } catch {
+      // localStorage 접근 불가 환경은 무시
+    }
+  }, []);
+
+  /** 쿠폰/열람 코드 수동 적용 */
+  const applyCoupon = useCallback(async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    setCouponMessage("");
+    try {
+      const res = await fetch("/api/coupon/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.valid && data.kind === "unlock") {
+        // 열람 코드 — 결제 없이 즉시 잠금 해제 (1회용 소진)
+        setCouponMessage("열람 코드 확인 중…");
+        const redeemRes = await fetch("/api/coupon/redeem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        });
+        const redeem = await redeemRes.json();
+        if (redeem.valid && redeem.accessToken) {
+          track("payment_done");
+          onPaymentComplete(redeem.accessToken, null);
+        } else {
+          setCouponMessage("이미 사용되었거나 유효하지 않은 코드입니다");
+        }
+        return;
+      }
+      if (data.valid) {
+        setDiscountPct(data.discountPct);
+        if (data.kind === "coupon") {
+          setDiscountLabel("쿠폰 할인");
+          setAppliedCode({ coupon: code });
+        } else {
+          setDiscountLabel("친구 추천 할인");
+          setAppliedCode({ ref: code });
+        }
+        setCouponMessage(`${data.discountPct}% 할인이 적용되었습니다`);
+      } else {
+        setCouponMessage("유효하지 않은 코드입니다");
+      }
+    } catch {
+      setCouponMessage("확인 중 오류가 발생했습니다");
+    }
+  }, [couponInput, onPaymentComplete]);
+
   /** PortOne SDK를 동적으로 로드 */
   const loadPortOneSDK = useCallback(async (): Promise<void> => {
     if (sdkLoadedRef.current && window.PortOne) return;
@@ -151,9 +236,10 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
     });
   }, []);
 
-  /** 결제 프로세스 시작 */
-  const handlePayment = useCallback(async () => {
+  /** 결제 프로세스 시작 — 카카오페이(간편결제) 우선, 카드 선택 가능 */
+  const handlePayment = useCallback(async (method: "EASY_PAY" | "CARD" = "EASY_PAY") => {
     setErrorMessage("");
+    track("payment_click");
 
     try {
       // 1단계: SDK 로드
@@ -173,9 +259,10 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
         channelKey: PAYMENT_CONFIG.channelKey,
         paymentId,
         orderName: PAYMENT_CONFIG.productName,
-        totalAmount: PAYMENT_CONFIG.price,
+        totalAmount: finalPrice,
         currency: PAYMENT_CONFIG.currency,
-        payMethod: "CARD",
+        payMethod: method,
+        ...(method === "EASY_PAY" ? { easyPay: { easyPayProvider: "KAKAOPAY" } } : {}),
         /**
          * 프로덕션 설정:
          * customer: {
@@ -203,17 +290,26 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
         body: JSON.stringify({
           paymentId,
           orderName: PAYMENT_CONFIG.productName,
+          couponCode: appliedCode.coupon,
+          refCode: appliedCode.ref,
         }),
       });
 
-      const verifyResult: PaymentVerifyResponse = await verifyResponse.json();
+      const verifyResult: PaymentVerifyResponse & { referralCode?: string | null } =
+        await verifyResponse.json();
 
       if (!verifyResult.success || !verifyResult.accessToken) {
         throw new Error(verifyResult.error || "결제 검증에 실패했습니다.");
       }
 
+      // 사용한 추천코드는 재사용 방지를 위해 제거
+      if (appliedCode.ref) {
+        try { localStorage.removeItem(REF_BY_KEY); } catch {}
+      }
+
       // 4단계: 완료 콜백
-      onPaymentComplete(verifyResult.accessToken);
+      track("payment_done");
+      onPaymentComplete(verifyResult.accessToken, verifyResult.referralCode);
       setStatus("idle");
     } catch (error) {
       const message =
@@ -223,7 +319,7 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
       setErrorMessage(message);
       setStatus("error");
     }
-  }, [loadPortOneSDK, onPaymentComplete]);
+  }, [loadPortOneSDK, onPaymentComplete, finalPrice, appliedCode]);
 
   const isProcessing =
     status === "loading-sdk" || status === "paying" || status === "verifying";
@@ -238,7 +334,7 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
     <div className="flex flex-col items-center gap-3">
       {/* CTA 버튼 */}
       <button
-        onClick={handlePayment}
+        onClick={() => handlePayment("EASY_PAY")}
         disabled={isProcessing}
         aria-label="전체 분석 리포트 결제하기"
         aria-busy={isProcessing}
@@ -289,9 +385,19 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
               letterSpacing: "-0.02em",
             }}
           >
-            {isProcessing
-              ? statusText[status]
-              : `전체 분석 리포트 받기 — ₩${PAYMENT_CONFIG.price.toLocaleString()}`}
+            {isProcessing ? (
+              statusText[status]
+            ) : discountPct > 0 ? (
+              <>
+                카카오페이로 리포트 받기 —{" "}
+                <span style={{ textDecoration: "line-through", opacity: 0.6, fontWeight: 400 }}>
+                  ₩{PAYMENT_CONFIG.price.toLocaleString()}
+                </span>{" "}
+                ₩{finalPrice.toLocaleString()}
+              </>
+            ) : (
+              `카카오페이로 리포트 받기 — ₩${PAYMENT_CONFIG.price.toLocaleString()}`
+            )}
           </span>
         </div>
         {!isProcessing && (
@@ -309,6 +415,98 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
           </p>
         )}
       </button>
+
+      {/* 카드 결제 대안 */}
+      {!isProcessing && (
+        <button
+          onClick={() => handlePayment("CARD")}
+          style={{
+            background: "none",
+            border: "none",
+            color: "var(--ink-muted)",
+            fontSize: "13px",
+            textDecoration: "underline",
+            cursor: "pointer",
+          }}
+        >
+          신용·체크카드로 결제하기
+        </button>
+      )}
+
+      {/* 할인 적용 뱃지 */}
+      {discountPct > 0 && (
+        <div
+          style={{
+            fontSize: "12px",
+            fontWeight: 600,
+            color: "var(--seal)",
+            background: "var(--seal-bg)",
+            padding: "4px 12px",
+            borderRadius: "999px",
+          }}
+        >
+          {discountLabel} {discountPct}% 적용됨
+        </div>
+      )}
+
+      {/* 쿠폰 코드 입력 */}
+      {discountPct === 0 && (
+        <div style={{ width: "100%", maxWidth: "380px", textAlign: "center" }}>
+          {!showCouponInput ? (
+            <button
+              onClick={() => setShowCouponInput(true)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--ink-light)",
+                fontSize: "12px",
+                textDecoration: "underline",
+                cursor: "pointer",
+              }}
+            >
+              구매하신 열람 코드나 쿠폰이 있으신가요?
+            </button>
+          ) : (
+            <div style={{ display: "flex", gap: "6px" }}>
+              <input
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+                placeholder="예: OPEN-3F7A2C"
+                style={{
+                  flex: 1,
+                  padding: "8px 12px",
+                  fontSize: "13px",
+                  border: "1px solid var(--ink-ghost)",
+                  borderRadius: "8px",
+                  background: "var(--bg-white)",
+                  color: "var(--ink)",
+                }}
+              />
+              <button
+                onClick={applyCoupon}
+                style={{
+                  padding: "8px 16px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  border: "none",
+                  borderRadius: "8px",
+                  background: "var(--ink-medium)",
+                  color: "var(--bg-white)",
+                  cursor: "pointer",
+                }}
+              >
+                적용
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+      {couponMessage && (
+        <p style={{ fontSize: "12px", color: discountPct > 0 ? "#2D5A27" : "var(--seal)" }}>
+          {couponMessage}
+        </p>
+      )}
 
       {/* 안전한 결제 뱃지 */}
       <div

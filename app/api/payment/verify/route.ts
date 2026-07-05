@@ -4,6 +4,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PAYMENT_CONFIG, type PaymentVerifyResponse } from "@/lib/payment";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import {
+  issueReferralCode,
+  isValidReferralCode,
+  findUnusedCoupon,
+  markCouponUsed,
+  issueReferralReward,
+} from "@/lib/referral-server";
 import * as fs from "fs";
 import * as path from "path";
 import crypto from "crypto";
@@ -49,7 +56,7 @@ function savePaymentRecord(record: {
 export async function POST(request: NextRequest): Promise<NextResponse<PaymentVerifyResponse>> {
   try {
     const body = await request.json();
-    const { paymentId, orderName } = body;
+    const { paymentId, orderName, couponCode, refCode } = body;
 
     if (!paymentId || !orderName) {
       return NextResponse.json(
@@ -57,6 +64,27 @@ export async function POST(request: NextRequest): Promise<NextResponse<PaymentVe
         { status: 400 },
       );
     }
+
+    // ── 할인 검증 (클라이언트가 보낸 코드를 서버에서 재검증) ──
+    // 프로덕션에서는 PortOne 결제 금액과 (정가 - 할인) 일치 여부까지 검증할 것
+    let discountPct = 0;
+    let appliedCoupon: string | null = null;
+    let appliedRef: string | null = null;
+    if (couponCode && typeof couponCode === "string") {
+      const coupon = await findUnusedCoupon(couponCode.trim().toUpperCase());
+      if (coupon) {
+        discountPct = coupon.discountPct;
+        appliedCoupon = coupon.code;
+      }
+    }
+    if (!appliedCoupon && refCode && typeof refCode === "string") {
+      const normalized = refCode.trim().toUpperCase();
+      if (await isValidReferralCode(normalized)) {
+        discountPct = 50;
+        appliedRef = normalized;
+      }
+    }
+    const expectedAmount = Math.round(PAYMENT_CONFIG.price * (100 - discountPct) / 100);
 
     /**
      * 프로덕션 결제 검증:
@@ -113,24 +141,50 @@ export async function POST(request: NextRequest): Promise<NextResponse<PaymentVe
     if (isSupabaseConfigured()) {
       await supabase.from("payments").insert({
         payment_id: paymentId,
-        amount: PAYMENT_CONFIG.price,
+        amount: expectedAmount,
         product: orderName,
         status: "paid",
       });
     }
 
-    // File-based fallback
-    savePaymentRecord({
-      paymentId,
-      orderName,
-      amount: PAYMENT_CONFIG.price,
-      paidAt,
-      accessToken,
-    });
+    // 로컬 개발 폴백 (Supabase 미설정 시에만; 서버리스에서 /tmp는 휘발성)
+    if (!isSupabaseConfigured()) {
+      try {
+        savePaymentRecord({
+          paymentId,
+          orderName,
+          amount: expectedAmount,
+          paidAt,
+          accessToken,
+        });
+      } catch {
+        // 파일 기록 실패는 결제 성공에 영향 없음
+      }
+    }
+
+    // ── 추천/쿠폰 후처리 ──
+    // 1) 이 결제자에게 새 추천코드 발급 (공유용)
+    let myReferralCode: string | null = null;
+    try {
+      myReferralCode = await issueReferralCode(paymentId);
+    } catch {
+      // 추천코드 발급 실패는 결제 성공에 영향 없음
+    }
+    // 2) 사용한 쿠폰 소진 처리
+    if (appliedCoupon) {
+      try { await markCouponUsed(appliedCoupon, paymentId); } catch {}
+    }
+    // 3) 추천 성사 → 추천인에게 50% 보상 쿠폰 발급
+    if (appliedRef) {
+      try { await issueReferralReward(appliedRef); } catch {}
+    }
 
     return NextResponse.json({
       success: true,
       accessToken,
+      referralCode: myReferralCode,
+      paidAmount: expectedAmount,
+      discountPct,
     });
   } catch (error) {
     console.error("Payment verification error:", error);
