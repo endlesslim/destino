@@ -7,6 +7,8 @@ import { CHEONGAN_INFO, type Cheongan } from "./saju";
 export interface MBTIResult {
   primaryType: string;        // "ENTJ"
   secondaryType: string;      // "ESTJ" (alternative)
+  /** 'user' = 직접 입력한 실제 유형, 'estimated' = 사주 일간 기반 추정 */
+  source: "user" | "estimated";
   description: string;        // 4-5 sentences
   strengths: string[];
   weaknesses: string[];
@@ -287,21 +289,38 @@ export const MBTI_TRAIT_MAP: Record<string, string[]> = {
   "ISFP": ["감성", "섬세함", "적응력", "유연함"],
 };
 
+/** 유효한 MBTI 16유형인지 확인 */
+export function isValidMBTI(type: string): boolean {
+  const t = type.trim().toUpperCase();
+  return /^[EI][NS][TF][JP]$/.test(t) && !!MBTI_DATA[t];
+}
+
 // ━━━ 메인 분석 함수 ━━━
+/**
+ * @param userMbti 사용자가 직접 입력한 실제 MBTI (선택).
+ *   제공 시 이 유형을 기준으로 분석 (source: 'user'),
+ *   미제공 시 사주 일간 기반 추정 유형 사용 (source: 'estimated').
+ *   추정 유형은 통계적 경향일 뿐 실제 검사 결과와 다를 수 있음.
+ */
 export function analyzeMBTI(
   dayCheongan: Cheongan,
   zodiacName: string,
   zodiacElement: string,
+  userMbti?: string,
 ): MBTIResult {
   const mapping = CHEONGAN_MBTI_MAP[dayCheongan];
-  const primaryType = mapping.primary;
-  const secondaryType = mapping.secondary;
+  const normalized = userMbti?.trim().toUpperCase();
+  const useUserType = !!(normalized && isValidMBTI(normalized));
+
+  const primaryType = useUserType ? normalized! : mapping.primary;
+  const secondaryType = useUserType ? mapping.primary : mapping.secondary;
 
   const profile = MBTI_DATA[primaryType] || MBTI_DATA["ENTJ"];
 
   return {
     primaryType,
     secondaryType,
+    source: useUserType ? "user" : "estimated",
     description: profile.description,
     strengths: profile.strengths,
     weaknesses: profile.weaknesses,

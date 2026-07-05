@@ -1,7 +1,7 @@
 // src/lib/saju.ts
-// 사주 계산 엔진 — korean-lunar-calendar 기반 정확한 만세력 계산
+// 사주 계산 엔진 — 천문 계산(태양 황경) 기반 정통 만세력 (lib/manseryeok.ts)
 
-import KoreanLunarCalendar from 'korean-lunar-calendar';
+import { getFourPillars, dayGanjiIndex } from './manseryeok';
 
 // ━━━ 천간 (天干) ━━━
 export const CHEONGAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"] as const;
@@ -290,38 +290,29 @@ export const SANGGEUK: Record<Ohang, Ohang> = {
   "木":"土", "火":"金", "土":"水", "金":"木", "水":"火"
 };
 
-// ━━━ 정확한 만세력 계산 (korean-lunar-calendar) ━━━
+// ━━━ 정확한 만세력 계산 (천문 계산 기반 — lib/manseryeok.ts) ━━━
+//
+// 이전 구현은 korean-lunar-calendar의 getChineseGapja()를 사용했으나,
+// 이 라이브러리는 연주를 "음력 설날" 기준, 월주를 "음력 월" 기준으로 계산한다.
+// 정통 사주는 연주=입춘 기준, 월주=절기(節) 기준이므로
+// 설날~입춘 사이 출생자와 절기 경계 부근 출생자의 사주가 틀리게 나왔다.
+// 현재는 태양 황경 계산 기반 절기 엔진(manseryeok.ts)을 사용한다.
+//
+// Verification (scripts/verify-manseryeok.ts):
+// - 일주: 1900~2050 전 날짜 korean-lunar-calendar와 100% 일치
+// - 절기: KASI 공표 입춘 시각(2024/2025/2026)과 ±15분 이내 일치
+// - 입춘 경계·서머타임·23시 자시일변 케이스 검증
 
-// Verification:
-// 1990-01-15 → 己巳年 丁丑月 庚辰日 (confirmed via korean-lunar-calendar)
-// 1995-07-22 → 乙亥年 癸未月 甲寅日 (confirmed)
-// 2000-01-01 → 己卯年 丙子月 戊午日 (confirmed)
-
-/** 정확한 사주 계산 — 만세력 데이터 기반 (입춘 기준 연주 자동 반영) */
-export function getAccurateSaju(year: number, month: number, day: number) {
-  const cal = new KoreanLunarCalendar();
-  cal.setSolarDate(year, month, day);
-  const chinese = cal.getChineseGapja();
-
-  // Parse year pillar: "乙亥年" → cheongan="乙", jiji="亥"
-  const yearStr = chinese.year;
-  const yearCg = yearStr[0] as Cheongan;
-  const yearJj = yearStr[1] as Jiji;
-
-  // Parse month pillar: "癸未月" → cheongan="癸", jiji="未"
-  const monthStr = chinese.month;
-  const monthCg = monthStr[0] as Cheongan;
-  const monthJj = monthStr[1] as Jiji;
-
-  // Parse day pillar: "甲寅日" → cheongan="甲", jiji="寅"
-  const dayStr = chinese.day;
-  const dayCg = dayStr[0] as Cheongan;
-  const dayJj = dayStr[1] as Jiji;
-
+/**
+ * 정확한 사주 계산 — 입춘 기준 연주, 절기 기준 월주.
+ * @param hour 선택. 절기 경계일 출생 시 시각까지 반영해 정확도 향상 (미제공 시 정오 가정)
+ */
+export function getAccurateSaju(year: number, month: number, day: number, hour?: number) {
+  const p = getFourPillars(year, month, day, hour);
   return {
-    year: { cheongan: yearCg, jiji: yearJj },
-    month: { cheongan: monthCg, jiji: monthJj },
-    day: { cheongan: dayCg, jiji: dayJj },
+    year: { cheongan: p.year.stem as Cheongan, jiji: p.year.branch as Jiji },
+    month: { cheongan: p.month.stem as Cheongan, jiji: p.month.branch as Jiji },
+    day: { cheongan: p.day.stem as Cheongan, jiji: p.day.branch as Jiji },
   };
 }
 
@@ -343,25 +334,14 @@ export function getYearOhang(year: number): Ohang {
   return OHANG_LIST[Math.floor(cgIdx / 2)];
 }
 
-/** @deprecated getAccurateSaju 사용 권장. 간이 일주 (日柱) 추정 */
+/** 일간 (日干) — 율리우스 적일 기반 정확한 60갑자 계산 */
 export function estimateDayCheongan(year: number, month: number, day: number): Cheongan {
-  // 기준일: 1900년 1월 1일 = 甲子일 (갑자일)
-  // 이후 60일 주기로 순환
-  const base = new Date(1900, 0, 1);
-  const target = new Date(year, month - 1, day);
-  const diffDays = Math.floor((target.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
-  // 1900.1.1은 甲(0)子(0)일
-  const cgIdx = ((diffDays % 10) + 10) % 10;
-  return CHEONGAN[cgIdx];
+  return CHEONGAN[dayGanjiIndex(year, month, day) % 10];
 }
 
+/** 일지 (日支) — 율리우스 적일 기반 정확한 60갑자 계산 */
 export function estimateDayJiji(year: number, month: number, day: number): Jiji {
-  const base = new Date(1900, 0, 1);
-  const target = new Date(year, month - 1, day);
-  const diffDays = Math.floor((target.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
-  // 1900-01-01은 甲戌일 (지지 인덱스 10), +10 오프셋 보정
-  const jjIdx = (((diffDays + 10) % 12) + 12) % 12;
-  return JIJI[jjIdx];
+  return JIJI[dayGanjiIndex(year, month, day) % 12];
 }
 
 /** 월주 천간 추정 (연간 기준 오호연원법) */
@@ -429,19 +409,19 @@ export interface SajuResult {
 
 /** 사주 종합 분석 */
 export function analyzeSaju(year: number, month: number, day: number, hour?: number): SajuResult {
-  // 정확한 만세력 데이터 사용
-  const accurate = getAccurateSaju(year, month, day);
+  // 정확한 만세력 계산 (입춘 기준 연주, 절기 기준 월주, 자시일변·서머타임 보정 포함)
+  const pillars = getFourPillars(year, month, day, hour);
 
-  const yCg = accurate.year.cheongan;
-  const yJj = accurate.year.jiji;
+  const yCg = pillars.year.stem as Cheongan;
+  const yJj = pillars.year.branch as Jiji;
   const yOh = CHEONGAN_INFO[yCg].ohang;
 
-  const mCg = accurate.month.cheongan;
-  const mJj = accurate.month.jiji;
+  const mCg = pillars.month.stem as Cheongan;
+  const mJj = pillars.month.branch as Jiji;
   const mOh = CHEONGAN_INFO[mCg].ohang;
 
-  const dCg = accurate.day.cheongan;
-  const dJj = accurate.day.jiji;
+  const dCg = pillars.day.stem as Cheongan;
+  const dJj = pillars.day.branch as Jiji;
   const dOh = CHEONGAN_INFO[dCg].ohang;
 
   // 오행 밸런스 (연주 + 월주 + 일주 기준)
@@ -453,13 +433,13 @@ export function analyzeSaju(year: number, month: number, day: number, hour?: num
   balance[dOh] += 1;
   balance[JIJI_INFO[dJj].ohang] += 1;
 
-  // 시주 (時柱) 계산 — hour가 제공된 경우
+  // 시주 (時柱) — getFourPillars에서 자시일변·시간대 보정까지 반영해 계산됨
   let hourPillar: { cheongan: Cheongan; jiji: Jiji; ohang: Ohang } | undefined;
   let hourPersonality: string | undefined;
 
-  if (hour !== undefined && hour >= 0 && hour <= 23) {
-    const hJj = getHourJiji(hour);
-    const hCg = getHourCheongan(dCg, hour);
+  if (pillars.hour) {
+    const hCg = pillars.hour.stem as Cheongan;
+    const hJj = pillars.hour.branch as Jiji;
     const hOh = OHANG_LIST[Math.floor(CHEONGAN.indexOf(hCg) / 2)];
     hourPillar = { cheongan: hCg, jiji: hJj, ohang: hOh };
 

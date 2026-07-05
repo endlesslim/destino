@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import {
   generateTarotReading,
   toRomanNumeral,
+  drawDailySpread,
   type TarotCard,
   type TarotReading,
 } from "@/lib/tarot";
@@ -281,7 +282,7 @@ function InputSection({
               ["--tw-ring-color" as string]: "var(--tarot)",
             }}
             min={1920}
-            max={2025}
+            max={new Date().getFullYear()}
           />
           <input
             type="number"
@@ -339,7 +340,69 @@ function InputSection({
 
 // ━━━ 결과 표시 ━━━
 
-function ReadingDisplay({ reading }: { reading: TarotReading }) {
+/** 78장 풀덱 기반 오늘의 3카드 스프레드 (과거·현재·미래) */
+function DailySpreadSection({ birth }: { birth: { year: number; month: number; day: number } }) {
+  const [spread, setSpread] = useState<ReturnType<typeof drawDailySpread> | null>(null);
+
+  useEffect(() => {
+    // 오늘 날짜는 클라이언트에서 결정 (하이드레이션 불일치 방지)
+    const todayISO = new Date().toISOString().slice(0, 10);
+    setSpread(drawDailySpread(birth.year, birth.month, birth.day, todayISO));
+  }, [birth.year, birth.month, birth.day]);
+
+  if (!spread) return null;
+
+  const positions = [
+    { label: "과거", sub: "지나온 흐름", card: spread.past, reversed: spread.isReversed[0] },
+    { label: "현재", sub: "지금의 에너지", card: spread.present, reversed: spread.isReversed[1] },
+    { label: "미래", sub: "다가올 방향", card: spread.future, reversed: spread.isReversed[2] },
+  ];
+
+  return (
+    <ScrollReveal delay={200}>
+      <div className="flex flex-col gap-4">
+        <div className="text-center">
+          <p className="text-[11px] tracking-[0.1em] uppercase font-medium mb-1" style={{ color: "var(--tarot)" }}>
+            TODAY&apos;S SPREAD — 78장 풀덱
+          </p>
+          <p className="text-[13px]" style={{ color: "var(--ink-muted)" }}>
+            메이저·마이너 아르카나 78장 전체에서 뽑은 오늘의 세 장입니다. 매일 자정에 바뀝니다.
+          </p>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {positions.map((p) => (
+            <div
+              key={p.label}
+              className="rounded-xl p-3 text-center flex flex-col gap-1.5"
+              style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+            >
+              <span className="text-[11px] font-bold" style={{ color: "var(--tarot)" }}>{p.label}</span>
+              <span className="text-[10px]" style={{ color: "var(--ink-faint)" }}>{p.sub}</span>
+              <span className="text-[15px] font-black leading-tight" style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}>
+                {p.card.name}
+              </span>
+              <span className="text-[10px]" style={{ color: p.reversed ? "var(--seal)" : "var(--ink-light)" }}>
+                {p.reversed ? "역방향" : "정방향"}
+              </span>
+              <p className="text-[11px] leading-[1.6] text-left" style={{ color: "var(--ink-muted)" }}>
+                {(p.reversed ? p.card.reversed : p.card.upright).slice(0, 3).join(" · ")}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div
+          className="rounded-lg p-4 text-[13px] leading-[1.8]"
+          style={{ background: "var(--bg-warm)", color: "var(--ink-muted)" }}
+        >
+          <span className="font-bold" style={{ color: "var(--ink-medium)" }}>오늘의 중심 — {spread.present.name}{spread.isReversed[1] ? " (역방향)" : ""}: </span>
+          {spread.present.description}
+        </div>
+      </div>
+    </ScrollReveal>
+  );
+}
+
+function ReadingDisplay({ reading, birth }: { reading: TarotReading; birth?: { year: number; month: number; day: number } }) {
   const [copied, setCopied] = useState(false);
 
   function handleShare() {
@@ -355,6 +418,11 @@ function ReadingDisplay({ reading }: { reading: TarotReading }) {
 
   return (
     <div className="flex flex-col gap-8">
+      {/* 오늘의 3카드 — 78장 풀덱 */}
+      {birth && <DailySpreadSection birth={birth} />}
+
+      {birth && <Divider />}
+
       {/* Birth Card */}
       <CardSection
         sectionLabel="BIRTH CARD"
@@ -483,7 +551,7 @@ export default function TarotPage() {
       !m ||
       !d ||
       y < 1920 ||
-      y > 2025 ||
+      y > new Date().getFullYear() ||
       m < 1 ||
       m > 12 ||
       d < 1 ||
@@ -510,11 +578,11 @@ export default function TarotPage() {
 
   return (
     <main
-      className="min-h-screen flex flex-col items-center px-6 py-12"
+      className="min-h-screen flex flex-col items-center px-6 pb-12"
       style={{ background: "var(--bg-paper)" }}
     >
       <Nav />
-      <div className="w-full max-w-[440px] flex flex-col gap-8 pt-14">
+      <div className="w-full max-w-[440px] flex flex-col gap-8 pt-16">
         {/* Reset button */}
         {hasSaved && (
           <div className="flex justify-end -mb-4">
@@ -542,7 +610,14 @@ export default function TarotPage() {
             onSubmit={handleSubmit}
           />
         ) : (
-          <ReadingDisplay reading={reading} />
+          <ReadingDisplay
+            reading={reading}
+            birth={
+              birthYear && birthMonth && birthDay
+                ? { year: parseInt(birthYear), month: parseInt(birthMonth), day: parseInt(birthDay) }
+                : undefined
+            }
+          />
         )}
 
         <Footer />

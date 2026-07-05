@@ -286,3 +286,61 @@ export function analyzeWestern(month: number, day: number): WesternResult {
     modality: sign.modality,
   };
 }
+
+// ━━━ 정밀 분석 — 태양궁 + 달별자리 + 상승궁 (Big 3) ━━━
+// 달·상승궁 천문 계산은 lib/lunar-astro.ts (Meeus ELP-2000 축약 급수, 삭·망 40케이스 검증 통과)
+
+import {
+  getMoonSignIndex,
+  getRisingSignIndex,
+  MOON_SIGN_INFO,
+  RISING_SIGN_INFO,
+  type MoonSignInfo,
+  type RisingSignInfo,
+} from "./lunar-astro";
+
+export interface WesternFullResult extends WesternResult {
+  /** 달별자리 — 감정·내면 (황도 12궁 기준) */
+  moonSign: ZodiacSign;
+  moonInfo: MoonSignInfo;
+  /** 상승궁 — 첫인상·페르소나. 출생 시각 미제공 시 undefined */
+  risingSign?: ZodiacSign;
+  risingInfo?: RisingSignInfo;
+  /** 출생 시각 없이 정오 가정으로 달별자리를 계산했는지 여부 */
+  moonHourAssumed: boolean;
+}
+
+/**
+ * Co-Star급 Big 3 분석. 상승궁은 출생 시각(hour)이 있어야 계산됩니다.
+ * 달별자리는 시각 미제공 시 정오 가정 (달은 하루 ~13° 이동, 경계일 출생만 영향)
+ */
+export function analyzeWesternFull(
+  year: number,
+  month: number,
+  day: number,
+  hour?: number,
+): WesternFullResult {
+  const base = analyzeWestern(month, day);
+  const hasHour = hour !== undefined && hour >= 0 && hour <= 23;
+
+  const moonIdx = getMoonSignIndex(year, month, day, hasHour ? hour : undefined);
+  const moonSign = ZODIAC[moonIdx];
+  const moonInfo = MOON_SIGN_INFO[moonIdx];
+
+  let risingSign: ZodiacSign | undefined;
+  let risingInfo: RisingSignInfo | undefined;
+  if (hasHour) {
+    const risingIdx = getRisingSignIndex(year, month, day, hour!);
+    risingSign = ZODIAC[risingIdx];
+    risingInfo = RISING_SIGN_INFO[risingIdx];
+  }
+
+  return {
+    ...base,
+    moonSign,
+    moonInfo,
+    risingSign,
+    risingInfo,
+    moonHourAssumed: !hasHour,
+  };
+}

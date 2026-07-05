@@ -2,7 +2,7 @@
 // 교차점 분석 엔진 — DESTINO의 핵심 차별화 기능
 
 import { analyzeSaju, type SajuResult, type Ohang, OHANG_LIST, OHANG_INFO, SANGSAENG, CHEONGAN_INFO, JIJI_INFO } from "./saju";
-import { analyzeWestern, type WesternResult, ELEMENT_TO_OHANG } from "./western";
+import { analyzeWesternFull, type WesternResult, type WesternFullResult, ELEMENT_TO_OHANG } from "./western";
 import { analyzeNumerology, type NumerologyResult, LIFEPATH_TO_CHEONGAN } from "./numerology";
 import { analyzeMBTI, type MBTIResult, MBTI_TRAIT_MAP } from "./mbti";
 
@@ -171,7 +171,7 @@ export interface RelationshipCrosspoint {
 export interface CrosspointResult {
   // 개별 체계 결과
   saju: SajuResult;
-  western: WesternResult;
+  western: WesternFullResult; // 태양궁 + 달별자리 + 상승궁 (Big 3)
   numerology: NumerologyResult;
   mbti: MBTIResult;
 
@@ -314,9 +314,15 @@ function extractTraits(saju: SajuResult, western: WesternResult, numerology: Num
   return traitMap;
 }
 
+/** 서양 원소의 한국어 표기 (문장 내 삽입용) */
+const WESTERN_EL_KR: Record<string, string> = {
+  Fire: "불", Earth: "흙", Air: "바람", Water: "물",
+};
+
 function analyzeElementHarmony(saju: SajuResult, western: WesternResult): ElementHarmony {
   const eastern = saju.day.ohang;
   const westernEl = western.element;
+  const westernKr = WESTERN_EL_KR[westernEl] || westernEl;
   const matchingOhang = ELEMENT_TO_OHANG[westernEl] || [];
 
   // 완벽 공명: 서양 원소의 대응 오행에 동양 오행이 포함
@@ -324,7 +330,7 @@ function analyzeElementHarmony(saju: SajuResult, western: WesternResult): Elemen
     return {
       eastern, western: westernEl,
       relation: "공명",
-      description: `동양의 ${OHANG_INFO[eastern].kr}과 서양의 ${westernEl}이 같은 원소입니다. 두 문명이 완벽하게 같은 답을 내렸습니다.`,
+      description: `동양의 ${OHANG_INFO[eastern].kr}과 서양의 ${westernKr}이 같은 원소입니다. 두 문명이 완벽하게 같은 답을 내렸습니다.`,
       score: 95
     };
   }
@@ -334,7 +340,7 @@ function analyzeElementHarmony(saju: SajuResult, western: WesternResult): Elemen
     return {
       eastern, western: westernEl,
       relation: "상생",
-      description: `동양의 ${OHANG_INFO[eastern].kr}과 서양의 ${westernEl}이 서로를 키워주는 상생 관계입니다.`,
+      description: `동양의 ${OHANG_INFO[eastern].kr}과 서양의 ${westernKr}이 서로를 키워주는 상생 관계입니다.`,
       score: 80
     };
   }
@@ -344,7 +350,7 @@ function analyzeElementHarmony(saju: SajuResult, western: WesternResult): Elemen
     return {
       eastern, western: westernEl,
       relation: "긴장",
-      description: `동양의 ${OHANG_INFO[eastern].kr}과 서양의 ${westernEl} 사이에 긴장이 있습니다. 이 긴장이 성장의 원동력이 됩니다.`,
+      description: `동양의 ${OHANG_INFO[eastern].kr}과 서양의 ${westernKr} 사이에 긴장이 있습니다. 이 긴장이 성장의 원동력이 됩니다.`,
       score: 60
     };
   }
@@ -456,9 +462,9 @@ function analyzeCareerCrosspoint(
   const signName = sign.name;
   const lpName = lpInfo.name;
 
-  const description = `사주에서 '${dayNature}'의 기질은 ${sajuCareers[0]?.split(" — ")[1] || "독자적 역할"}을 가리키고, ` +
-    `${signName}의 별자리 에너지는 ${westernCareers[0]?.split(" — ")[1] || "창의적 분야"}에서 빛을 발합니다. ` +
-    `수비학의 '${lpName}' 경로는 ${numerologyCareers[0]?.split(" — ")[1] || "본질적 가치를 추구하는 일"}을 지향하고 있어, ` +
+  const description = `사주에서 '${dayNature}'의 기질은 "${sajuCareers[0]?.split(" — ")[1] || "독자적 역할"}"라는 방향을 가리키고, ` +
+    `${signName}의 별자리 에너지는 "${westernCareers[0]?.split(" — ")[1] || "창의적 분야"}" 영역에서 빛을 발합니다. ` +
+    `수비학의 '${lpName}' 경로 역시 "${numerologyCareers[0]?.split(" — ")[1] || "본질적 가치를 추구하는 일"}"라는 가치를 지향합니다. ` +
     `세 체계가 공통으로 가리키는 당신의 직업적 운명은 '${bestTitle}'의 방향입니다.`;
 
   return {
@@ -543,9 +549,9 @@ function analyzeRelationshipCrosspoint(
     }
   }
 
-  const description = `사주의 ${dayInfo.kr} 일간은 "${dayInfo.relationship.split('.')[0]}"이라는 연애 패턴을 보여주고, ` +
-    `${sign.name}의 사랑 방식은 "${sign.love_style.split('.')[0]}"으로 요약됩니다. ` +
-    `수비학의 ${lpInfo.name} 경로는 "${lpInfo.relationship_style.split('.')[0]}"이라는 관계 성향을 가리킵니다. ` +
+  const description = `사주의 ${dayInfo.kr} 일간은 "${dayInfo.relationship.split('.')[0]}"라는 연애 패턴을 보여주고, ` +
+    `${sign.name}의 사랑 방식은 "${sign.love_style.split('.')[0]}"라는 문장으로 요약됩니다. ` +
+    `수비학의 ${lpInfo.name} 경로는 "${lpInfo.relationship_style.split('.')[0]}"라는 관계 성향을 가리킵니다. ` +
     `이 세 가지가 교차하여 만들어내는 당신의 연애 아키타입은 '${bestTitle}'입니다.`;
 
   return {
@@ -595,7 +601,7 @@ function generateLifeAdvice(
   // 5. 동서양 교차 조언
   if (elementHarmony.relation === "긴장") {
     advice.push(
-      `[교차점의 가르침] 동양의 ${OHANG_INFO[elementHarmony.eastern].kr}과 서양의 ${elementHarmony.western} 사이의 긴장은 ` +
+      `[교차점의 가르침] 동양의 ${OHANG_INFO[elementHarmony.eastern].kr}과 서양의 ${WESTERN_EL_KR[elementHarmony.western] || elementHarmony.western} 원소 사이의 긴장은 ` +
       `당신 안에 상반된 두 가지 힘이 공존한다는 뜻입니다. 이 긴장을 억누르지 말고 창조적 에너지로 전환하세요. ` +
       `가장 위대한 작품은 모순 속에서 태어납니다.`
     );
@@ -653,16 +659,16 @@ function generateCrossMessage(
   // 문장 3-4: 사주 + 서양 구체적 정렬 설명
   msg += `사주에서 당신의 일간은 ${dayKr}(${dayNature})으로, `;
   if (elementHarmony.relation === "공명") {
-    msg += `서양 점성술의 ${signName}이 가리키는 ${western.element} 원소와 같은 기운으로 공명합니다. `;
+    msg += `서양 점성술의 ${signName}이 가리키는 ${WESTERN_EL_KR[western.element] || western.element}의 원소와 같은 기운으로 공명합니다. `;
     msg += `동양의 오행과 서양의 원소가 하나로 겹치는 이 조합은 대단히 드물며, 타고난 방향성이 분명하여 흔들림 없이 자기 길을 갈 수 있는 축복을 받았습니다. `;
   } else if (elementHarmony.relation === "상생") {
-    msg += `${signName}(${western.element})의 에너지와 상생의 관계를 이루고 있습니다. `;
-    msg += `동양의 ${OHANG_INFO[elementHarmony.eastern].kr}이 서양의 ${elementHarmony.western}을 만나 서로를 키워주는 이 구조는 균형 잡힌 성장이 가능한 길상의 조합으로, 인생의 고비마다 회복력이 강하게 발현됩니다. `;
+    msg += `${signName}(${WESTERN_EL_KR[western.element] || western.element}의 원소)의 에너지와 상생의 관계를 이루고 있습니다. `;
+    msg += `동양의 ${OHANG_INFO[elementHarmony.eastern].kr}이 서양의 ${WESTERN_EL_KR[elementHarmony.western] || elementHarmony.western} 원소를 만나 서로를 키워주는 이 구조는 균형 잡힌 성장이 가능한 길상의 조합으로, 인생의 고비마다 회복력이 강하게 발현됩니다. `;
   } else if (elementHarmony.relation === "긴장") {
-    msg += `${signName}(${western.element})과 사이에 흥미로운 긴장이 존재합니다. `;
+    msg += `${signName}(${WESTERN_EL_KR[western.element] || western.element}의 원소)과의 사이에 흥미로운 긴장이 존재합니다. `;
     msg += `이 긴장은 약점이 아니라 창조적 폭발력의 원천으로, 내면에 상반된 두 가지 힘이 공존하기에 남들이 상상하지 못하는 독창적 관점을 만들어냅니다. `;
   } else {
-    msg += `${signName}(${western.element})이 제시하는 방향과 독특한 화학 반응을 일으킵니다. `;
+    msg += `${signName}(${WESTERN_EL_KR[western.element] || western.element}의 원소)이 제시하는 방향과 독특한 화학 반응을 일으킵니다. `;
     msg += `여러 문명이 당신을 서로 다른 빛깔로 그리지만, 바로 그 다양성이야말로 복합적이고 매혹적인 인격의 근거입니다. `;
   }
 
@@ -695,13 +701,14 @@ function buildOhangVisual(saju: SajuResult): { ohang: Ohang; ratio: number; labe
 export function analyzeCrosspoint(
   year: number, month: number, day: number,
   name?: string,
-  hour?: number
+  hour?: number,
+  userMbti?: string
 ): CrosspointResult {
   // 개별 체계 분석
   const saju = analyzeSaju(year, month, day, hour);
-  const western = analyzeWestern(month, day);
+  const western = analyzeWesternFull(year, month, day, hour);
   const numerology = analyzeNumerology(year, month, day, name);
-  const mbti = analyzeMBTI(saju.day.cheongan, western.sunSign.name, western.element);
+  const mbti = analyzeMBTI(saju.day.cheongan, western.sunSign.name, western.element, userMbti);
 
   // 특성 추출 & 교차점 찾기
   const traitMap = extractTraits(saju, western, numerology, mbti);
