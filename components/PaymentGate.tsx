@@ -13,6 +13,8 @@ const MY_REF_KEY = "destino_my_refcode";
 interface PaymentGateProps {
   /** CrosspointResult를 JSON 직렬화한 문자열 (생년월일 해시 추출용) */
   result: string;
+  /** 아키타입 이름 — 페이월 헤드라인 개인화용 */
+  archetype?: string;
   /** 전체 리포트 컨텐츠 */
   children: ReactNode;
 }
@@ -132,7 +134,7 @@ function ReferralBanner() {
   );
 }
 
-export default function PaymentGate({ result, children }: PaymentGateProps) {
+export default function PaymentGate({ result, archetype, children }: PaymentGateProps) {
   const [state, setState] = useState<GateState>("preview");
   const [isChecking, setIsChecking] = useState(true);
   const [revealProgress, setRevealProgress] = useState(0);
@@ -351,7 +353,7 @@ export default function PaymentGate({ result, children }: PaymentGateProps) {
               marginBottom: "4px",
             }}
           >
-            봉인을 해제하고 전체 리포트를 받으세요
+            {archetype ? `'${archetype}' 전체 리포트가 준비되었습니다` : "봉인을 해제하고 전체 리포트를 받으세요"}
           </p>
           <p style={{ fontSize: "12px", color: "var(--ink-light)", marginBottom: "12px" }}>
             사주카페 1회 상담 ₩100,000+ · 같은 깊이를 이 가격에

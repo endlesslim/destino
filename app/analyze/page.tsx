@@ -1029,6 +1029,38 @@ function AnalyzePageInner() {
               </div>
             </ScrollReveal>
 
+            {/* 무료 가치: 일간 + 오행 밸런스 — "내 사주가 진짜 계산됐다"는 실감 */}
+            <ScrollReveal delay={80}>
+              <div
+                className="rounded-[14px] p-6 mb-3.5"
+                style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+              >
+                <SectionHeader color="var(--saju)" title="나의 기운 — 오행 밸런스" />
+                <p className="text-[14px] leading-[1.8] mb-4" style={{ color: "var(--ink-medium)" }}>
+                  당신의 일간(日干)은{" "}
+                  <span className="font-black" style={{ color: OHANG_INFO[result.saju.day.ohang].color, fontFamily: "var(--font-display)" }}>
+                    {result.saju.day.cheongan} {result.saju.personality.kr}
+                  </span>
+                  {" · "}{result.saju.personality.nature} — {result.saju.personality.personality}
+                </p>
+                <div className="flex justify-center gap-3 mb-4">
+                  {(["木", "火", "土", "金", "水"] as const).map((oh) => (
+                    <span
+                      key={oh}
+                      className="text-xs font-semibold px-2 py-1 rounded"
+                      style={{
+                        background: OHANG_BAR_COLORS[oh] + "15",
+                        color: OHANG_BAR_COLORS[oh],
+                      }}
+                    >
+                      {oh} {OHANG_INFO[oh].kr}
+                    </span>
+                  ))}
+                </div>
+                <OhangBars balance={result.saju.ohang_balance} />
+              </div>
+            </ScrollReveal>
+
             {/* 나머지 2개 문명으로 이어지는 크로스링크 — "6개 문명" 브랜드 약속 완성 */}
             <ScrollReveal delay={0}>
               <div
@@ -1062,10 +1094,29 @@ function AnalyzePageInner() {
               </div>
             </ScrollReveal>
 
+            {/* 무료→유료 전환 브릿지 — 미완결 서사로 자연스럽게 연결 */}
+            <ScrollReveal delay={120}>
+              <div className="py-6 text-center">
+                <p className="text-[12px] font-semibold tracking-widest mb-2" style={{ color: "var(--ink-light)" }}>
+                  여기까지가 무료로 보여드리는 뼈대입니다
+                </p>
+                <p
+                  className="text-[18px] font-black leading-[1.5] text-balance"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
+                >
+                  당신의 유형, &lsquo;{result.archetype}&rsquo; —
+                  <br />
+                  어떤 일에서 빛나고 누구를 만나야 하는지는
+                  <br />
+                  <span style={{ color: "var(--seal)" }}>아래에 봉인되어 있습니다</span>
+                </p>
+              </div>
+            </ScrollReveal>
+
             {/* ═══════════════════════════════════════════
                 SECTION B: PREMIUM REPORT (PaymentGate)
                ═══════════════════════════════════════════ */}
-            <PaymentGate result={JSON.stringify(result)}>
+            <PaymentGate result={JSON.stringify(result)} archetype={result.archetype}>
               <div className="flex flex-col gap-1">
 
                 {/* B1: 아키타입 상세 */}
@@ -1189,31 +1240,6 @@ function AnalyzePageInner() {
                         </div>
                       </>
                     )}
-                  </div>
-                </ScrollReveal>
-
-                {/* B2: 오행 밸런스 */}
-                <ScrollReveal delay={80}>
-                  <div
-                    className="rounded-[14px] p-6 mb-3.5"
-                    style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
-                  >
-                    <SectionHeader color="var(--saju)" title="오행 밸런스" />
-                    <div className="flex justify-center gap-3 mb-4">
-                      {(["木", "火", "土", "金", "水"] as const).map((oh) => (
-                        <span
-                          key={oh}
-                          className="text-xs font-semibold px-2 py-1 rounded"
-                          style={{
-                            background: OHANG_BAR_COLORS[oh] + "15",
-                            color: OHANG_BAR_COLORS[oh],
-                          }}
-                        >
-                          {oh} {OHANG_INFO[oh].kr}
-                        </span>
-                      ))}
-                    </div>
-                    <OhangBars balance={result.saju.ohang_balance} />
                   </div>
                 </ScrollReveal>
 
