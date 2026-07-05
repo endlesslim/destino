@@ -638,7 +638,7 @@ function AnalyzePageInner() {
                 운명의 교차점
               </h1>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                생년월일을 입력하면<br />동서양 4개 체계가 동시에 분석합니다
+                사주에게 묻고, 별자리에게 다시 묻습니다<br />답이 겹치는 지점 — 30초면 확인됩니다
               </p>
             </div>
 
