@@ -5,8 +5,8 @@ import { type CrosspointResult } from "./cross-engine";
 import { OHANG_INFO, CHEONGAN_INFO, type Ohang, SANGSAENG } from "./saju";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-4-20250514";
-const CLAUDE_DAILY_MODEL = process.env.CLAUDE_DAILY_MODEL || "claude-haiku-4-5-20251001";
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-5";
+const CLAUDE_DAILY_MODEL = process.env.CLAUDE_DAILY_MODEL || "claude-haiku-4-5";
 
 interface ClaudeResponse {
   interpretation: string;
@@ -140,6 +140,7 @@ export async function getInterpretation(result: CrosspointResult): Promise<strin
       body: JSON.stringify({
         model: CLAUDE_MODEL,
         max_tokens: 2000,
+        thinking: { type: "disabled" },
         messages: [
           { role: "user", content: buildCrosspointPrompt(result) }
         ],
