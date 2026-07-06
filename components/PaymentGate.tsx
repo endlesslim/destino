@@ -408,6 +408,65 @@ export default function PaymentGate({ result, archetype, children }: PaymentGate
             </li>
           ))}
         </ul>
+
+        {/* 신뢰 블록 — 사실 기반 항목만 */}
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "380px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            marginTop: 10,
+          }}
+        >
+          {[
+            {
+              icon: "曆",
+              title: "천문 계산 기반 만세력",
+              desc: "태양 황경으로 절기를 계산하는 정밀 엔진 — 시중 만세력과 교차 검증을 통과했습니다",
+            },
+            {
+              icon: "私",
+              title: "회원가입 없음 · 개인정보 최소 수집",
+              desc: "생년월일은 리포트 생성에만 사용됩니다",
+            },
+            {
+              icon: "保",
+              title: "코드 미작동 시 100% 재발급",
+              desc: "열람에 문제가 있으면 새 코드를 다시 보내드립니다",
+            },
+          ].map((t) => (
+            <div
+              key={t.title}
+              style={{ display: "flex", gap: 10, alignItems: "flex-start", textAlign: "left" }}
+            >
+              <span
+                style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--seal)",
+                  background: "var(--seal-bg)",
+                  border: "1px solid var(--seal)",
+                  flexShrink: 0,
+                  fontFamily: "var(--font-display)",
+                }}
+              >
+                {t.icon}
+              </span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>{t.title}</div>
+                <div style={{ fontSize: 12, color: "var(--ink-light)", lineHeight: 1.5 }}>{t.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

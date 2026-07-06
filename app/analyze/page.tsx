@@ -893,7 +893,7 @@ function AnalyzePageInner() {
             {/* Date */}
             <ScrollReveal delay={0} className="flex justify-end items-center mb-5">
               <span className="text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
-                {year}.{month}.{day}
+                {name.trim() ? `${name.trim()}님 · ` : ""}{year}.{month}.{day}
               </span>
             </ScrollReveal>
 

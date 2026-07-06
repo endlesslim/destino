@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "DESTINO" }],
   creator: "DESTINO",
-  metadataBase: new URL("https://destino.kr"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://destino-mocha.vercel.app"),
   alternates: {
     canonical: "/",
     languages: {
@@ -54,17 +54,26 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    url: "https://destino.kr",
+    url: "/",
     title: "DESTINO — 사주도 별자리도 같은 답",
     description:
       "사주, 자미두수, 서양 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
     siteName: "DESTINO",
+    images: [
+      {
+        url: "/og.png",
+        width: 2400,
+        height: 1256,
+        alt: "사주와 별자리가 같은 말을 합니다 — DESTINO",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "DESTINO — 사주도 별자리도 같은 답",
     description:
       "사주, 자미두수, 서양 점성술, 수비학, 타로, MBTI를 교차 분석해서 당신의 운명 교차점을 찾아드립니다.",
+    images: ["/og.png"],
   },
   robots: {
     index: true,

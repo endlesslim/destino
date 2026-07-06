@@ -377,30 +377,61 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
         {couponMessage && (
           <p style={{ fontSize: "13px", color: "var(--seal)", textAlign: "center" }}>{couponMessage}</p>
         )}
+        {/* 구분선 */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", margin: "4px 0" }}>
+          <div style={{ flex: 1, height: 1, background: "var(--ink-ghost)" }} />
+          <span style={{ fontSize: "11px", color: "var(--ink-light)", whiteSpace: "nowrap" }}>
+            아직 코드가 없다면
+          </span>
+          <div style={{ flex: 1, height: 1, background: "var(--ink-ghost)" }} />
+        </div>
+
         {CONTACT_URL ? (
           <a
             href={CONTACT_URL}
             target="_blank"
             rel="noreferrer"
+            onClick={() => track("payment_click")}
             style={{
               width: "100%",
               textAlign: "center",
-              padding: "13px 0",
-              fontSize: "14px",
-              fontWeight: 700,
+              padding: "15px 0",
+              fontSize: "15px",
+              fontWeight: 800,
               borderRadius: "12px",
-              border: "1.5px solid var(--ink)",
-              color: "var(--ink)",
+              border: "none",
+              color: "#191919",
               textDecoration: "none",
-              background: "transparent",
+              background: "#FAE100",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
             }}
           >
-            코드가 없다면 구매 문의하기
+            💬 카카오톡으로 구매 문의하기
           </a>
         ) : (
-          <p style={{ fontSize: "12px", color: "var(--ink-light)", textAlign: "center" }}>
-            코드는 구매 시 카카오톡으로 보내드립니다
-          </p>
+          <div
+            style={{
+              width: "100%",
+              padding: "13px 16px",
+              fontSize: "13px",
+              lineHeight: 1.65,
+              borderRadius: "12px",
+              border: "1.5px dashed var(--border-strong)",
+              background: "var(--bg-paper)",
+              color: "var(--ink-medium)",
+              textAlign: "center",
+            }}
+          >
+            <strong style={{ color: "var(--ink)" }}>구매를 원하시면</strong>
+            <br />
+            보고 계신 당근 채팅방에{" "}
+            <strong style={{ color: "var(--seal)" }}>&ldquo;전체 리포트&rdquo;</strong>
+            라고 보내주세요
+            <br />
+            <span style={{ fontSize: "12px", color: "var(--ink-light)" }}>
+              입금 확인 즉시 열람 코드를 보내드립니다 (보통 10분 이내)
+            </span>
+          </div>
         )}
       </div>
     );
