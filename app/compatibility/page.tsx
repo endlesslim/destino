@@ -8,6 +8,7 @@ import Divider from "@/components/ui/Divider";
 import Nav from "@/components/Nav";
 import ScrollReveal from "@/components/ScrollReveal";
 import { analyzeCompatibility, type CompatibilityResult } from "@/lib/compatibility";
+import CompatGate from "@/components/CompatGate";
 import { OHANG_INFO, type Ohang } from "@/lib/saju";
 import { playStampSound } from "@/lib/sound";
 import Dot from "@/components/ui/Dot";
@@ -16,6 +17,93 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { SajuIcon, AstroIcon, NumeroIcon, MBTIIcon, FaceIcon, TarotIcon, SystemIcon, StarIcon, TwinMoonsIcon } from "@/components/ui/SystemIcons";
 import { useCountUp } from "@/hooks/useCountUp";
 import Footer from "@/components/Footer";
+
+// ━━━ AI 맞춤 궁합 해석 ━━━
+function AICompatInterpretation({ result, p1Name, p2Name }: { result: CompatibilityResult; p1Name?: string; p2Name?: string }) {
+  const [interpretation, setInterpretation] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const fetched = useRef(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (fetched.current) return;
+    // 봉인 미리보기 안에서는 AI 호출 생략 — 해제 후에만 과금 발생
+    if (rootRef.current?.closest('[data-gated="true"]')) return;
+    fetched.current = true;
+
+    const summary = {
+      p1: {
+        name: p1Name || undefined,
+        ilgan: result.person1.saju.day.cheongan,
+        ohang: result.person1.saju.day.ohang,
+        sunSign: result.person1.western.sunSign.name,
+        element: result.person1.western.element,
+        lifePath: result.person1.numerology.lifePath,
+        mbti: result.person1.mbti?.primaryType,
+      },
+      p2: {
+        name: p2Name || undefined,
+        ilgan: result.person2.saju.day.cheongan,
+        ohang: result.person2.saju.day.ohang,
+        sunSign: result.person2.western.sunSign.name,
+        element: result.person2.western.element,
+        lifePath: result.person2.numerology.lifePath,
+        mbti: result.person2.mbti?.primaryType,
+      },
+      overallScore: result.overallScore,
+      archetype: result.archetype,
+      relation: result.elementRelation.relation,
+      sharedTraits: result.sharedTraits,
+      tensionTraits: result.tensionTraits,
+    };
+
+    fetch("/api/compat-interpret", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(summary),
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error("failed");
+        return r.json();
+      })
+      .then((d) => setInterpretation(d.interpretation))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, [result, p1Name, p2Name]);
+
+  return (
+    <div
+      ref={rootRef}
+      className="rounded-[14px] p-6 mb-3.5"
+      style={{ background: "var(--bg-white)", border: "1.5px solid var(--border)" }}
+    >
+      <SectionHeader
+        color="var(--seal)"
+        title="AI 맞춤 궁합 해석"
+        subtitle="두 사람의 데이터 조합에서만 나오는 해석"
+        icon={<TwinMoonsIcon color="var(--seal)" size={14} />}
+      />
+      {loading && (
+        <div className="space-y-2.5">
+          {[92, 100, 96, 88].map((w, i) => (
+            <div key={i} className="h-3.5 rounded animate-pulse" style={{ width: `${w}%`, background: "var(--bg-warm)" }} />
+          ))}
+        </div>
+      )}
+      {error && (
+        <p className="text-sm leading-[1.8]" style={{ color: "var(--ink-muted)" }}>
+          해석을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.
+        </p>
+      )}
+      {interpretation && (
+        <p className="text-[15px] leading-[1.9]" style={{ fontFamily: "var(--font-display)", color: "var(--ink-medium)" }}>
+          {interpretation}
+        </p>
+      )}
+    </div>
+  );
+}
 
 // ━━━ 특성 분석 그룹 (공유·보완·긴장) ━━━
 // color는 alpha 접미사를 붙이므로 CSS 변수가 아닌 hex 값이어야 함
@@ -1183,6 +1271,14 @@ function CompatibilityPageInner() {
               </div>
             </ScrollReveal>
 
+            {/* ━━━ 심층 리포트 (봉인 구간) — 타임라인·소통·갈등·특성·조언·AI 해석 ━━━ */}
+            <CompatGate
+              pairKey={`${year1}-${month1}-${day1}_${year2}-${month2}-${day2}`}
+              p1Name={name1.trim() || undefined}
+              p2Name={name2.trim() || undefined}
+              archetype={result.archetype}
+            >
+
             {/* ━━━ 5. 관계 타임라인 ━━━ */}
             <ScrollReveal delay={480}>
               <div
@@ -1501,7 +1597,16 @@ function CompatibilityPageInner() {
               </div>
             </ScrollReveal>
 
-            {/* ━━━ 9.5. Marriage CTA ━━━ */}
+            {/* ━━━ 9.9. AI 맞춤 궁합 해석 (봉인 구간 마지막) ━━━ */}
+            <ScrollReveal delay={840}>
+              <AICompatInterpretation
+                result={result}
+                p1Name={name1.trim() || undefined}
+                p2Name={name2.trim() || undefined}
+              />
+            </ScrollReveal>
+
+            {/* ━━━ Marriage CTA — 해제자 전용 보너스 ━━━ */}
             <ScrollReveal delay={860}>
               <Link
                 href={`/marriage?y1=${year1}&m1=${month1}&d1=${day1}&y2=${year2}&m2=${month2}&d2=${day2}${name1 ? `&n1=${encodeURIComponent(name1)}` : ""}${name2 ? `&n2=${encodeURIComponent(name2)}` : ""}`}
@@ -1527,6 +1632,8 @@ function CompatibilityPageInner() {
                 </svg>
               </Link>
             </ScrollReveal>
+
+            </CompatGate>
 
             {/* ━━━ 10. Share ━━━ */}
             <ScrollReveal delay={880}>

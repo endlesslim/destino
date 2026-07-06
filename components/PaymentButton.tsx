@@ -32,6 +32,8 @@ declare global {
 
 interface PaymentButtonProps {
   onPaymentComplete: (accessToken: string, referralCode?: string | null) => void;
+  /** 구매 안내 문구에 쓰일 상품명 (기본: 전체 리포트) */
+  productLabel?: string;
 }
 
 /** 다이아몬드 아이콘 SVG (이모지 대신 인라인 SVG 사용) */
@@ -121,7 +123,7 @@ function Spinner() {
   );
 }
 
-export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps) {
+export default function PaymentButton({ onPaymentComplete, productLabel = "전체 리포트" }: PaymentButtonProps) {
   const [status, setStatus] = useState<
     "idle" | "loading-sdk" | "paying" | "verifying" | "error"
   >("idle");
@@ -425,7 +427,7 @@ export default function PaymentButton({ onPaymentComplete }: PaymentButtonProps)
             <strong style={{ color: "var(--ink)" }}>구매를 원하시면</strong>
             <br />
             보고 계신 당근 채팅방에{" "}
-            <strong style={{ color: "var(--seal)" }}>&ldquo;전체 리포트&rdquo;</strong>
+            <strong style={{ color: "var(--seal)" }}>&ldquo;{productLabel}&rdquo;</strong>
             라고 보내주세요
             <br />
             <span style={{ fontSize: "12px", color: "var(--ink-light)" }}>
