@@ -107,7 +107,7 @@ ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow anonymous insert" ON coupons FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow anonymous select" ON coupons FOR SELECT USING (true);
 -- 미사용 쿠폰만 사용 처리 가능
-CREATE POLICY "Allow mark used" ON coupons FOR UPDATE USING (used_at IS NULL);
+CREATE POLICY "Allow mark used" ON coupons FOR UPDATE USING (used_at IS NULL) WITH CHECK (true);
 
 -- ━━━ 대시보드 조회 정책 ━━━
 -- 권장: Vercel 환경변수에 SUPABASE_SERVICE_ROLE_KEY를 설정하면 아래 정책 없이도
