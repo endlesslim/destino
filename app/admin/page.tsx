@@ -27,6 +27,116 @@ interface Stats {
 
 const KEY_STORAGE = "destino_admin_key";
 
+// ━━━ 고객 여정 흐름 그래프 (sankey식 SVG) ━━━
+const JOURNEY_SHORT_LABELS: Record<string, string> = {
+  visit_analyze: "방문",
+  analyze_submit: "분석 실행",
+  result_view: "결과 확인",
+  paywall_view: "페이월 도달",
+  payment_click: "구매 문의",
+  payment_done: "결제 완료",
+};
+
+function JourneyFlow({ funnel }: { funnel: Array<{ step: string; label: string; sessions: number }> }) {
+  const W = 720;
+  const H = 230;
+  const PAD_X = 46;
+  const CY = 92; // 밴드 중심선
+  const MAX_HALF = 58; // 최대 밴드 반높이
+  const n = funnel.length;
+  const max = Math.max(...funnel.map((f) => f.sessions));
+
+  if (max === 0) {
+    return (
+      <p className="text-sm" style={{ color: "var(--ink-faint)" }}>
+        아직 여정 데이터가 없습니다. 방문자가 생기면 흐름이 그려집니다.
+      </p>
+    );
+  }
+
+  const xAt = (i: number) => PAD_X + (i * (W - PAD_X * 2)) / (n - 1);
+  const halfAt = (s: number) => (s <= 0 ? 1.5 : Math.max(4, (s / max) * MAX_HALF));
+
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", minWidth: 560, display: "block" }}>
+        {/* 흐름 밴드 */}
+        {funnel.slice(0, -1).map((f, i) => {
+          const next = funnel[i + 1];
+          const x1 = xAt(i);
+          const x2 = xAt(i + 1);
+          const mx = (x1 + x2) / 2;
+          const h1 = halfAt(f.sessions);
+          const h2 = halfAt(next.sessions);
+          const dropped = Math.max(0, f.sessions - next.sessions);
+          const convRate = f.sessions > 0 ? Math.round((next.sessions / f.sessions) * 100) : 0;
+          return (
+            <g key={f.step}>
+              <path
+                d={`M ${x1} ${CY - h1} C ${mx} ${CY - h1}, ${mx} ${CY - h2}, ${x2} ${CY - h2} L ${x2} ${CY + h2} C ${mx} ${CY + h2}, ${mx} ${CY + h1}, ${x1} ${CY + h1} Z`}
+                fill="var(--seal)"
+                opacity={0.78 - i * 0.11}
+              />
+              {/* 전환율 (밴드 위) */}
+              <text
+                x={mx}
+                y={CY - Math.max(h1, h2) - 8}
+                textAnchor="middle"
+                fontSize="10.5"
+                fontWeight="700"
+                fill="var(--ink-muted)"
+              >
+                {convRate}%
+              </text>
+              {/* 이탈 (밴드 아래) */}
+              {dropped > 0 && (
+                <>
+                  <path
+                    d={`M ${mx - 4} ${CY + Math.max(h1, h2) + 6} L ${mx} ${CY + Math.max(h1, h2) + 13} L ${mx + 4} ${CY + Math.max(h1, h2) + 6}`}
+                    fill="none"
+                    stroke="#C0392B"
+                    strokeWidth="1.3"
+                  />
+                  <text
+                    x={mx}
+                    y={CY + Math.max(h1, h2) + 26}
+                    textAnchor="middle"
+                    fontSize="10"
+                    fontWeight="600"
+                    fill="#C0392B"
+                  >
+                    −{dropped} 이탈
+                  </text>
+                </>
+              )}
+            </g>
+          );
+        })}
+
+        {/* 단계 노드 */}
+        {funnel.map((f, i) => {
+          const x = xAt(i);
+          const h = halfAt(f.sessions);
+          return (
+            <g key={f.step}>
+              <line x1={x} y1={CY - h - 3} x2={x} y2={CY + h + 3} stroke="var(--ink)" strokeWidth="2.5" strokeLinecap="round" />
+              <text x={x} y={CY - h - 24} textAnchor="middle" fontSize="16" fontWeight="800" fill="var(--ink)" fontFamily="var(--font-display)">
+                {f.sessions}
+              </text>
+              <text x={x} y={H - 32} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--ink-medium)">
+                {JOURNEY_SHORT_LABELS[f.step] || f.label}
+              </text>
+              <text x={x} y={H - 18} textAnchor="middle" fontSize="9" fill="var(--ink-faint)">
+                {i + 1}단계
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
 /**
  * 열람 코드 일괄 생성 도구 — 판매 자동화의 기본 수단.
  * 미리 뽑아두고 입금 확인 시 목록에서 하나 복사해 보내면 끝.
@@ -397,6 +507,20 @@ export default function AdminPage() {
               {stats.satisfaction.total === 0 && (
                 <p className="mt-3 text-sm" style={{ color: "var(--ink-faint)" }}>아직 수집된 피드백이 없습니다.</p>
               )}
+            </section>
+
+            {/* ── 고객 여정 흐름 ── */}
+            <section className="mb-10">
+              <h2 className="mb-1 text-lg font-bold" style={{ color: "var(--ink)" }}>고객 여정</h2>
+              <p className="mb-4 text-xs" style={{ color: "var(--ink-faint)" }}>
+                방문부터 결제까지의 흐름 — 밴드가 좁아지는 곳이 이탈 지점입니다
+              </p>
+              <div
+                className="rounded-[12px] p-4"
+                style={{ background: "var(--bg-white)", border: "1px solid var(--border)" }}
+              >
+                <JourneyFlow funnel={stats.funnel} />
+              </div>
             </section>
 
             {/* ── 퍼널 ── */}
