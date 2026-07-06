@@ -176,8 +176,13 @@ function UnlockCodesTool({ adminKey }: { adminKey: string }) {
     });
   }
 
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://destino-mocha.vercel.app";
+
   const customerMsg = (code: string) =>
-    `입금 확인되었습니다. 감사합니다 🙏\n\n1) destino에서 생년월일을 입력해 무료 분석을 받아보세요\n2) 결과 하단의 "구매하신 열람 코드나 쿠폰이 있으신가요?"에 아래 코드를 입력하시면 전체 리포트가 열립니다\n\n열람 코드: ${code}\n\n· 코드를 입력하신 순간부터 24시간 동안 보실 수 있어요\n· 리포트 하단의 "PDF로 저장"을 누르시면 평생 소장하실 수 있어요`;
+    `입금 확인되었습니다. 감사합니다 🙏\n\n1) 아래 링크에서 생년월일을 입력해 무료 분석을 받아보세요\n${SITE_URL}/analyze\n\n2) 결과 하단의 "열람 코드를 받으셨나요?"에 아래 코드를 입력하시면 전체 리포트가 열립니다\n\n열람 코드: ${code}\n\n· 코드를 입력하신 순간부터 24시간 동안 보실 수 있어요\n· 리포트 하단의 "PDF로 저장"을 누르시면 평생 소장하실 수 있어요`;
+
+  const compatMsg = (code: string) =>
+    `입금 확인되었습니다. 감사합니다 🙏\n\n1) 아래 링크에서 두 분의 생년월일을 입력해 무료 궁합을 받아보세요\n${SITE_URL}/compatibility\n\n2) 결과 아래 "열람 코드를 받으셨나요?"에 아래 코드를 입력하시면 심층 리포트(타임라인·소통법·갈등 해법·AI 해석)가 열립니다\n\n열람 코드: ${code}\n\n· 코드를 입력하신 순간부터 24시간 동안 보실 수 있어요\n· 열람 후 "결혼 궁합 심화 분석"도 무료로 이용하실 수 있어요`;
 
   return (
     <section className="mb-10">
@@ -247,7 +252,18 @@ function UnlockCodesTool({ adminKey }: { adminKey: string }) {
                     background: "var(--bg-white)",
                   }}
                 >
-                  {copied === c + "-msg" ? "✓" : "카톡 문구"}
+                  {copied === c + "-msg" ? "✓" : "개인 문구"}
+                </button>
+                <button
+                  onClick={() => copy(compatMsg(c), c + "-cmsg")}
+                  className="rounded border px-2.5 py-1.5 text-[11px] font-bold"
+                  style={{
+                    borderColor: copied === c + "-cmsg" ? "#2D5A27" : "var(--ink-ghost)",
+                    color: copied === c + "-cmsg" ? "#2D5A27" : "var(--ink-medium)",
+                    background: "var(--bg-white)",
+                  }}
+                >
+                  {copied === c + "-cmsg" ? "✓" : "궁합 문구"}
                 </button>
               </div>
             ))}
