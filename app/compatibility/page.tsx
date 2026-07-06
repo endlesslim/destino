@@ -425,7 +425,7 @@ function CompatibilityPageInner() {
                 <input
                   className={inputClass}
                   style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)" }}
-                  placeholder="예: 길동"
+                  placeholder="예: 홍길동"
                   value={name1}
                   onChange={(e) => setName1(e.target.value)}
                   onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
@@ -530,7 +530,7 @@ function CompatibilityPageInner() {
                 <input
                   className={inputClass}
                   style={{ background: "var(--bg-paper)", border: "2px solid var(--border)", color: "var(--ink)" }}
-                  placeholder="예: 영희"
+                  placeholder="예: 김영희"
                   value={name2}
                   onChange={(e) => setName2(e.target.value)}
                   onFocus={(e) => (e.target.style.borderColor = "var(--seal)")}
