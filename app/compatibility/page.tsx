@@ -17,26 +17,87 @@ import { SajuIcon, AstroIcon, NumeroIcon, MBTIIcon, FaceIcon, TarotIcon, SystemI
 import { useCountUp } from "@/hooks/useCountUp";
 import Footer from "@/components/Footer";
 
-// ━━━ 칩 컴포넌트 ━━━
-function Chip({
-  label,
-  color = "var(--ink-muted)",
-  bg,
+// ━━━ 특성 분석 그룹 (공유·보완·긴장) ━━━
+// color는 alpha 접미사를 붙이므로 CSS 변수가 아닌 hex 값이어야 함
+function TraitGroup({
+  hanja,
+  title,
+  desc,
+  traits,
+  color,
 }: {
-  label: string;
-  color?: string;
-  bg?: string;
+  hanja: string;
+  title: string;
+  desc: string;
+  traits: string[];
+  color: string;
 }) {
   return (
-    <span
-      className="inline-block px-3 py-1 rounded-full text-xs font-semibold"
-      style={{
-        color,
-        background: bg || `${color}12`,
-      }}
+    <div
+      className="rounded-[10px] p-4 mb-3 last:mb-0"
+      style={{ background: `${color}08`, border: `1px solid ${color}20` }}
     >
-      {label}
-    </span>
+      <div className="flex items-start gap-3">
+        <span
+          className="w-8 h-8 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0"
+          style={{
+            background: `${color}12`,
+            color,
+            border: `1px solid ${color}30`,
+            fontFamily: "var(--font-display)",
+          }}
+        >
+          {hanja}
+        </span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[13.5px] font-bold" style={{ color: "var(--ink)" }}>
+              {title}
+            </span>
+            <span
+              className="text-[10px] font-bold px-1.5 rounded-full leading-[16px]"
+              style={{ background: `${color}14`, color }}
+            >
+              {traits.length}
+            </span>
+          </div>
+          <p className="text-[12.5px] leading-relaxed mt-0.5" style={{ color: "var(--ink-muted)" }}>
+            {desc}
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-1.5 mt-3 pl-11">
+        {traits.map((t) => {
+          const isVs = t.includes(" vs ");
+          const isPair = t.includes(" + ");
+          const parts = isVs ? t.split(" vs ") : isPair ? t.split(" + ") : [t];
+          return (
+            <span
+              key={t}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold"
+              style={{
+                background: "var(--bg-white)",
+                border: `1.5px solid ${color}38`,
+                color: "var(--ink-medium)",
+                boxShadow: "0 1px 2px rgba(28,25,23,0.05)",
+              }}
+            >
+              {parts.length === 2 ? (
+                <>
+                  <span>{parts[0]}</span>
+                  <span className="text-[10px] font-bold" style={{ color }}>
+                    {isVs ? "vs" : "⇄"}
+                  </span>
+                  <span>{parts[1]}</span>
+                </>
+              ) : (
+                t
+              )}
+            </span>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -1317,59 +1378,46 @@ function CompatibilityPageInner() {
 
                 {/* Shared */}
                 {result.sharedTraits.length > 0 && (
-                  <div className="mb-4">
-                    <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
-                      공유 특성
-                    </div>
-                    <p className="text-[14px] mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                      두 사람이 함께 가지고 있는 특성. 공감의 기반이자 관계의 뿌리입니다.
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {result.sharedTraits.map((t) => (
-                        <Chip key={t} label={t} color="var(--saju)" />
-                      ))}
-                    </div>
-                  </div>
+                  <TraitGroup
+                    hanja="同"
+                    title="공유 특성"
+                    desc="두 사람이 함께 가지고 있는 특성. 공감의 기반이자 관계의 뿌리입니다."
+                    traits={result.sharedTraits}
+                    color="#2D5A27"
+                  />
                 )}
 
                 {/* Complementary */}
                 {result.complementaryTraits.length > 0 && (
-                  <div className="mb-4">
-                    <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
-                      상호보완 특성
-                    </div>
-                    <p className="text-[14px] mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                      한쪽이 부족한 것을 다른 쪽이 채워주는 조합. 함께할 때 더 완전해집니다.
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {result.complementaryTraits.map((t) => (
-                        <Chip key={t} label={t} color="var(--astro)" />
-                      ))}
-                    </div>
-                  </div>
+                  <TraitGroup
+                    hanja="補"
+                    title="상호보완 특성"
+                    desc="한쪽이 부족한 것을 다른 쪽이 채워주는 조합. 함께할 때 더 완전해집니다."
+                    traits={result.complementaryTraits}
+                    color="#1E3A5F"
+                  />
                 )}
 
                 {/* Tension */}
                 {result.tensionTraits.length > 0 && (
-                  <div>
-                    <div className="text-[11px] font-semibold tracking-wider mb-2" style={{ color: "var(--ink-light)" }}>
-                      긴장 포인트
-                    </div>
-                    <p className="text-[14px] mb-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                      에너지가 충돌하는 지점. 갈등의 씨앗이지만, 잘 다루면 성장의 촉매가 됩니다.
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {result.tensionTraits.map((t) => (
-                        <Chip key={t} label={t} color="var(--face)" />
-                      ))}
-                    </div>
-                  </div>
+                  <TraitGroup
+                    hanja="衝"
+                    title="긴장 포인트"
+                    desc="에너지가 충돌하는 지점. 갈등의 씨앗이지만, 잘 다루면 성장의 촉매가 됩니다."
+                    traits={result.tensionTraits}
+                    color="#8B6914"
+                  />
                 )}
 
                 {result.sharedTraits.length === 0 && result.complementaryTraits.length === 0 && result.tensionTraits.length === 0 && (
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                    두 사람의 특성이 각자의 고유한 영역에서 발현됩니다. 겹치는 부분이 적다는 것은 서로에게 새로운 시각을 줄 수 있다는 의미입니다.
-                  </p>
+                  <div
+                    className="rounded-[10px] p-4"
+                    style={{ background: "var(--bg-paper)", border: "1px solid var(--border)" }}
+                  >
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+                      두 사람의 특성이 각자의 고유한 영역에서 발현됩니다. 겹치는 부분이 적다는 것은 서로에게 새로운 시각을 줄 수 있다는 의미입니다.
+                    </p>
+                  </div>
                 )}
               </div>
             </ScrollReveal>
