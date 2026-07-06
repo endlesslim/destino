@@ -169,73 +169,162 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center">
       {/* ━━━ 1. Hero ━━━ */}
       <section
-        className="w-full flex flex-col items-center px-6 pt-24 pb-24"
+        className="w-full flex flex-col items-center px-6 pt-16 pb-16 md:pt-24 md:pb-20"
         style={{ background: "var(--bg-paper)" }}
       >
-        <div className="w-full max-w-[440px] flex flex-col items-center text-center gap-6 animate-fade-up">
-          <Seal size="lg" char="命" className="animate-seal-pop" />
+        <div className="w-full max-w-[980px] flex flex-col md:flex-row items-center gap-12 md:gap-14">
+          {/* 카피 컬럼 */}
+          <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left gap-6 animate-fade-up">
+            <div className="flex items-center gap-3">
+              <Seal size="md" char="命" className="animate-seal-pop" />
+              <p
+                className="text-sm font-black tracking-[0.15em] uppercase"
+                style={{ color: "var(--ink-light)", fontFamily: "var(--font-display)" }}
+              >
+                DESTINO
+              </p>
+            </div>
 
-          <p
-            className="text-sm font-black tracking-[0.15em] uppercase"
-            style={{
-              color: "var(--ink-light)",
-              fontFamily: "var(--font-display)",
-            }}
-          >
-            DESTINO
-          </p>
-
-          <h1
-            className="text-[46px] font-black leading-[1.15] tracking-[-0.02em]"
-            style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
-          >
-            사주도 별자리도
-            <br />
-            <span style={{ color: "var(--seal)" }}>같은 답</span>이라면
-          </h1>
-
-          <p
-            className="text-[15px] leading-[1.9] text-pretty max-w-[340px]"
-            style={{ color: "var(--ink-medium)" }}
-          >
-            사주명리학 3,000년, 서양 점성술 4,000년, 수비학 2,500년.
-            서로 만난 적 없는 이 풀이들이
-            당신에 대해 같은 답을 내리는 지점이 있습니다.
-          </p>
-
-          <div className="flex flex-col gap-3 w-full mt-2">
-            <Link
-              href="/analyze"
-              className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg btn-stamp"
-              style={{
-                background: "var(--seal)",
-                color: "#fff",
-                fontFamily: "var(--font-display)",
-                boxShadow: "0 4px 16px var(--shadow-btn)",
-              }}
+            <h1
+              className="text-[42px] md:text-[50px] font-black leading-[1.15] tracking-[-0.02em]"
+              style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}
             >
-              무료로 분석하기
-            </Link>
-            <Link
-              href="/compatibility"
-              className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-colors"
-              style={{
-                border: "2px solid var(--ink)",
-                color: "var(--ink)",
-                background: "transparent",
-                fontFamily: "var(--font-display)",
-              }}
+              사주도 별자리도
+              <br />
+              <span style={{ color: "var(--seal)" }}>같은 답</span>이라면
+            </h1>
+
+            <p
+              className="text-[15px] leading-[1.9] text-pretty max-w-[380px]"
+              style={{ color: "var(--ink-medium)" }}
             >
-              궁합 분석하기
-            </Link>
+              사주명리학 3,000년, 서양 점성술 4,000년, 수비학 2,500년.
+              서로 만난 적 없는 이 풀이들이
+              당신에 대해 같은 답을 내리는 지점이 있습니다.
+              생년월일 하나로, 그 겹치는 지점만 보여드립니다.
+            </p>
+
+            <div className="flex flex-col gap-3 w-full max-w-[360px] mt-2">
+              <Link
+                href="/analyze"
+                className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg btn-stamp"
+                style={{
+                  background: "var(--seal)",
+                  color: "#fff",
+                  fontFamily: "var(--font-display)",
+                  boxShadow: "0 4px 16px var(--shadow-btn)",
+                }}
+              >
+                무료로 분석하기
+              </Link>
+              <Link
+                href="/compatibility"
+                className="w-full py-3.5 text-center text-[15px] font-bold tracking-wide rounded-lg transition-colors"
+                style={{
+                  border: "2px solid var(--ink)",
+                  color: "var(--ink)",
+                  background: "transparent",
+                  fontFamily: "var(--font-display)",
+                }}
+              >
+                궁합 분석하기
+              </Link>
+            </div>
+
+            {/* 신뢰 스트립 */}
+            <div
+              className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-1 text-[12px] font-semibold"
+              style={{ color: "var(--ink-light)" }}
+            >
+              <span>✓ 회원가입 없음</span>
+              <span>✓ 30초 무료 분석</span>
+              <span>✓ 6개 체계 교차 검증</span>
+            </div>
           </div>
 
-          {/* Scroll indicator */}
-          <div className="flex justify-center mt-8 animate-bounce" style={{ opacity: 0.3 }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12l7 7 7-7" stroke="var(--ink-light)" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
+          {/* 결과 미리보기 카드 컬럼 */}
+          <div className="flex-1 flex justify-center animate-fade-up" style={{ animationDelay: "0.15s" }}>
+            <div
+              aria-hidden="true"
+              className="w-full max-w-[330px] rounded-[16px] p-5 rotate-[1.5deg]"
+              style={{
+                background: "var(--bg-white)",
+                border: "1.5px solid var(--border)",
+                boxShadow: "0 18px 44px rgba(28,25,23,0.12), 0 2px 8px rgba(28,25,23,0.06)",
+              }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="flex items-center gap-1.5 text-[11px] font-bold" style={{ color: "var(--seal)" }}>
+                  <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "var(--seal)" }} />
+                  교차점
+                </span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--bg-warm)", color: "var(--ink-light)" }}>
+                  분석 결과 미리보기
+                </span>
+              </div>
+
+              <div className="text-center mb-3">
+                <span
+                  className="text-[56px] font-black leading-none"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--seal)" }}
+                >
+                  95<span className="text-[24px]">%</span>
+                </span>
+                <div className="text-[13px] font-bold mt-1" style={{ color: "var(--seal-dark)" }}>
+                  상생의 조화
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex-1 rounded-lg p-3 text-center" style={{ background: "var(--bg-paper)" }}>
+                  <div className="text-[10px] font-semibold mb-0.5" style={{ color: "var(--face)" }}>● 동양</div>
+                  <div className="text-[20px] font-black" style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}>甲木</div>
+                  <div className="text-[10px]" style={{ color: "var(--ink-light)" }}>사주 · 큰 나무</div>
+                </div>
+                <span className="text-[14px]" style={{ color: "var(--ink-faint)" }}>↔</span>
+                <div className="flex-1 rounded-lg p-3 text-center" style={{ background: "var(--bg-paper)" }}>
+                  <div className="text-[10px] font-semibold mb-0.5" style={{ color: "var(--astro)" }}>● 서양</div>
+                  <div className="text-[20px] font-black" style={{ fontFamily: "var(--font-display)", color: "var(--ink)" }}>물병자리</div>
+                  <div className="text-[10px]" style={{ color: "var(--ink-light)" }}>Air · 바람</div>
+                </div>
+              </div>
+
+              <div
+                className="rounded-[10px] px-4 py-3 -rotate-[0.5deg]"
+                style={{ background: "var(--seal-bg)", border: "1.5px solid var(--seal)" }}
+              >
+                <div className="text-[10px] font-semibold mb-0.5" style={{ color: "var(--ink-light)" }}>교차점 유형</div>
+                <div
+                  className="text-[20px] font-black"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--seal-dark)" }}
+                >
+                  조용한 예언자
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
+                {["통찰력", "독립성", "직관"].map((t) => (
+                  <span
+                    key={t}
+                    className="px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                    style={{ background: "var(--bg-white)", border: "1.5px solid rgba(45,90,39,0.25)", color: "var(--ink-medium)" }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="flex flex-col items-center gap-1 mt-14 animate-bounce" style={{ opacity: 0.45 }}>
+          <span className="text-[11px] font-semibold" style={{ color: "var(--ink-light)" }}>
+            교차점이란?
+          </span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12l7 7 7-7" stroke="var(--ink-light)" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
         </div>
       </section>
 
