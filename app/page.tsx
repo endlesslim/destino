@@ -246,7 +246,7 @@ export default function Home() {
           <div className="flex-1 flex justify-center animate-fade-up" style={{ animationDelay: "0.15s" }}>
             <div
               aria-hidden="true"
-              className="w-full max-w-[330px] rounded-[16px] p-5 rotate-[1.5deg]"
+              className="w-full max-w-[330px] rounded-[16px] p-5"
               style={{
                 background: "var(--bg-white)",
                 border: "1.5px solid var(--border)",
@@ -290,7 +290,7 @@ export default function Home() {
               </div>
 
               <div
-                className="rounded-[10px] px-4 py-3 -rotate-[0.5deg]"
+                className="rounded-[10px] px-4 py-3"
                 style={{ background: "var(--seal-bg)", border: "1.5px solid var(--seal)" }}
               >
                 <div className="text-[10px] font-semibold mb-0.5" style={{ color: "var(--ink-light)" }}>교차점 유형</div>
