@@ -128,7 +128,7 @@ export default function CompatGate({ pairKey, p1Name, p2Name, archetype, childre
   return (
     <div style={{ position: "relative" }}>
       {/* 봉인된 심층 리포트 실루엣 */}
-      <div aria-hidden="true" style={{ maxHeight: "380px", overflow: "hidden", position: "relative" }}>
+      <div aria-hidden="true" style={{ maxHeight: "200px", overflow: "hidden", position: "relative" }}>
         <div data-gated="true" style={{ filter: "blur(7px)", userSelect: "none", pointerEvents: "none" }}>
           {children}
         </div>
@@ -138,7 +138,7 @@ export default function CompatGate({ pairKey, p1Name, p2Name, archetype, childre
             bottom: 0,
             left: 0,
             right: 0,
-            height: 240,
+            height: 140,
             background: "linear-gradient(transparent, var(--bg-paper) 85%)",
             pointerEvents: "none",
           }}
@@ -150,8 +150,8 @@ export default function CompatGate({ pairKey, p1Name, p2Name, archetype, childre
         style={{
           position: "relative",
           zIndex: 10,
-          marginTop: "-90px",
-          padding: "40px 20px",
+          marginTop: "-55px",
+          padding: "20px 20px 40px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

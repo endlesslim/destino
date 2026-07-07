@@ -288,7 +288,7 @@ export default function PaymentGate({ result, archetype, children }: PaymentGate
       <div
         aria-hidden="true"
         style={{
-          maxHeight: "400px",
+          maxHeight: "210px",
           overflow: "hidden",
           position: "relative",
         }}
@@ -311,7 +311,7 @@ export default function PaymentGate({ result, archetype, children }: PaymentGate
             bottom: 0,
             left: 0,
             right: 0,
-            height: 260,
+            height: 150,
             background: "linear-gradient(transparent, var(--bg-paper) 85%)",
             pointerEvents: "none",
           }}
@@ -323,8 +323,8 @@ export default function PaymentGate({ result, archetype, children }: PaymentGate
         style={{
           position: "relative",
           zIndex: 10,
-          marginTop: "-100px",
-          padding: "40px 20px",
+          marginTop: "-60px",
+          padding: "20px 20px 40px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
