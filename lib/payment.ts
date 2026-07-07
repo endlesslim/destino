@@ -72,3 +72,6 @@ export const PAYMENT_ENABLED = !!process.env.NEXT_PUBLIC_PORTONE_STORE_ID;
 
 /** 수동 판매 문의 링크 (카카오 오픈채팅 등). 미설정 시 문의 버튼 숨김 */
 export const CONTACT_URL = process.env.NEXT_PUBLIC_CONTACT_URL || "";
+
+/** 수동 판매용 입금 계좌 — 예: "카카오뱅크 3333-01-1234567 홍길동" (미설정 시 채팅 안내로 대체) */
+export const BANK_INFO = process.env.NEXT_PUBLIC_BANK_INFO || "";

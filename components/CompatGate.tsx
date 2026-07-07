@@ -199,7 +199,8 @@ export default function CompatGate({ pairKey, p1Name, p2Name, archetype, childre
           </div>
         </div>
 
-        <PaymentButton onPaymentComplete={handlePaymentComplete} productLabel="궁합 리포트" />
+        {/* price: 표시용(수동 모드) — PortOne 실결제 전환 시 서버 검증 금액도 상품별 분기 필요 */}
+        <PaymentButton onPaymentComplete={handlePaymentComplete} productLabel="궁합 리포트" price={9900} />
 
         <ul
           style={{
